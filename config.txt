@@ -18,7 +18,7 @@ class Config {
   boolean ON_DRAG_ONLY = true
   int EYE_MOTION_SPEED = 30
   boolean FORCED_PROGRESS = false
-  String MOTION_CONTROLLER = null // EyeTrackerFrame, TobiiReceiver, or RfcommServer
+  String MOTION_CONTROLLER = "RfcommServer" // null, EyeTrackerFrame, TobiiReceiver, or RfcommServer
 
   def OCTAVE_PROGRAM = [win: "octave-4.0.1.exe"]
 

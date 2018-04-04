@@ -36,6 +36,9 @@ public class RfcommServer implements MotionController {
     private Session session = null;
 
     private TargetMover tm;
+    
+    static int user = 1;
+    static int connected_user = 1;
 
     public RfcommServer() throws IOException {
         // RFCOMMベースのサーバの開始。
@@ -53,14 +56,15 @@ public class RfcommServer implements MotionController {
     }
 
     public void setTarget(TargetMover tm) {
-	this.tm = tm;
+	   this.tm = tm;
     }
     
     public void start() {
 	if (session == null) {
 	    throw new IllegalStateException("init() must be called in advance");
 	}
-        Thread thread = new Thread(session);
+        String user_name = String.valueOf(user);
+	Thread thread = new Thread(session, user_name);
         thread.start();
     }
 
@@ -68,10 +72,11 @@ public class RfcommServer implements MotionController {
       クライアントからの接続待ち。
      @return 接続されたたセッションを返す。*/
     public void init() throws IOException {
-        System.out.println("Accept");
-        StreamConnection channel = server.acceptAndOpen();//クライアントがくるまでここで待機
-        System.out.println("Connect");
-        session = new Session(channel);
+        	System.out.println("user"+user+"の接続を待っています");
+        	StreamConnection channel = server.acceptAndOpen();//クライアントがくるまでここで待機
+        	System.out.println("user"+user+"の接続が完了しました");
+        	session = new Session(channel);
+		user++;
     }
 
     /*
@@ -98,7 +103,8 @@ public class RfcommServer implements MotionController {
                 byte[] buff = new byte[2048];
                 int n = 0;
                 String[] element;
-
+		Thread thread = new Thread(String.valueOf(connected_user));
+		connected_user++;
                 while (true) {
                     n = btIn.read(buff);
                     /*
@@ -116,20 +122,21 @@ public class RfcommServer implements MotionController {
 			    long t = Long.parseLong(element[0]);
 			    float p = Float.parseFloat(element[1]);
 			    int evt = Integer.parseInt(element[2]);
-			    System.err.println("(time=" + t + ", position=" + p + ",attacktiming_switch=" + evt + ")");
-			    //                            synchronized(time) {
-			    //                                time.add(t);
-			    //                            }
-			    //                            synchronized(position) {
-			    //                                position.add(p);
-			    //                            }
-			    //                            synchronized(attacktiming_switch){
-			    //                                attacktiming_switch.add(Integer.parseInt(element[2]));
-			    //                            }
-			    tm.setTarget(0, tm.height() * (1.0 - p));
-			    if (evt != TargetMover.NO_EVENT) {
-				tm.sendEvent(evt);
+			    int user_number = Integer.parseInt(thread.getName());
+			    System.err.println("user"+user_number+": (time=" + t + ", position=" + p + ",attacktiming_switch=" + evt + ")");
+			      /*各ユーザのandroidから送信されたデータの格納処理
+			      user_numberの値に応じて各ユーザごとに分けてデータを処理すること
+			      は可能なのですが将来的にもっと多人数を想定する場合もう少し効率的な書き方をする必要が
+			      あるかもしれません*/
+			    if(user_number == 1){
+			    	tm.setTarget(0, tm.height() * (1.0 - p));
+				if (evt != TargetMover.NO_EVENT) {
+					tm.sendEvent(evt);
+			    	}
+			    }else{
+				/*2人目以降のユーザのTargetMoverに関する処理*/	
 			    }
+			    
                         }
 
 
@@ -164,31 +171,16 @@ public class RfcommServer implements MotionController {
         }
     }
 
+    
 
     //メインメソッド
     public static void main(String[] args) throws Exception {
 	RfcommServer server = new RfcommServer();
-	server.init();
-	server.start();
-	/*
-        while(true){
-                synchronized(time) {
-                    for (int i = 0; i < session.time.size(); i++) {
-                        System.out.println("time=" + time.get(i) + ",position=" + position.get(i)+",attacktiming_switch="+attacktiming_switch.get(i));
-
-                    }
-                    time.clear();
-                    position.clear();
-                    attacktiming_switch.clear();
-                }
-            try{
-                Thread.sleep(1000); //1秒Sleepする
-            }catch(InterruptedException e){}
-        }
-	*/
-
-
-
-
+	String user_name = "user";
+        //while (n < 3){ //接続するユーザ数 Todo:接続するユーザ数を選択できるようにするといいかも(今は2人) 
+            server.init();
+	    server.start();
+            user++;
+        //}	
     }
 }

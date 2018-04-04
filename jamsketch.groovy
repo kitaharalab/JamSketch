@@ -16,7 +16,7 @@ class JamSketch extends SimplePianoRoll implements TargetMover {
   boolean nowDrawing = false
   String username = ""
   static def CFG
-  
+
   void setup() {
     super.setup()
     size(1200, 700)
@@ -28,15 +28,14 @@ class JamSketch extends SimplePianoRoll implements TargetMover {
     setLabel("Reset").setPosition(160, 645).setSize(120, 40)
     p5ctrl.addButton("loadCurve").
     setLabel("Load").setPosition(300, 645).setSize(120, 40)
-
-
+    
     if (CFG.MOTION_CONTROLLER != null) {
       def ctrl = Class.forName(CFG.MOTION_CONTROLLER).newInstance()
       ctrl.setTarget(this)
       ctrl.init()
-      ctrl.start()
+      ctrl.start();
     }
-    
+
 /*
     if (TOBII) {
       def tobii = new TobiiReceiver(this)
@@ -58,8 +57,6 @@ if (EYE_TRACKER) {
       eyetracker.start(this)
     }
     */
-
-    inputName()
     
 }
 
@@ -70,8 +67,7 @@ if (EYE_TRACKER) {
     def part = data.scc.getFirstPartWithChannel(1)
     setDataModel(
       part.getPianoRollDataModel(
-	CFG.INITIAL_BLANK_MEASURES,
-	CFG.INITIAL_BLANK_MEASURES + CFG.NUM_OF_MEASURES
+	CFG.INITIAL_BLANK_MEASURES, CFG.INITIAL_BLANK_MEASURES + CFG.NUM_OF_MEASURES
       ))
   }
   
@@ -102,16 +98,7 @@ if (EYE_TRACKER) {
     if (CFG.FORCED_PROGRESS) {
       mouseX = beat2x(getCurrentMeasure()+1, getCurrentBeat());
     }
-    if (!CFG.ON_DRAG_ONLY && isInside(mouseX, mouseY)) {
-      updateCurve()
-    }
-    if (CFG.CURSOR_ENHANCED) {
-      fill(255, 0, 0)
-      ellipse(mouseX, mouseY, 10, 10)
-    }
-  }
-
-  void updateCurve() {
+    if ((!CFG.ON_DRAG_ONLY || nowDrawing) && isInside(mouseX, mouseY)) {
       int m1 = x2measure(mouseX)
       int m0 = x2measure(pmouseX)
       if (0 <= m0) {  
@@ -129,8 +116,13 @@ if (EYE_TRACKER) {
           data.updateCurve(m0 % CFG.NUM_OF_MEASURES)
 	}
       }
+    }
+    if (CFG.CURSOR_ENHANCED) {
+      fill(255, 0, 0)
+      ellipse(mouseX, mouseY, 10, 10)
+    }
   }
-  
+
   void stop() {
     super.stop()
     featext.stop()
@@ -149,10 +141,6 @@ if (EYE_TRACKER) {
   }
 
   void resetMusic() {
-    if (isNowPlaying()) {
-      stopMusic()
-      makeLog("stop")
-    }
     initData()
     setTickPosition(0)
     getDataModel().setFirstMeasure(CFG.INITIAL_BLANK_MEASURES)
@@ -174,9 +162,6 @@ if (EYE_TRACKER) {
       def pngname = "${CFG.LOG_DIR}/${logname}_screenshot.png"
       save(pngname)
       println("saved as ${pngname}")
-    } else if (action == "name") {
-      def txtname = "${CFG.LOG_DIR}/${logname}_name.txt"
-      saveStrings(txtname, [username] as String[])
     } else {
       def txtname = "${CFG.LOG_DIR}/${logname}_${action}.txt"
       saveStrings(txtname, [action] as String[])
@@ -184,11 +169,6 @@ if (EYE_TRACKER) {
     }
   }
 
-  void mouseDragged() {
-    //    if (ON_DRUG_ONLY)
-      updateCurve()
-  }
-  
 /*
   void mouseDragged() {
     if (FORCED_PROGRESS) {
@@ -239,12 +219,6 @@ if (EYE_TRACKER) {
     data.updateCurve('all')
   }
 
-  void inputName() {
-    username = JOptionPane.showInputDialog(this, "Input your name") ?: username
-    println("Set USERNAME to ${username}")
-    makeLog("name")
-  }
-  
   void mousePressed() {
     nowDrawing = true
   }
@@ -253,7 +227,7 @@ if (EYE_TRACKER) {
     nowDrawing = false
     if (isInside(mouseX, mouseY)) {
       println(x2measure(mouseX))
-      println(CFG.NUM_OF_MEASURES)
+      println(NUM_OF_MEASURES)
       data.updateCurve(x2measure(mouseX) % CFG.NUM_OF_MEASURES)
     }
   }
@@ -365,3 +339,5 @@ if (EYE_TRACKER) {
 }
 JamSketch.CFG = evaluate(new File("./config.txt"))
 JamSketch.start("JamSketch")
+
+  
