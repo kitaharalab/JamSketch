@@ -8,14 +8,15 @@ import groovy.json.*
 import controlP5.*
 import javax.swing.*
 import javax.swing.filechooser.*
-import static Config.*
 
 class JamSketch extends SimplePianoRoll implements TargetMover {
 
 
   MelodyData data
   boolean nowDrawing = false
-  public int user_number = 2 //’ÊM‚ðs‚¤ƒfƒoƒCƒX‚Ì”‚ð•\‚·•Ï”
+  String username = ""
+  static def CFG
+  public int user_number = 2 //ï¿½ÊMï¿½ï¿½sï¿½ï¿½ï¿½fï¿½oï¿½Cï¿½Xï¿½Ìï¿½ï¿½ï¿½\ï¿½ï¿½ï¿½Ïï¿½
 
   void setup() {
     super.setup()
@@ -28,9 +29,9 @@ class JamSketch extends SimplePianoRoll implements TargetMover {
     setLabel("Reset").setPosition(160, 645).setSize(120, 40)
     p5ctrl.addButton("loadCurve").
     setLabel("Load").setPosition(300, 645).setSize(120, 40)
-    //‚±‚±‚©‚çBluetooth‚ÌÚ‘±‚ªƒXƒ^[ƒg‚µ‚Ä‚¢‚é
-    if (MOTION_CONTROLLER != null) {
-      def ctrl = Class.forName(MOTION_CONTROLLER).newInstance()
+    //ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Bluetoothï¿½ÌÚ‘ï¿½ï¿½ï¿½ï¿½Xï¿½^ï¿½[ï¿½gï¿½ï¿½ï¿½Ä‚ï¿½ï¿½ï¿½
+    if (CFG.MOTION_CONTROLLER != null) {
+      def ctrl = Class.forName(CFG.MOTION_CONTROLLER).newInstance()
       ctrl.setTarget(this)
       for(;user_number > 0;user_number--){
       	ctrl.init()
@@ -63,13 +64,13 @@ if (EYE_TRACKER) {
 }
 
   void initData() {
-    data = new MelodyData("blues01.mid", width, this, this)
+    data = new MelodyData(CFG.MIDFILENAME, width, this, this)
     println(data.getFullChordProgression())
     smfread(data.scc.getMIDISequence())
     def part = data.scc.getFirstPartWithChannel(1)
     setDataModel(
       part.getPianoRollDataModel(
-	INITIAL_BLANK_MEASURES, INITIAL_BLANK_MEASURES + NUM_OF_MEASURES
+	CFG.INITIAL_BLANK_MEASURES, CFG.INITIAL_BLANK_MEASURES + CFG.NUM_OF_MEASURES
       ))
   }
   
@@ -81,26 +82,26 @@ if (EYE_TRACKER) {
       if (data.curve1[i] != null && data.curve1[i+1] != null)
 	line(i, data.curve1[i] as int, i+1, data.curve1[i+1] as int)
     }
-    if (getCurrentMeasure() == NUM_OF_MEASURES - 1) {
+    if (getCurrentMeasure() == CFG.NUM_OF_MEASURES - 1) {
       makeLog("melody")
-      if (MELODY_RESETING) {
-	getDataModel().shiftMeasure(NUM_OF_MEASURES)
+      if (CFG.MELODY_RESETING) {
+	getDataModel().shiftMeasure(CFG.NUM_OF_MEASURES)
 	data.resetCurve()
       }
     }
     if (isNowPlaying()) {
       def data = getDataModel()
       int m = getCurrentMeasure() + data.getFirstMeasure() -
-              INITIAL_BLANK_MEASURES + 1
-      int mtotal = data.getMeasureNum() * REPEAT_TIMES
+              CFG.INITIAL_BLANK_MEASURES + 1
+      int mtotal = data.getMeasureNum() * CFG.REPEAT_TIMES
       textSize(32)
       fill(0, 0, 0)
       text(m + " / " + mtotal, 460, 675)
     }
-    if (FORCED_PROGRESS) {
+    if (CFG.FORCED_PROGRESS) {
       mouseX = beat2x(getCurrentMeasure()+1, getCurrentBeat());
     }
-    if ((!ON_DRAG_ONLY || nowDrawing) && isInside(mouseX, mouseY)) {
+    if ((!CFG.ON_DRAG_ONLY || nowDrawing) && isInside(mouseX, mouseY)) {
       int m1 = x2measure(mouseX)
       int m0 = x2measure(pmouseX)
       if (0 <= m0) {  
@@ -115,11 +116,11 @@ if (EYE_TRACKER) {
 //	  }
 //	}
         if (m1 > m0) {
-          data.updateCurve(m0 % NUM_OF_MEASURES)
+          data.updateCurve(m0 % CFG.NUM_OF_MEASURES)
 	}
       }
     }
-    if (CURSOR_ENHANCED) {
+    if (CFG.CURSOR_ENHANCED) {
       fill(255, 0, 0)
       ellipse(mouseX, mouseY, 10, 10)
     }
@@ -145,27 +146,27 @@ if (EYE_TRACKER) {
   void resetMusic() {
     initData()
     setTickPosition(0)
-    getDataModel().setFirstMeasure(INITIAL_BLANK_MEASURES)
+    getDataModel().setFirstMeasure(CFG.INITIAL_BLANK_MEASURES)
     makeLog("reset")
   }
 
   void makeLog(action) {
     def logname = "output_" + (new Date()).toString().replace(" ", "_").replace(":", "-")
     if (action == "melody") {
-      def midname = "${LOG_DIR}/${logname}_melody.mid"
+      def midname = "${CFG.LOG_DIR}/${logname}_melody.mid"
       data.scc.toWrapper().toMIDIXML().writefileAsSMF(midname)
       println("saved as ${midname}")
-      def sccname = "${LOG_DIR}/${logname}_melody.sccxml"
+      def sccname = "${CFG.LOG_DIR}/${logname}_melody.sccxml"
       data.scc.toWrapper().writefile(sccname)
       println("saved as ${sccname}")
-      def jsonname = "${LOG_DIR}/${logname}_curve.json"
+      def jsonname = "${CFG.LOG_DIR}/${logname}_curve.json"
       saveStrings(jsonname, [JsonOutput.toJson(data.curve1)] as String[])
       println("saved as ${jsonname}")
-      def pngname = "${LOG_DIR}/${logname}_screenshot.png"
+      def pngname = "${CFG.LOG_DIR}/${logname}_screenshot.png"
       save(pngname)
       println("saved as ${pngname}")
     } else {
-      def txtname = "${LOG_DIR}/${logname}_${action}.txt"
+      def txtname = "${CFG.LOG_DIR}/${logname}_${action}.txt"
       saveStrings(txtname, [action] as String[])
       println("saved as ${txtname}")
     }
@@ -229,8 +230,8 @@ if (EYE_TRACKER) {
     nowDrawing = false
     if (isInside(mouseX, mouseY)) {
       println(x2measure(mouseX))
-      println(NUM_OF_MEASURES)
-      data.updateCurve(x2measure(mouseX) % NUM_OF_MEASURES)
+      println(CFG.NUM_OF_MEASURES)
+      data.updateCurve(x2measure(mouseX) % CFG.NUM_OF_MEASURES)
     }
   }
 
@@ -240,7 +241,7 @@ if (EYE_TRACKER) {
 	stopMusic()
       } else {
 	setTickPosition(0)
-	getDataModel().setFirstMeasure(INITIAL_BLANK_MEASURES)
+	getDataModel().setFirstMeasure(CFG.INITIAL_BLANK_MEASURES)
 	playMusic()
       }
       //    } else if (key == 'l') {
@@ -339,6 +340,7 @@ if (EYE_TRACKER) {
 //    peyeY = mouseY
   }
 }
+JamSketch.CFG = evaluate(new File("./config.txt"))
 JamSketch.start("JamSketch")
 
   
