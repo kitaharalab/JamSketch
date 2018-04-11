@@ -11,12 +11,11 @@ import javax.swing.filechooser.*
 
 class JamSketch extends SimplePianoRoll implements TargetMover {
 
-
   MelodyData data
   boolean nowDrawing = false
   String username = ""
   static def CFG
-  public int user_number = 2 //�ʐM��s���f�o�C�X�̐���\���ϐ�
+//  public int user_number = 2 //�ʐM��s���f�o�C�X�̐���\���ϐ�
 
   void setup() {
     super.setup()
@@ -33,33 +32,11 @@ class JamSketch extends SimplePianoRoll implements TargetMover {
     if (CFG.MOTION_CONTROLLER != null) {
       def ctrl = Class.forName(CFG.MOTION_CONTROLLER).newInstance()
       ctrl.setTarget(this)
-      for(;user_number > 0;user_number--){
-      	ctrl.init()
-      	ctrl.start();
-      }
+      ctrl.init()
+      ctrl.start()
     }
 
-/*
-    if (TOBII) {
-      def tobii = new TobiiReceiver(this)
-      tobii.init()	
-      tobii.start()
-    }
-    if (BLUETOOTH) {
-      def rfcomm = new RfcommServer(this, height)
-      rfcomm.connect()
-      rfcomm.start()
-    }
-*/
     initData()
-
-/*
-if (EYE_TRACKER) {
-      def eyetracker = new EyeTrackerFrame()
-      eyetracker.showCameraChooser()
-      eyetracker.start(this)
-    }
-    */
     
 }
 
@@ -314,30 +291,9 @@ if (EYE_TRACKER) {
     if (smoothY < 0) smoothY = 0
     if (smoothY > height) smoothY = height
 
-
-/*
-   if (Math.abs(smoothX - peyeX) > 20) {
-     if (smoothX > peyeX) {
-       smoothX = peyeX + 20
-     } else {
-       smoothX = peyeX - 20
-     }
-   }
-   if (Math.abs(smoothY - peyeY) > 20) {
-     if (smoothY > peyeY) {
-       smoothY = peyeY + 20
-     } else {
-       smoothY = peyeY - 20
-     }
-   }
-   */
      mouseX = smoothX
      mouseY = smoothY
-   
-////    mouseX -= 0.5 * (x - peyeX) * width
-////    mouseY += 0.5 * (y - peyeY) * height
-//    peyeX = mouseX
-//    peyeY = mouseY
+
   }
 }
 JamSketch.CFG = evaluate(new File("./config.txt"))
