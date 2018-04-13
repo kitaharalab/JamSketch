@@ -35,7 +35,7 @@ public class RfcommServer implements MotionController {
     private List<Session> sessions = null;
     private TargetMover tm;
     
-    static int user = 1;
+//    static int user = 1;
 
     public RfcommServer() throws IOException {
         // RFCOMMベースのサーバの開始。
@@ -71,7 +71,7 @@ public class RfcommServer implements MotionController {
       クライアントからの接続待ち。
      @return 接続されたたセッションを返す。*/
     public void init() throws IOException {
-        for (; user <= 2; user++) {
+        for (int user = 1; user <= 2; user++) {
             System.out.println("user"+user+"の接続を待っています");
             StreamConnection channel = server.acceptAndOpen();//クライアントがくるまでここで待機
             System.out.println("user"+user+"の接続が完了しました");
@@ -171,14 +171,14 @@ public class RfcommServer implements MotionController {
 
     
 
-    //メインメソッド
-    public static void main(String[] args) throws Exception {
-	RfcommServer server = new RfcommServer();
-	String user_name = "user";
-        //while (n < 3){ //接続するユーザ数 Todo:接続するユーザ数を選択できるようにするといいかも(今は2人) 
-            server.init();
-	    server.start();
-            user++;
-        //}	
-    }
+    // //メインメソッド
+    // public static void main(String[] args) throws Exception {
+	// RfcommServer server = new RfcommServer();
+	// String user_name = "user";
+    //     //while (n < 3){ //接続するユーザ数 Todo:接続するユーザ数を選択できるようにするといいかも(今は2人) 
+    //         server.init();
+	//     server.start();
+    //         user++;
+    //     //}	
+    // }
 }
