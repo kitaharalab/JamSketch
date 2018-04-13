@@ -15,7 +15,6 @@ class JamSketch extends SimplePianoRoll implements TargetMover {
   boolean nowDrawing = false
   String username = ""
   static def CFG
-//  public int user_number = 2 //�ʐM��s���f�o�C�X�̐���\���ϐ�
 
   void setup() {
     super.setup()
@@ -28,7 +27,7 @@ class JamSketch extends SimplePianoRoll implements TargetMover {
     setLabel("Reset").setPosition(160, 645).setSize(120, 40)
     p5ctrl.addButton("loadCurve").
     setLabel("Load").setPosition(300, 645).setSize(120, 40)
-    //��������Bluetooth�̐ڑ����X�^�[�g���Ă���
+
     if (CFG.MOTION_CONTROLLER != null) {
       def ctrl = Class.forName(CFG.MOTION_CONTROLLER).newInstance()
       ctrl.setTarget(this)
@@ -47,7 +46,7 @@ class JamSketch extends SimplePianoRoll implements TargetMover {
     def part = data.scc.getFirstPartWithChannel(1)
     setDataModel(
       part.getPianoRollDataModel(
-	CFG.INITIAL_BLANK_MEASURES, CFG.INITIAL_BLANK_MEASURES + CFG.NUM_OF_MEASURES
+	    CFG.INITIAL_BLANK_MEASURES, CFG.INITIAL_BLANK_MEASURES + CFG.NUM_OF_MEASURES
       ))
   }
   
@@ -57,13 +56,13 @@ class JamSketch extends SimplePianoRoll implements TargetMover {
     strokeWeight(3)
     (0..<(data.curve1.size()-1)).each { i ->
       if (data.curve1[i] != null && data.curve1[i+1] != null)
-	line(i, data.curve1[i] as int, i+1, data.curve1[i+1] as int)
-    }
+    	  line(i, data.curve1[i] as int, i+1, data.curve1[i+1] as int)
+      }
     if (getCurrentMeasure() == CFG.NUM_OF_MEASURES - 1) {
       makeLog("melody")
       if (CFG.MELODY_RESETING) {
-	getDataModel().shiftMeasure(CFG.NUM_OF_MEASURES)
-	data.resetCurve()
+	      getDataModel().shiftMeasure(CFG.NUM_OF_MEASURES)
+	      data.resetCurve()
       }
     }
     if (isNowPlaying()) {
@@ -85,16 +84,11 @@ class JamSketch extends SimplePianoRoll implements TargetMover {
         if (pmouseX < mouseX) {
        	  (pmouseX..mouseX).each { i ->
             data.curve1[i] = mouseY
-	  }
-	}
-//	else if (pmouseX > mouseX) {
-//	  (pmouseX..mouseX).each { i ->
-//	    data.curve1[i] = null
-//	  }
-//	}
+	        }
+	      }
         if (m1 > m0) {
           data.updateCurve(m0 % CFG.NUM_OF_MEASURES)
-	}
+        }
       }
     }
     if (CFG.CURSOR_ENHANCED) {
@@ -113,8 +107,6 @@ class JamSketch extends SimplePianoRoll implements TargetMover {
       stopMusic()
       makeLog("stop")
     } else {
-      //      setTickPosition(0)
-      //      getDataModel().setFirstMeasure(INITIAL_BLANK_MEASURES)
       playMusic()
       makeLog("play")
     }
@@ -149,48 +141,26 @@ class JamSketch extends SimplePianoRoll implements TargetMover {
     }
   }
 
-/*
-  void mouseDragged() {
-    if (FORCED_PROGRESS) {
-      mouseX = beat2x(getCurrentMeasure()+1, getCurrentBeat());
-    }
-    if (inside(mouseX, mouseY)) {
-      if (mouseButton == RIGHT || (keyPressed && keyCode == SHIFT)) {
-	(pmouseX..mouseX).each { i ->
-	  data.curve1[i] = null
-	}
-      } else if (mouseButton == LEFT) {
-	(pmouseX..mouseX).each { i ->
-	  data.curve1[i] = mouseY
-	}
-      }
-      if (x2measure(pmouseX) < x2measure(mouseX)) {
-	data.updateCurve(x2measure(pmouseX) % NUM_OF_MEASURES)
-      }
-    }
-  }
-*/
-
   void loadCurve() {
     def filter = new FileNameExtensionFilter(".json or .txt", "json", "txt")
     def chooser = new JFileChooser(currentDirectory: new File("."),
 				   fileFilter: filter)
     if (chooser.showOpenDialog(this) == JFileChooser.APPROVE_OPTION) {
       if (chooser.selectedFile.name.endsWith(".json")) {
-	data.curve1 = json.parseText(chooser.selectedFile.text)
+      	data.curve1 = json.parseText(chooser.selectedFile.text)
       } else if (chooser.selectedFile.name.endsWith(".txt")) {
-	println("Reading ${chooser.selectedFile.absolutePath}")
-	def table = loadTable(chooser.selectedFile.absolutePath, "csv")
-	data.curve1 = [null] * width
-	int n = table.getRowCount()
-	int m = data.curve1.size() - 100
-	for (int i in 100..<(data.curve1.size()-1)) {
-	  int from = (i-100) * n / m
-	  int thru = ((i+1)-100) * n / m - 1
-	  data.curve1[i] =
-	    (from..thru).collect{notenum2y(table.getFloat(it, 0))}.sum() /
-	    (from..thru).size()
-	}
+        println("Reading ${chooser.selectedFile.absolutePath}")
+        def table = loadTable(chooser.selectedFile.absolutePath, "csv")
+        data.curve1 = [null] * width
+        int n = table.getRowCount()
+        int m = data.curve1.size() - 100
+        for (int i in 100..<(data.curve1.size()-1)) {
+          int from = (i-100) * n / m
+          int thru = ((i+1)-100) * n / m - 1
+          data.curve1[i] =
+            (from..thru).collect{notenum2y(table.getFloat(it, 0))}.sum() /
+            (from..thru).size()
+        }
       }
     } else {
       println("File is not supported")
@@ -215,25 +185,12 @@ class JamSketch extends SimplePianoRoll implements TargetMover {
   void keyReleased() {
     if (key == ' ') {
       if (isNowPlaying()) {
-	stopMusic()
+      	stopMusic()
       } else {
-	setTickPosition(0)
-	getDataModel().setFirstMeasure(CFG.INITIAL_BLANK_MEASURES)
-	playMusic()
+        setTickPosition(0)
+        getDataModel().setFirstMeasure(CFG.INITIAL_BLANK_MEASURES)
+        playMusic()
       }
-      //    } else if (key == 'l') {
-      //      def json = new JsonSlurper()
-      //      data.curve1 = json.parseText((new File("curve.json")).text)
-      //      data.updateCurve()
-      //      (0..<NUM_OF_MEASURES).each {
-      //	model.updateMusicRepresentation(it)
-      //      }
-      //    } else if (key == 's') {
-      //      def filename =
-      //	"output_${(new Date()).toString().replace(" ", "_")}.mid"
-      //	data.scc.toWrapper().toMIDIXML().writefileAsSMF(filename)
-      //	println("saved as ${filename}.")
-      //	data.scc.toWrapper().writefile("output.xml")
     } else if (key == 'b') {
       setNoteVisible(!isNoteVisible());
       println("Visible=${isVisible()}")
@@ -241,10 +198,6 @@ class JamSketch extends SimplePianoRoll implements TargetMover {
       data.updateCurve('all')
     }
   }
-
-//  double peyeX = 0, peyeY = 0
-//  double meyeX = 0.5, meyeY = 0.5
-//  int eyeCount = 1
 
   def eyeX = [] as LinkedList
   def eyeY = [] as LinkedList
@@ -268,32 +221,25 @@ class JamSketch extends SimplePianoRoll implements TargetMover {
 
   void setTarget(double x, double y) {
     println("(${x}, ${y})")
-/*      meyeX = (meyeX * eyeCount + x) / (eyeCount + 1)
-      meyeY = (meyeY * eyeCount + y) / (eyeCount + 1)
-    eyeCount++
-    mouseX -= EYE_MOTION_SPEED * (x - meyeX)
-    mouseY += EYE_MOTION_SPEED * (y - meyeY)
-*/
-   if (eyeX.size() > n_eyesmooth) {
-     eyeX.removeAt(0)
-     eyeY.removeAt(0)
-   }
-   eyeX.add(x)
-   eyeY.add(y)
-   def smoothX = eyeX.sum() / n_eyesmooth
-   def smoothY = eyeY.sum() / n_eyesmooth
+    if (eyeX.size() > n_eyesmooth) {
+      eyeX.removeAt(0)
+      eyeY.removeAt(0)
+    }
+    eyeX.add(x)
+    eyeY.add(y)
+    def smoothX = eyeX.sum() / n_eyesmooth
+    def smoothY = eyeY.sum() / n_eyesmooth
 
-   smoothX = x
-   smoothY = y
+    smoothX = x
+    smoothY = y
 
     if (smoothX < 0) smoothX = 0
     if (smoothX > width) smoothX = width
     if (smoothY < 0) smoothY = 0
     if (smoothY > height) smoothY = height
 
-     mouseX = smoothX
-     mouseY = smoothY
-
+    mouseX = smoothX
+    mouseY = smoothY
   }
 }
 JamSketch.CFG = evaluate(new File("./config.txt"))
