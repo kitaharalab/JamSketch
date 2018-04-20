@@ -14,6 +14,7 @@ import java.util.List;
 
 import javax.bluetooth.LocalDevice;
 import javax.bluetooth.ServiceRecord;
+import javax.bluetooth.RemoteDevice;
 import javax.microedition.io.Connector;
 import javax.microedition.io.StreamConnection;
 import javax.microedition.io.StreamConnectionNotifier;
@@ -62,7 +63,7 @@ public class RfcommServer implements MotionController {
             throw new IllegalStateException("init() must be called in advance");
         } else {
             for (Session session : sessions) {
-                new Thread(session, session.getName()).start();
+                new Thread(session, session.getRemoteDeviceName()).start();
             }    
         }
     }
@@ -72,10 +73,11 @@ public class RfcommServer implements MotionController {
      @return 接続されたたセッションを返す。*/
     public void init() throws IOException {
         for (int user = 1; user <= 2; user++) {
-            System.out.println("user"+user+"の接続を待っています");
+            System.out.println("userの接続を待っています");
             StreamConnection channel = server.acceptAndOpen();//クライアントがくるまでここで待機
-            System.out.println("user"+user+"の接続が完了しました");
-            sessions.add(new Session(channel, String.valueOf(user)));
+            Session session = new Session(channel);
+            sessions.add(session);
+            System.out.println(session.getRemoteDeviceName() + "の接続が完了しました");
         }
     }
 
@@ -86,16 +88,24 @@ public class RfcommServer implements MotionController {
         private StreamConnection channel = null;
         private InputStream btIn = null;
         private OutputStream btOut = null;
-        private String name = null;
+        private RemoteDevice rd = null;
 
-        public Session(StreamConnection channel, String name) throws IOException {
+        public Session(StreamConnection channel) throws IOException {
             this.channel = channel;
             this.btIn = channel.openInputStream();
             this.btOut = channel.openOutputStream();
-            this.name = name;
+            rd = RemoteDevice.getRemoteDevice(channel);
         }
 
-        public String getName() {
+        public String getRemoteDeviceName() {
+            String name = null;
+            try {
+                name = rd.getFriendlyName(false);
+                
+            } catch (IOException e) {
+                e.printStackTrace();
+                //TODO: handle exception
+            }
             return name;
         }
 
@@ -124,14 +134,14 @@ public class RfcommServer implements MotionController {
                             long t = Long.parseLong(element[0]);
                             float p = Float.parseFloat(element[1]);
                             int evt = Integer.parseInt(element[2]);
-                            int user_number = Integer.parseInt(name);
-                            System.err.println("user"+user_number+": (time=" + t + ", position=" + p + ",attacktiming_switch=" + evt + ")");
+                            //int user_number = Integer.parseInt(name);
+                            System.err.println(getRemoteDeviceName() + ": (time=" + t + ", position=" + p + ",attacktiming_switch=" + evt + ")");
 			      /*各ユーザのandroidから送信されたデータの格納処理
 			      user_numberの値に応じて各ユーザごとに分けてデータを処理すること
 			      は可能なのですが将来的にもっと多人数を想定する場合もう少し効率的な書き方をする必要が
 			      あるかもしれません*/
-                            // test -- only user1 can set target
-                            if (name.equals("1")) {
+                            // test -- only P01T_6 can set target
+                            if (getRemoteDeviceName().equals("P01T_6")) {
                                 tm.setTarget(0, tm.height() * (1.0 - p));
                                 if (evt != TargetMover.NO_EVENT) {
                                     tm.sendEvent(evt);
@@ -169,16 +179,4 @@ public class RfcommServer implements MotionController {
         }
     }
 
-    
-
-    // //メインメソッド
-    // public static void main(String[] args) throws Exception {
-	// RfcommServer server = new RfcommServer();
-	// String user_name = "user";
-    //     //while (n < 3){ //接続するユーザ数 Todo:接続するユーザ数を選択できるようにするといいかも(今は2人) 
-    //         server.init();
-	//     server.start();
-    //         user++;
-    //     //}	
-    // }
 }
