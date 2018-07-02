@@ -11,12 +11,24 @@ import javax.swing.filechooser.*
 
 class JamSketch extends SimplePianoRoll implements TargetMover {
 
-
   MelodyData data
   boolean nowDrawing = false
   String username = ""
   static def CFG
-  
+
+  def jwinFrame
+
+  void addJWin() {
+    if (jwinFrame == null) {
+      jwinFrame = new JWinFrame(this.frame.getTitle() + ".jwinpointer")
+      jwinFrame.setTarget(this)
+      jwinFrame.init()
+          
+    } else if (!jwinFrame.isVisible()) {
+      jwinFrame.setVisible(true)
+    }
+  }
+
   void setup() {
     super.setup()
     size(1200, 700)
@@ -29,6 +41,9 @@ class JamSketch extends SimplePianoRoll implements TargetMover {
     p5ctrl.addButton("loadCurve").
     setLabel("Load").setPosition(300, 645).setSize(120, 40)
 
+    // Add JWinPointer
+    p5ctrl.addButton("addJWin").
+    setLabel("Pressure").setPosition(440, 645).setSize(120, 40)
 
     if (CFG.MOTION_CONTROLLER != null) {
       def ctrl = Class.forName(CFG.MOTION_CONTROLLER).newInstance()
@@ -37,31 +52,10 @@ class JamSketch extends SimplePianoRoll implements TargetMover {
       ctrl.start()
     }
     
-/*
-    if (TOBII) {
-      def tobii = new TobiiReceiver(this)
-      tobii.init()	
-      tobii.start()
-    }
-    if (BLUETOOTH) {
-      def rfcomm = new RfcommServer(this, height)
-      rfcomm.connect()
-      rfcomm.start()
-    }
-*/
     initData()
-
-/*
-if (EYE_TRACKER) {
-      def eyetracker = new EyeTrackerFrame()
-      eyetracker.showCameraChooser()
-      eyetracker.start(this)
-    }
-    */
-
     inputName()
-    
-}
+
+  }
 
   void initData() {
     data = new MelodyData(CFG.MIDFILENAME, width, this, this)
@@ -70,11 +64,11 @@ if (EYE_TRACKER) {
     def part = data.scc.getFirstPartWithChannel(1)
     setDataModel(
       part.getPianoRollDataModel(
-	CFG.INITIAL_BLANK_MEASURES,
-	CFG.INITIAL_BLANK_MEASURES + CFG.NUM_OF_MEASURES
+        CFG.INITIAL_BLANK_MEASURES,
+        CFG.INITIAL_BLANK_MEASURES + CFG.NUM_OF_MEASURES
       ))
   }
-  
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                
   void draw() {
     super.draw()
     stroke(0, 0, 255)
@@ -109,6 +103,7 @@ if (EYE_TRACKER) {
       fill(255, 0, 0)
       ellipse(mouseX, mouseY, 10, 10)
     }
+
   }
 
   void updateCurve() {
@@ -120,11 +115,7 @@ if (EYE_TRACKER) {
             data.curve1[i] = mouseY
 	  }
 	}
-//	else if (pmouseX > mouseX) {
-//	  (pmouseX..mouseX).each { i ->
-//	    data.curve1[i] = null
-//	  }
-//	}
+
         if (m1 > m0) {
           data.updateCurve(m0 % CFG.NUM_OF_MEASURES)
 	}
@@ -189,28 +180,6 @@ if (EYE_TRACKER) {
       updateCurve()
   }
   
-/*
-  void mouseDragged() {
-    if (FORCED_PROGRESS) {
-      mouseX = beat2x(getCurrentMeasure()+1, getCurrentBeat());
-    }
-    if (inside(mouseX, mouseY)) {
-      if (mouseButton == RIGHT || (keyPressed && keyCode == SHIFT)) {
-	(pmouseX..mouseX).each { i ->
-	  data.curve1[i] = null
-	}
-      } else if (mouseButton == LEFT) {
-	(pmouseX..mouseX).each { i ->
-	  data.curve1[i] = mouseY
-	}
-      }
-      if (x2measure(pmouseX) < x2measure(mouseX)) {
-	data.updateCurve(x2measure(pmouseX) % NUM_OF_MEASURES)
-      }
-    }
-  }
-*/
-
   void loadCurve() {
     def filter = new FileNameExtensionFilter(".json or .txt", "json", "txt")
     def chooser = new JFileChooser(currentDirectory: new File("."),
@@ -267,19 +236,6 @@ if (EYE_TRACKER) {
 	getDataModel().setFirstMeasure(CFG.INITIAL_BLANK_MEASURES)
 	playMusic()
       }
-      //    } else if (key == 'l') {
-      //      def json = new JsonSlurper()
-      //      data.curve1 = json.parseText((new File("curve.json")).text)
-      //      data.updateCurve()
-      //      (0..<NUM_OF_MEASURES).each {
-      //	model.updateMusicRepresentation(it)
-      //      }
-      //    } else if (key == 's') {
-      //      def filename =
-      //	"output_${(new Date()).toString().replace(" ", "_")}.mid"
-      //	data.scc.toWrapper().toMIDIXML().writefileAsSMF(filename)
-      //	println("saved as ${filename}.")
-      //	data.scc.toWrapper().writefile("output.xml")
     } else if (key == 'b') {
       setNoteVisible(!isNoteVisible());
       println("Visible=${isVisible()}")
@@ -287,10 +243,6 @@ if (EYE_TRACKER) {
       data.updateCurve('all')
     }
   }
-
-//  double peyeX = 0, peyeY = 0
-//  double meyeX = 0.5, meyeY = 0.5
-//  int eyeCount = 1
 
   def eyeX = [] as LinkedList
   def eyeY = [] as LinkedList
@@ -314,20 +266,30 @@ if (EYE_TRACKER) {
 
   void setTarget(double x, double y) {
     println("(${x}, ${y})")
-/*      meyeX = (meyeX * eyeCount + x) / (eyeCount + 1)
-      meyeY = (meyeY * eyeCount + y) / (eyeCount + 1)
-    eyeCount++
-    mouseX -= EYE_MOTION_SPEED * (x - meyeX)
-    mouseY += EYE_MOTION_SPEED * (y - meyeY)
-*/
-   if (eyeX.size() > n_eyesmooth) {
-     eyeX.removeAt(0)
-     eyeY.removeAt(0)
-   }
-   eyeX.add(x)
-   eyeY.add(y)
-   def smoothX = eyeX.sum() / n_eyesmooth
-   def smoothY = eyeY.sum() / n_eyesmooth
+
+  //  if (eyeX.size() > n_eyesmooth) {
+  //    eyeX.removeAt(0)
+  //    eyeY.removeAt(0)
+  //  }
+  //  eyeX.add(x)
+  //  eyeY.add(y)
+  //  def smoothX = eyeX.sum() / n_eyesmooth
+  //  def smoothY = eyeY.sum() / n_eyesmooth
+
+  //  smoothX = x
+  //  smoothY = y
+
+  //   if (smoothX < 0) smoothX = 0
+  //   if (smoothX > width) smoothX = width
+  //   if (smoothY < 0) smoothY = 0
+  //   if (smoothY > height) smoothY = height
+
+  //    mouseX = smoothX
+  //    mouseY = smoothY
+   
+  }
+  void setTarget(double x, double y, int p) {
+    println("(${x}, ${y}, ${p})")
 
    smoothX = x
    smoothY = y
@@ -337,31 +299,11 @@ if (EYE_TRACKER) {
     if (smoothY < 0) smoothY = 0
     if (smoothY > height) smoothY = height
 
-
-/*
-   if (Math.abs(smoothX - peyeX) > 20) {
-     if (smoothX > peyeX) {
-       smoothX = peyeX + 20
-     } else {
-       smoothX = peyeX - 20
-     }
-   }
-   if (Math.abs(smoothY - peyeY) > 20) {
-     if (smoothY > peyeY) {
-       smoothY = peyeY + 20
-     } else {
-       smoothY = peyeY - 20
-     }
-   }
-   */
      mouseX = smoothX
      mouseY = smoothY
    
-////    mouseX -= 0.5 * (x - peyeX) * width
-////    mouseY += 0.5 * (y - peyeY) * height
-//    peyeX = mouseX
-//    peyeY = mouseY
   }
+
 }
 JamSketch.CFG = evaluate(new File("./config.txt"))
 JamSketch.start("JamSketch")
