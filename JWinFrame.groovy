@@ -36,8 +36,9 @@ public class JWinFrame extends DispatchEventFrame implements PointerEventListene
         setBounds(frameX, frameY, frameWidth, frameHeight)
         setVisible(true)
 
-        def jwin = new JWinPointerReader(jwinFrame.getTitle())
-        jwin.addPointerEventListener(jwinFrame)
+        def jwin = new JWinPointerReader(this.getTitle())
+        println(this.getTitle())
+        jwin.addPointerEventListener(this)
 
     }
 
