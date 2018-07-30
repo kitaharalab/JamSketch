@@ -363,7 +363,7 @@ public class EyePanel extends JPanel implements Runnable
       double yInEye = ((double)eyeRect.height()/2 + yDist*PUPIL_SCALE)/eyeRect.height();
 
       // move the target using the pupil's relative position inside the eye rectangle
-      targetFrame.setTarget(xInEye, yInEye);
+      targetFrame.setTargetXY(xInEye, yInEye);
     }
   }  // end of trackPupil()
 

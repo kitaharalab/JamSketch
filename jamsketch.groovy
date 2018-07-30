@@ -11,10 +11,11 @@ import javax.swing.filechooser.*
 
 class JamSketch extends SimplePianoRoll implements TargetMover {
 
-  MelodyData data
+  MelodyData melodyData
   boolean nowDrawing = false
   String username = ""
   static def CFG
+  def ctrl
 
   void setup() {
     super.setup()
@@ -29,74 +30,85 @@ class JamSketch extends SimplePianoRoll implements TargetMover {
     setLabel("Load").setPosition(300, 645).setSize(120, 40)
 
     if (CFG.MOTION_CONTROLLER != null) {
-      def ctrl = Class.forName(CFG.MOTION_CONTROLLER).newInstance()
-      ctrl.setTarget(this)
-      ctrl.init()
-      ctrl.start()
+      if (CFG.MOTION_CONTROLLER == "RfcommServer"){
+          JamSketch.start("JamSketchSlave")
+      } else {
+        ctrl = Class.forName(CFG.MOTION_CONTROLLER).newInstance()
+        ctrl.setTargetMover(this)
+        ctrl.init()
+        ctrl.start()
+      }
     }
 
     initData()
-    
-}
+  }
 
   void initData() {
-    data = new MelodyData(CFG.MIDFILENAME, width, this, this)
-    println(data.getFullChordProgression())
-    smfread(data.scc.getMIDISequence())
-    def part = data.scc.getFirstPartWithChannel(1)
+    melodyData = new MelodyData(CFG.MIDFILENAME, width, this, this)
+    println(melodyData.getFullChordProgression())
+    smfread(melodyData.scc.getMIDISequence())
+    def part = melodyData.scc.getFirstPartWithChannel(1)
     setDataModel(
       part.getPianoRollDataModel(
 	    CFG.INITIAL_BLANK_MEASURES, CFG.INITIAL_BLANK_MEASURES + CFG.NUM_OF_MEASURES
       ))
   }
-  
+
   void draw() {
-    super.draw()
-    stroke(0, 0, 255)
+    super.draw()    
     strokeWeight(3)
-    (0..<(data.curve1.size()-1)).each { i ->
-      if (data.curve1[i] != null && data.curve1[i+1] != null)
-    	  line(i, data.curve1[i] as int, i+1, data.curve1[i+1] as int)
+    stroke(0, 0, 255)
+
+    (0..<(melodyData.curve1.size()-1)).each { i ->
+      println("${melodyData.curve1[i]}, ${melodyData.curve1[i+1]}")
+      if (melodyData.curve1[i] != null && melodyData.curve1[i+1] != null) {
+        line(i, melodyData.curve1[i] as int, i+1, melodyData.curve1[i+1] as int)
       }
+    }
+
     if (getCurrentMeasure() == CFG.NUM_OF_MEASURES - 1) {
       makeLog("melody")
       if (CFG.MELODY_RESETING) {
-	      getDataModel().shiftMeasure(CFG.NUM_OF_MEASURES)
-	      data.resetCurve()
+        getDataModel().shiftMeasure(CFG.NUM_OF_MEASURES)
+        melodyData.resetCurve()
       }
     }
-    if (isNowPlaying()) {
-      def data = getDataModel()
-      int m = getCurrentMeasure() + data.getFirstMeasure() -
-              CFG.INITIAL_BLANK_MEASURES + 1
-      int mtotal = data.getMeasureNum() * CFG.REPEAT_TIMES
-      textSize(32)
-      fill(0, 0, 0)
-      text(m + " / " + mtotal, 460, 675)
-    }
-    if (CFG.FORCED_PROGRESS) {
-      mouseX = beat2x(getCurrentMeasure()+1, getCurrentBeat());
-    }
+
     if ((!CFG.ON_DRAG_ONLY || nowDrawing) && isInside(mouseX, mouseY)) {
       int m1 = x2measure(mouseX)
       int m0 = x2measure(pmouseX)
       if (0 <= m0) {  
         if (pmouseX < mouseX) {
-       	  (pmouseX..mouseX).each { i ->
-            data.curve1[i] = mouseY
-	        }
-	      }
+          (pmouseX..mouseX).each { i ->
+            melodyData.curve1[i] = mouseY
+          }
+        }
         if (m1 > m0) {
-          data.updateCurve(m0 % CFG.NUM_OF_MEASURES)
+          melodyData.updateCurve(m0 % CFG.NUM_OF_MEASURES)
         }
       }
     }
+
+    if (isNowPlaying()) {
+      def dataModel = getDataModel()
+      int m = getCurrentMeasure() + dataModel.getFirstMeasure() -
+              CFG.INITIAL_BLANK_MEASURES + 1
+      int mtotal = dataModel.getMeasureNum() * CFG.REPEAT_TIMES
+      textSize(32)
+      fill(0, 0, 0)
+      text(m + " / " + mtotal, 460, 675)
+    }
+
+    if (CFG.FORCED_PROGRESS) {
+      mouseX = beat2x(getCurrentMeasure()+1, getCurrentBeat());
+    }
+
     if (CFG.CURSOR_ENHANCED) {
       fill(255, 0, 0)
       ellipse(mouseX, mouseY, 10, 10)
     }
   }
-
+  
   void stop() {
     super.stop()
     featext.stop()
@@ -123,13 +135,13 @@ class JamSketch extends SimplePianoRoll implements TargetMover {
     def logname = "output_" + (new Date()).toString().replace(" ", "_").replace(":", "-")
     if (action == "melody") {
       def midname = "${CFG.LOG_DIR}/${logname}_melody.mid"
-      data.scc.toWrapper().toMIDIXML().writefileAsSMF(midname)
+      melodyData.scc.toWrapper().toMIDIXML().writefileAsSMF(midname)
       println("saved as ${midname}")
       def sccname = "${CFG.LOG_DIR}/${logname}_melody.sccxml"
-      data.scc.toWrapper().writefile(sccname)
+      melodyData.scc.toWrapper().writefile(sccname)
       println("saved as ${sccname}")
       def jsonname = "${CFG.LOG_DIR}/${logname}_curve.json"
-      saveStrings(jsonname, [JsonOutput.toJson(data.curve1)] as String[])
+      saveStrings(jsonname, [JsonOutput.toJson(melodyData.curve1)] as String[])
       println("saved as ${jsonname}")
       def pngname = "${CFG.LOG_DIR}/${logname}_screenshot.png"
       save(pngname)
@@ -147,17 +159,17 @@ class JamSketch extends SimplePianoRoll implements TargetMover {
 				   fileFilter: filter)
     if (chooser.showOpenDialog(this) == JFileChooser.APPROVE_OPTION) {
       if (chooser.selectedFile.name.endsWith(".json")) {
-      	data.curve1 = json.parseText(chooser.selectedFile.text)
+      	melodyData.curve1 = json.parseText(chooser.selectedFile.text)
       } else if (chooser.selectedFile.name.endsWith(".txt")) {
         println("Reading ${chooser.selectedFile.absolutePath}")
         def table = loadTable(chooser.selectedFile.absolutePath, "csv")
-        data.curve1 = [null] * width
+        melodyData.curve1 = [null] * width
         int n = table.getRowCount()
-        int m = data.curve1.size() - 100
-        for (int i in 100..<(data.curve1.size()-1)) {
+        int m = melodyData.curve1.size() - 100
+        for (int i in 100..<(melodyData.curve1.size()-1)) {
           int from = (i-100) * n / m
           int thru = ((i+1)-100) * n / m - 1
-          data.curve1[i] =
+          melodyData.curve1[i] =
             (from..thru).collect{notenum2y(table.getFloat(it, 0))}.sum() /
             (from..thru).size()
         }
@@ -166,7 +178,7 @@ class JamSketch extends SimplePianoRoll implements TargetMover {
       println("File is not supported")
       return
     }
-    data.updateCurve('all')
+    melodyData.updateCurve('all')
   }
 
   void mousePressed() {
@@ -178,7 +190,7 @@ class JamSketch extends SimplePianoRoll implements TargetMover {
     if (isInside(mouseX, mouseY)) {
       println(x2measure(mouseX))
       println(CFG.NUM_OF_MEASURES)
-      data.updateCurve(x2measure(mouseX) % CFG.NUM_OF_MEASURES)
+      melodyData.updateCurve(x2measure(mouseX) % CFG.NUM_OF_MEASURES)
     }
   }
 
@@ -195,7 +207,7 @@ class JamSketch extends SimplePianoRoll implements TargetMover {
       setNoteVisible(!isNoteVisible());
       println("Visible=${isVisible()}")
     } else if (key == 'u') {
-      data.updateCurve('all')
+      melodyData.updateCurve('all')
     }
   }
 
@@ -211,6 +223,7 @@ class JamSketch extends SimplePianoRoll implements TargetMover {
     width
   }
 
+  @Synchronized
   void sendEvent(int event) {
     if (event == TargetMover.ONSET) {
        mousePressed()
@@ -219,28 +232,29 @@ class JamSketch extends SimplePianoRoll implements TargetMover {
     }
   }
 
-  void setTarget(double x, double y) {
+  void setTargetXY(double x, double y) {
     println("(${x}, ${y})")
-    if (eyeX.size() > n_eyesmooth) {
-      eyeX.removeAt(0)
-      eyeY.removeAt(0)
-    }
-    eyeX.add(x)
-    eyeY.add(y)
-    def smoothX = eyeX.sum() / n_eyesmooth
-    def smoothY = eyeY.sum() / n_eyesmooth
+    // if (eyeX.size() > n_eyesmooth) {
+    //   eyeX.removeAt(0)
+    //   eyeY.removeAt(0)
+    // }
+    // eyeX.add(x)
+    // eyeY.add(y)
+    // def smoothX = eyeX.sum() / n_eyesmooth
+    // def smoothY = eyeY.sum() / n_eyesmooth
 
-    smoothX = x
-    smoothY = y
+    // smoothX = x
+    // smoothY = y
 
-    if (smoothX < 0) smoothX = 0
-    if (smoothX > width) smoothX = width
-    if (smoothY < 0) smoothY = 0
-    if (smoothY > height) smoothY = height
+    // if (smoothX < 0) smoothX = 0
+    // if (smoothX > width) smoothX = width
+    // if (smoothY < 0) smoothY = 0
+    // if (smoothY > height) smoothY = height
 
-    mouseX = smoothX
-    mouseY = smoothY
+    mouseX = x
+    mouseY = y
   }
+
 }
 JamSketch.CFG = evaluate(new File("./config.txt"))
 JamSketch.start("JamSketch")

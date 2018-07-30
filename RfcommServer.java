@@ -4,6 +4,7 @@
  * Created by korona on 2017/04/11.
  */
 
+import java.awt.Color;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -28,43 +29,30 @@ public class RfcommServer implements MotionController {
      UUIDは乱数生成したものを使用
      */
     static final String serverUUID = "17fcf242f86d4e35805e546ee3040b84";
-
-    private StreamConnectionNotifier server = null;
-    private List<Long> time;
-    private List<Float> position;
-    private List<Integer> attacktiming_switch;
-    private List<Session> sessions = null;
+    static private StreamConnectionNotifier server = null;
     private TargetMover tm;
+    private Session session = null;
     
-//    static int user = 1;
-
-    public RfcommServer() throws IOException {
-        // RFCOMMベースのサーバの開始。
-        // - btspp:は PRCOMM 用なのでベースプロトコルによって変わる。
-        server = (StreamConnectionNotifier) Connector.open(
+    static private StreamConnectionNotifier getStreamConnectionNotifier() throws IOException {
+        if (server == null) {
+            server = (StreamConnectionNotifier) Connector.open(
                 "btspp://localhost:" + serverUUID,
-                Connector.READ_WRITE, true//読み書きモードでサーバースタート
-        );
-        // ローカルデバイスにサービスを登録。
-        ServiceRecord record = LocalDevice.getLocalDevice().getRecord(server);
-        LocalDevice.getLocalDevice().updateRecord(record);
-	    time = Collections.synchronizedList(new LinkedList<Long>());
-        position = Collections.synchronizedList(new LinkedList<Float>());
-        attacktiming_switch = Collections.synchronizedList(new LinkedList<Integer>());
-        sessions = Collections.synchronizedList(new ArrayList<Session>());
+                Connector.READ_WRITE, true);
+            ServiceRecord record = LocalDevice.getLocalDevice().getRecord(server);
+            LocalDevice.getLocalDevice().updateRecord(record);
+        }
+        return server;
     }
 
-    public void setTarget(TargetMover tm) {
+    public void setTargetMover(TargetMover tm) {
 	   this.tm = tm;
     }
     
     public void start() {
-        if (sessions.isEmpty()) {
+        if (session == null) {
             throw new IllegalStateException("init() must be called in advance");
         } else {
-            for (Session session : sessions) {
-                new Thread(session, session.getRemoteDeviceName()).start();
-            }    
+            new Thread(session).start();
         }
     }
 
@@ -72,13 +60,11 @@ public class RfcommServer implements MotionController {
       クライアントからの接続待ち。
      @return 接続されたたセッションを返す。*/
     public void init() throws IOException {
-        for (int user = 1; user <= 2; user++) {
-            System.out.println("userの接続を待っています");
-            StreamConnection channel = server.acceptAndOpen();//クライアントがくるまでここで待機
-            Session session = new Session(channel);
-            sessions.add(session);
-            System.out.println(session.getRemoteDeviceName() + "の接続が完了しました");
-        }
+        StreamConnectionNotifier server = getStreamConnectionNotifier();
+        System.out.println("clientの接続を待っています");
+        StreamConnection channel = server.acceptAndOpen();//クライアントがくるまでここで待機
+        session = new Session(channel);
+        System.out.println("接続が完了しました");
     }
 
     /*
@@ -88,25 +74,11 @@ public class RfcommServer implements MotionController {
         private StreamConnection channel = null;
         private InputStream btIn = null;
         private OutputStream btOut = null;
-        private RemoteDevice rd = null;
 
         public Session(StreamConnection channel) throws IOException {
             this.channel = channel;
             this.btIn = channel.openInputStream();
             this.btOut = channel.openOutputStream();
-            rd = RemoteDevice.getRemoteDevice(channel);
-        }
-
-        public String getRemoteDeviceName() {
-            String name = null;
-            try {
-                name = rd.getFriendlyName(false);
-                
-            } catch (IOException e) {
-                e.printStackTrace();
-                //TODO: handle exception
-            }
-            return name;
         }
 
         /**
@@ -135,23 +107,21 @@ public class RfcommServer implements MotionController {
                             float p = Float.parseFloat(element[1]);
                             int evt = Integer.parseInt(element[2]);
                             //int user_number = Integer.parseInt(name);
-                            System.err.println(getRemoteDeviceName() + ": (time=" + t + ", position=" + p + ",attacktiming_switch=" + evt + ")");
+                            System.err.println("(time=" + t + ", position=" + p + ", event=" + evt + ")");
 			      /*各ユーザのandroidから送信されたデータの格納処理
 			      user_numberの値に応じて各ユーザごとに分けてデータを処理すること
 			      は可能なのですが将来的にもっと多人数を想定する場合もう少し効率的な書き方をする必要が
-			      あるかもしれません*/
-                            // test -- only P01T_6 can set target
-                            if (getRemoteDeviceName().equals("P01T_6")) {
-                                tm.setTarget(0, tm.height() * (1.0 - p));
-                                if (evt != TargetMover.NO_EVENT) {
-                                    tm.sendEvent(evt);
-                                }                                    
-                            }
+                  あるかもしれません*/
+                            tm.setTargetXY(0, (tm.height() * (1.0 - p)));
+                            if (evt != TargetMover.NO_EVENT) {
+                                tm.sendEvent(evt);
+                            }                                    
                         }
                     }
                     try{
                         Thread.sleep(50);
                     } catch (InterruptedException e){
+                        e.printStackTrace();
                     }
                 }
             } catch (Throwable t) {
@@ -164,11 +134,11 @@ public class RfcommServer implements MotionController {
         //接続が切れた場合ストリームを閉じる
         public void close() {
             System.out.println("Session Close");
-            if (btIn    != null)
+            if (btIn != null)
                 try {
                     btIn.close();
             } catch (Exception e) {}
-            if (btOut   != null)
+            if (btOut != null)
                 try {
                     btOut.close();
                 } catch (Exception e) {}
