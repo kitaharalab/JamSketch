@@ -30,10 +30,10 @@ class JamSketch extends SimplePianoRoll implements TargetMover {
     setLabel("Load").setPosition(300, 645).setSize(120, 40)
 
     if (CFG.MOTION_CONTROLLER != null) {
-      if (CFG.MOTION_CONTROLLER == "RfcommServer"){
-          JamSketch.start("JamSketchSlave")
+      if (CFG.MOTION_CONTROLLER.contains("RfcommServer")){
+          JamSketch.main("JamSketchSlave", ["RfcommServer"] as String[])
       } else {
-        ctrl = Class.forName(CFG.MOTION_CONTROLLER).newInstance()
+        ctrl = Class.forName(CFG.MOTION_CONTROLLER[0]).newInstance()
         ctrl.setTargetMover(this)
         ctrl.init()
         ctrl.start()
@@ -58,13 +58,7 @@ class JamSketch extends SimplePianoRoll implements TargetMover {
     super.draw()    
     strokeWeight(3)
     stroke(0, 0, 255)
-
-    (0..<(melodyData.curve1.size()-1)).each { i ->
-      println("${melodyData.curve1[i]}, ${melodyData.curve1[i+1]}")
-      if (melodyData.curve1[i] != null && melodyData.curve1[i+1] != null) {
-        line(i, melodyData.curve1[i] as int, i+1, melodyData.curve1[i+1] as int)
-      }
-    }
+    drawCurve()
 
     if (getCurrentMeasure() == CFG.NUM_OF_MEASURES - 1) {
       makeLog("melody")
@@ -74,17 +68,19 @@ class JamSketch extends SimplePianoRoll implements TargetMover {
       }
     }
 
-    if ((!CFG.ON_DRAG_ONLY || nowDrawing) && isInside(mouseX, mouseY)) {
-      int m1 = x2measure(mouseX)
-      int m0 = x2measure(pmouseX)
-      if (0 <= m0) {  
-        if (pmouseX < mouseX) {
-          (pmouseX..mouseX).each { i ->
-            melodyData.curve1[i] = mouseY
+    if (!(ctrl in RfcommServer)) {
+      if ((!CFG.ON_DRAG_ONLY || nowDrawing) && isInside(mouseX, mouseY)) {
+        int m1 = x2measure(mouseX)
+        int m0 = x2measure(pmouseX)
+        if (0 <= m0) {  
+          if (pmouseX < mouseX) {
+            (pmouseX..mouseX).each { i ->
+              melodyData.curve1[i] = mouseY
+            }
           }
-        }
-        if (m1 > m0) {
-          melodyData.updateCurve(m0 % CFG.NUM_OF_MEASURES)
+          if (m1 > m0) {
+            melodyData.updateCurve(m0 % CFG.NUM_OF_MEASURES)
+          }
         }
       }
     }
@@ -107,6 +103,15 @@ class JamSketch extends SimplePianoRoll implements TargetMover {
       fill(255, 0, 0)
       ellipse(mouseX, mouseY, 10, 10)
     }
+  }
+
+  void drawCurve() {
+    (0..<(melodyData.curve1.size()-1)).each { i ->
+      //println("${melodyData.curve1[i]}, ${melodyData.curve1[i+1]}")
+      if (melodyData.curve1[i] != null && melodyData.curve1[i+1] != null) {
+        line(i, melodyData.curve1[i] as int, i+1, melodyData.curve1[i+1] as int)
+      }
+    }    
   }
   
   void stop() {
@@ -211,10 +216,6 @@ class JamSketch extends SimplePianoRoll implements TargetMover {
     }
   }
 
-  def eyeX = [] as LinkedList
-  def eyeY = [] as LinkedList
-  def n_eyesmooth = 10
-
   int height() {
     height
   }
@@ -223,7 +224,6 @@ class JamSketch extends SimplePianoRoll implements TargetMover {
     width
   }
 
-  @Synchronized
   void sendEvent(int event) {
     if (event == TargetMover.ONSET) {
        mousePressed()
@@ -234,23 +234,6 @@ class JamSketch extends SimplePianoRoll implements TargetMover {
 
   void setTargetXY(double x, double y) {
     println("(${x}, ${y})")
-    // if (eyeX.size() > n_eyesmooth) {
-    //   eyeX.removeAt(0)
-    //   eyeY.removeAt(0)
-    // }
-    // eyeX.add(x)
-    // eyeY.add(y)
-    // def smoothX = eyeX.sum() / n_eyesmooth
-    // def smoothY = eyeY.sum() / n_eyesmooth
-
-    // smoothX = x
-    // smoothY = y
-
-    // if (smoothX < 0) smoothX = 0
-    // if (smoothX > width) smoothX = width
-    // if (smoothY < 0) smoothY = 0
-    // if (smoothY > height) smoothY = height
-
     mouseX = x
     mouseY = y
   }

@@ -6,7 +6,7 @@ class JamSketchSlave extends JamSketch implements TargetMover {
     size(1200, 700)
     showMidiOutChooser()
 
-    ctrl = Class.forName(CFG.MOTION_CONTROLLER).newInstance()
+    ctrl = Class.forName(args[0]).newInstance()
     ctrl.setTargetMover(this)
     ctrl.init()
     ctrl.start()
@@ -14,18 +14,34 @@ class JamSketchSlave extends JamSketch implements TargetMover {
     initData()
   }
 
-  void draw() {
-    super.draw()
+  void setTargetXY(double x, double y) {
+      int measure = getCurrentMeasure()
+      double beat = getCurrentBeat()
+      if (measure >= 0) {
+        double myX = beat2x(measure + 1, beat)
+        melodyData.curve1[myX as int] = y
+        println("melodyData.curve1[${myX as int}]=${y}")
+        fillCurve1(myX as int)
+    }
+  }
 
-    int m1 = x2measure(mouseX)
-    int m0 = x2measure(pmouseX)
-    if (0 <= m0) {
-      if (pmouseX < mouseX) {
-        (pmouseX..mouseX).each { i ->
-          melodyData.curve1[i] = mouseY
+  private void fillCurve1(currentValueIndex) {
+    if (currentValueIndex > 0) {
+      def pIndex = getPreviousValueIndex(currentValueIndex)
+      if (pIndex >= 0 && (currentValueIndex - pIndex) > 1) {
+        def diff = (melodyData.curve1[currentValueIndex] - melodyData.curve1[pIndex]) / (currentValueIndex - pIndex)
+        for (i in currentValueIndex - 1 .. pIndex + 1) {
+          melodyData.curve1[i] = melodyData.curve1[i + 1] - diff
         }
       }
     }
   }
+
+  private int getPreviousValueIndex(currentValueIndex) {
+    for (i in currentValueIndex - 1 .. 0) {
+      if (melodyData.curve1[i] != null) return i
+      if (i == 0) return -1
+    }
+  } 
 
 }
