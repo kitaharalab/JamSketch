@@ -23,6 +23,10 @@ class TobiiReceiver extends Thread implements MotionController {
     sv_socket.close();
   }
 
+  // def eyeX = [] as LinkedList
+  // def eyeY = [] as LinkedList
+  // def n_eyesmooth = 10
+
   void run() {
     if (tm ==  null)
       throw new IllegalStateException("setTarget() must be called")
@@ -34,7 +38,26 @@ class TobiiReceiver extends Thread implements MotionController {
 	if (match.size() > 0) {
 	  println match[0][1]
 	  println match[0][2]
-	  tm.setTarget(match[0][1] as double, match[0][2] as double)
+
+    // if (eyeX.size() > n_eyesmooth) {
+    //   eyeX.removeAt(0)
+    //   eyeY.removeAt(0)
+    // }
+    // eyeX.add(x)
+    // eyeY.add(y)
+    // def smoothX = eyeX.sum() / n_eyesmooth
+    // def smoothY = eyeY.sum() / n_eyesmooth
+
+    smoothX = match[0][1]
+    smoothY = match[0][2]
+
+    if (smoothX < 0) smoothX = 0
+    if (smoothX > width) smoothX = width
+    if (smoothY < 0) smoothY = 0
+    if (smoothY > height) smoothY = height
+
+
+	  tm.setTargetXY(smoothX as double, smoothY as double)
 	}
 //        System.currentThread().sleep(10) 
     }
