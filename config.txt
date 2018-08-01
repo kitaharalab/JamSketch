@@ -15,12 +15,12 @@ class Config {
   boolean EXPRESSION = true
   boolean MELODY_RESETING = true
   boolean CURSOR_ENHANCED = true
-  boolean ON_DRAG_ONLY = true
+  boolean ON_DRAG_ONLY = false
   int EYE_MOTION_SPEED = 30
   boolean FORCED_PROGRESS = true
-  String MOTION_CONTROLLER = "RfcommServer" // null, EyeTrackerFrame, TobiiReceiver, or RfcommServer
+  List<String> MOTION_CONTROLLER = ["RfcommServer"] // null, EyeTrackerFrame, TobiiReceiver, or RfcommServer
 
-  def OCTAVE_PROGRAM = [win: "octave.exe"]
+  def OCTAVE_PROGRAM = [win: "octave-4.4.0.exe"]
 
   int GA_TIME = 500
   int GA_POPUL_SIZE = 200
