@@ -15,7 +15,7 @@ class JamSketch extends SimplePianoRoll implements TargetMover {
   boolean nowDrawing = false
   String username = ""
   static def CFG
-  def ctrl
+  def motionController
 
   void setup() {
     super.setup()
@@ -30,13 +30,15 @@ class JamSketch extends SimplePianoRoll implements TargetMover {
     setLabel("Load").setPosition(300, 645).setSize(120, 40)
 
     if (CFG.MOTION_CONTROLLER != null) {
-      if (CFG.MOTION_CONTROLLER.contains("RfcommServer")){
-          JamSketch.main("JamSketchSlave", ["RfcommServer"] as String[])
-      } else {
-        ctrl = Class.forName(CFG.MOTION_CONTROLLER[0]).newInstance()
-        ctrl.setTargetMover(this)
-        ctrl.init()
-        ctrl.start()
+      CFG.MOTION_CONTROLLER.each { mCtrl ->
+        if (mCtrl == "RfcommServer") {
+            JamSketch.main("JamSketchSlave", [mCtrl] as String[])
+        } else {
+          motionController = Class.forName(mCtrl).newInstance()
+          motionController.setTargetMover(this)
+          motionController.init()
+          motionController.start()
+        }
       }
     }
 
@@ -68,7 +70,7 @@ class JamSketch extends SimplePianoRoll implements TargetMover {
       }
     }
 
-    if (!(ctrl in RfcommServer)) {
+    if (!(motionController in RfcommServer)) {
       if ((!CFG.ON_DRAG_ONLY || nowDrawing) && isInside(mouseX, mouseY)) {
         int m1 = x2measure(mouseX)
         int m0 = x2measure(pmouseX)

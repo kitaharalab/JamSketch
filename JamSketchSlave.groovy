@@ -6,10 +6,10 @@ class JamSketchSlave extends JamSketch implements TargetMover {
     size(1200, 700)
     showMidiOutChooser()
 
-    ctrl = Class.forName(args[0]).newInstance()
-    ctrl.setTargetMover(this)
-    ctrl.init()
-    ctrl.start()
+    motionController = Class.forName(args[0]).newInstance()
+    motionController.setTargetMover(this)
+    motionController.init()
+    motionController.start()
 
     initData()
   }
