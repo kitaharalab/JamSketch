@@ -38,10 +38,19 @@ public class RfcommServer implements MotionController {
             server = (StreamConnectionNotifier) Connector.open(
                 "btspp://localhost:" + serverUUID,
                 Connector.READ_WRITE, true);
-            ServiceRecord record = LocalDevice.getLocalDevice().getRecord(server);
-            LocalDevice.getLocalDevice().updateRecord(record);
         }
         return server;
+    }
+
+    static public void close() {
+        System.out.println("RfconnServer close() called.");
+        if (server != null) {
+            try {
+                server.close();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     public void setTargetMover(TargetMover tm) {
@@ -137,7 +146,7 @@ public class RfcommServer implements MotionController {
             if (btIn != null)
                 try {
                     btIn.close();
-            } catch (Exception e) {}
+                } catch (Exception e) {}
             if (btOut != null)
                 try {
                     btOut.close();

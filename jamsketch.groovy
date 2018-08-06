@@ -43,6 +43,9 @@ class JamSketch extends SimplePianoRoll implements TargetMover {
     }
 
     initData()
+
+    // add WindowListener (windowClosing) which calls exit();
+    super.setupExternalMessages()
   }
 
   void initData() {
@@ -118,7 +121,7 @@ class JamSketch extends SimplePianoRoll implements TargetMover {
   
   void stop() {
     super.stop()
-    featext.stop()
+    //featext.stop()
   }
 
   void startMusic() {
@@ -218,6 +221,12 @@ class JamSketch extends SimplePianoRoll implements TargetMover {
     }
   }
 
+  public void exit() {
+    println("exit() called.")
+    super.exit();
+    RfcommServer.close();
+  }
+
   int height() {
     height
   }
@@ -239,9 +248,8 @@ class JamSketch extends SimplePianoRoll implements TargetMover {
     mouseX = x
     mouseY = y
   }
-
 }
 JamSketch.CFG = evaluate(new File("./config.txt"))
 JamSketch.start("JamSketch")
-
+// JamSketch.main("JamSketch", ["--external"] as String[])
   
