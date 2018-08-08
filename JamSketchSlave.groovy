@@ -12,6 +12,9 @@ class JamSketchSlave extends JamSketch implements TargetMover {
     motionController.start()
 
     initData()
+
+    // add WindowListener (windowClosing) which calls exit();
+    super.setupExternalMessages()
   }
 
   void setTargetXY(double x, double y) {
@@ -42,6 +45,6 @@ class JamSketchSlave extends JamSketch implements TargetMover {
       if (melodyData.curve1[i] != null) return i
       if (i == 0) return -1
     }
-  } 
+  }
 
 }
