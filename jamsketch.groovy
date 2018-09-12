@@ -31,14 +31,7 @@ class JamSketch extends SimplePianoRoll implements TargetMover {
 
     if (CFG.MOTION_CONTROLLER != null) {
       CFG.MOTION_CONTROLLER.each { mCtrl ->
-        if (mCtrl == "RfcommServer") {
-            JamSketch.main("JamSketchSlave", [mCtrl] as String[])
-        } else {
-          motionController = Class.forName(mCtrl).newInstance()
-          motionController.setTargetMover(this)
-          motionController.init()
-          motionController.start()
-        }
+        JamSketch.main("JamSketchSlave", [mCtrl] as String[])
       }
     }
 
@@ -63,51 +56,11 @@ class JamSketch extends SimplePianoRoll implements TargetMover {
     super.draw()    
     strokeWeight(3)
     stroke(0, 0, 255)
+    
     drawCurve()
-
-    if (getCurrentMeasure() == CFG.NUM_OF_MEASURES - 1) {
-      makeLog("melody")
-      if (CFG.MELODY_RESETING) {
-        getDataModel().shiftMeasure(CFG.NUM_OF_MEASURES)
-        melodyData.resetCurve()
-      }
-    }
-
-    if (!(motionController in RfcommServer)) {
-      if ((!CFG.ON_DRAG_ONLY || nowDrawing) && isInside(mouseX, mouseY)) {
-        int m1 = x2measure(mouseX)
-        int m0 = x2measure(pmouseX)
-        if (0 <= m0) {  
-          if (pmouseX < mouseX) {
-            (pmouseX..mouseX).each { i ->
-              melodyData.curve1[i] = mouseY
-            }
-          }
-          if (m1 > m0) {
-            melodyData.updateCurve(m0 % CFG.NUM_OF_MEASURES)
-          }
-        }
-      }
-    }
-
-    if (isNowPlaying()) {
-      def dataModel = getDataModel()
-      int m = getCurrentMeasure() + dataModel.getFirstMeasure() -
-              CFG.INITIAL_BLANK_MEASURES + 1
-      int mtotal = dataModel.getMeasureNum() * CFG.REPEAT_TIMES
-      textSize(32)
-      fill(0, 0, 0)
-      text(m + " / " + mtotal, 460, 675)
-    }
-
-    if (CFG.FORCED_PROGRESS) {
-      mouseX = beat2x(getCurrentMeasure()+1, getCurrentBeat());
-    }
-
-    if (CFG.CURSOR_ENHANCED) {
-      fill(255, 0, 0)
-      ellipse(mouseX, mouseY, 10, 10)
-    }
+    processLastMeasure()
+    enhanceCursor()
+    drawProgress()
   }
 
   void drawCurve() {
@@ -117,6 +70,52 @@ class JamSketch extends SimplePianoRoll implements TargetMover {
         line(i, melodyData.curve1[i] as int, i+1, melodyData.curve1[i+1] as int)
       }
     }    
+  }
+
+  void storeCursorPosition() {
+    if ((!CFG.ON_DRAG_ONLY || nowDrawing) && isInside(mouseX, mouseY)) {
+      int m1 = x2measure(mouseX)
+      int m0 = x2measure(pmouseX)
+      if (0 <= m0) {  
+        if (pmouseX < mouseX) {
+          (pmouseX..mouseX).each { i ->
+            melodyData.curve1[i] = mouseY
+          }
+        }
+        if (m1 > m0) {
+          melodyData.updateCurve(m0 % CFG.NUM_OF_MEASURES)
+        }
+      }
+    }
+  }
+
+  void processLastMeasure() {
+    if (getCurrentMeasure() == CFG.NUM_OF_MEASURES - 1) {
+      makeLog("melody")
+      if (CFG.MELODY_RESETING) {
+        getDataModel().shiftMeasure(CFG.NUM_OF_MEASURES)
+        melodyData.resetCurve()
+      }
+    }
+  }
+
+  void enhanceCursor() {
+    if (CFG.CURSOR_ENHANCED) {
+      fill(255, 0, 0)
+      ellipse(mouseX, mouseY, 10, 10)
+    }
+  }
+
+  void drawProgress() {
+    if (isNowPlaying()) {
+      def dataModel = getDataModel()
+      int m = getCurrentMeasure() + dataModel.getFirstMeasure() -
+              CFG.INITIAL_BLANK_MEASURES + 1
+      int mtotal = dataModel.getMeasureNum() * CFG.REPEAT_TIMES
+      textSize(32)
+      fill(0, 0, 0)
+      text(m + " / " + mtotal, 460, 675)    
+    }
   }
   
   void stop() {
@@ -197,11 +196,15 @@ class JamSketch extends SimplePianoRoll implements TargetMover {
   
   void mouseReleased() {
     nowDrawing = false
-    if (isInside(mouseX, mouseY)) {
-      println(x2measure(mouseX))
-      println(CFG.NUM_OF_MEASURES)
-      melodyData.updateCurve(x2measure(mouseX) % CFG.NUM_OF_MEASURES)
-    }
+    // if (isInside(mouseX, mouseY)) {
+    //   println(x2measure(mouseX))
+    //   println(CFG.NUM_OF_MEASURES)
+    //   melodyData.updateCurve(x2measure(mouseX) % CFG.NUM_OF_MEASURES)
+    // }
+  }
+
+  void mouseDragged() {
+    storeCursorPosition()
   }
 
   void keyReleased() {

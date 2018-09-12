@@ -18,7 +18,7 @@ class Config {
   boolean ON_DRAG_ONLY = false
   int EYE_MOTION_SPEED = 30
   boolean FORCED_PROGRESS = true
-  List<String> MOTION_CONTROLLER = ["RfcommServer"] // null, EyeTrackerFrame, TobiiReceiver, or RfcommServer
+  List<String> MOTION_CONTROLLER = ["Cursor"] // null, "EyeTrackerFrame", "TobiiReceiver", "RfcommServer" or "Cursor"
 
   def OCTAVE_PROGRAM = [win: "octave-4.4.0.exe"]
 
@@ -26,7 +26,6 @@ class Config {
   int GA_POPUL_SIZE = 200
   String GA_INIT = "tree"  // "random" or "tree"
   
- 
   def MODEL_FILENAME_BASE = "./expressive/models/takeTheATrain_KNN"
   def MODEL_FILENAMES =
     [dur: MODEL_FILENAME_BASE + "_durRat.model",

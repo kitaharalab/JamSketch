@@ -6,15 +6,23 @@ class JamSketchSlave extends JamSketch implements TargetMover {
     size(1200, 700)
     showMidiOutChooser()
 
-    motionController = Class.forName(args[0]).newInstance()
-    motionController.setTargetMover(this)
-    motionController.init()
-    motionController.start()
+    if (args[0] != "Cursor") {
+      motionController = Class.forName(args[0]).newInstance()
+      motionController.setTargetMover(this)
+      motionController.init()
+      motionController.start()
+    }
 
     initData()
 
     // add WindowListener (windowClosing) which calls exit();
     super.setupExternalMessages()
+  }
+
+  void mouseDragged() {
+    if (motionController == null) {
+      storeCursorPosition()
+    }
   }
 
   void setTargetXY(double x, double y) {
