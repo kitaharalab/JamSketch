@@ -2,7 +2,6 @@ class JamSketchSlave extends JamSketch implements TargetMover {
 
   def motionController
   int startPosition = 0
-  int currentX
 
   void setup() {
     background(255)
@@ -59,12 +58,29 @@ class JamSketchSlave extends JamSketch implements TargetMover {
       int measure = getCurrentMeasure()
       double beat = getCurrentBeat()
       if (measure >= 0) {
-        currentX = beat2x(measure + 1, beat) as int
+        def currentX = beat2x(measure + 1, beat) as int
         if (nowDrawing) {
           melodyData.curve1[currentX] = y
           println("melodyData.curve1[${currentX}]=${y}")
           fillCurve1(currentX)
         }
+    }
+  }
+
+  int height() {
+    height
+  }
+
+  int width() {
+    width
+  }
+
+  void sendEvent(int event) {
+    if (event == TargetMover.ONSET) {
+      startPosition = (beat2x(getCurrentMeasure() + 1, getCurrentBeat())) as int
+      nowDrawing = true
+    } else if (event == TargetMover.OFFSET) {
+      nowDrawing = false
     }
   }
 
@@ -84,23 +100,6 @@ class JamSketchSlave extends JamSketch implements TargetMover {
     for (i in currentValueIndex - 1 .. startPosition) {
       if (melodyData.curve1[i] != null) return i
       if (i == startPosition) return -1
-    }
-  }
-
-  int height() {
-    height
-  }
-
-  int width() {
-    width
-  }
-
-  void sendEvent(int event) {
-    if (event == TargetMover.ONSET) {
-      startPosition = currentX
-      nowDrawing = true
-    } else if (event == TargetMover.OFFSET) {
-      nowDrawing = false
     }
   }
 

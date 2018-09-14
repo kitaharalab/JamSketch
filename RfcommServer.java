@@ -121,10 +121,10 @@ public class RfcommServer implements MotionController {
 			      user_numberの値に応じて各ユーザごとに分けてデータを処理すること
 			      は可能なのですが将来的にもっと多人数を想定する場合もう少し効率的な書き方をする必要が
                   あるかもしれません*/
-                            tm.setTargetXY(0, (tm.height() * (1.0 - p)));
                             if (evt != TargetMover.NO_EVENT) {
                                 tm.sendEvent(evt);
                             }                                    
+                            tm.setTargetXY(0, (tm.height() * (1.0 - p)));
                         }
                     }
                     try{
