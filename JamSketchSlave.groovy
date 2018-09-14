@@ -1,5 +1,9 @@
 class JamSketchSlave extends JamSketch implements TargetMover {
 
+  def motionController
+  int startPosition = 0
+  int currentX
+
   void setup() {
     background(255)
     smooth()
@@ -19,6 +23,32 @@ class JamSketchSlave extends JamSketch implements TargetMover {
     super.setupExternalMessages()
   }
 
+  void processLastMeasure() {
+    startPosition = 0
+    super.processLastMeasure()
+  }
+
+  void drawProgress() {
+    super.drawProgress()
+    if (nowDrawing) {
+      textSize(32)
+      fill(255, 165, 0)
+      text("Drawing", 100, 675)    
+    }
+  }
+
+  void mousePressed() {
+    if (motionController == null) {
+      nowDrawing = true
+    }
+  }
+  
+  void mouseReleased() {
+    if (motionController == null) {
+      nowDrawing = false
+    }
+  }
+
   void mouseDragged() {
     if (motionController == null) {
       storeCursorPosition()
@@ -29,15 +59,17 @@ class JamSketchSlave extends JamSketch implements TargetMover {
       int measure = getCurrentMeasure()
       double beat = getCurrentBeat()
       if (measure >= 0) {
-        double myX = beat2x(measure + 1, beat)
-        melodyData.curve1[myX as int] = y
-        println("melodyData.curve1[${myX as int}]=${y}")
-        fillCurve1(myX as int)
+        currentX = beat2x(measure + 1, beat) as int
+        if (nowDrawing) {
+          melodyData.curve1[currentX] = y
+          println("melodyData.curve1[${currentX}]=${y}")
+          fillCurve1(currentX)
+        }
     }
   }
 
   private void fillCurve1(currentValueIndex) {
-    if (currentValueIndex > 0) {
+    if (currentValueIndex > startPosition) {
       def pIndex = getPreviousValueIndex(currentValueIndex)
       if (pIndex >= 0 && (currentValueIndex - pIndex) > 1) {
         def diff = (melodyData.curve1[currentValueIndex] - melodyData.curve1[pIndex]) / (currentValueIndex - pIndex)
@@ -49,9 +81,26 @@ class JamSketchSlave extends JamSketch implements TargetMover {
   }
 
   private int getPreviousValueIndex(currentValueIndex) {
-    for (i in currentValueIndex - 1 .. 0) {
+    for (i in currentValueIndex - 1 .. startPosition) {
       if (melodyData.curve1[i] != null) return i
-      if (i == 0) return -1
+      if (i == startPosition) return -1
+    }
+  }
+
+  int height() {
+    height
+  }
+
+  int width() {
+    width
+  }
+
+  void sendEvent(int event) {
+    if (event == TargetMover.ONSET) {
+      startPosition = currentX
+      nowDrawing = true
+    } else if (event == TargetMover.OFFSET) {
+      nowDrawing = false
     }
   }
 

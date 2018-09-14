@@ -9,13 +9,12 @@ import controlP5.*
 import javax.swing.*
 import javax.swing.filechooser.*
 
-class JamSketch extends SimplePianoRoll implements TargetMover {
+class JamSketch extends SimplePianoRoll {
 
   MelodyData melodyData
   boolean nowDrawing = false
   String username = ""
   static def CFG
-  def motionController
 
   void setup() {
     super.setup()
@@ -58,7 +57,11 @@ class JamSketch extends SimplePianoRoll implements TargetMover {
     stroke(0, 0, 255)
     
     drawCurve()
-    processLastMeasure()
+    
+    if (getCurrentMeasure() == CFG.NUM_OF_MEASURES - 1) {
+      processLastMeasure()
+    }
+    
     enhanceCursor()
     drawProgress()
   }
@@ -90,12 +93,10 @@ class JamSketch extends SimplePianoRoll implements TargetMover {
   }
 
   void processLastMeasure() {
-    if (getCurrentMeasure() == CFG.NUM_OF_MEASURES - 1) {
-      makeLog("melody")
-      if (CFG.MELODY_RESETING) {
-        getDataModel().shiftMeasure(CFG.NUM_OF_MEASURES)
-        melodyData.resetCurve()
-      }
+    makeLog("melody")
+    if (CFG.MELODY_RESETING) {
+      getDataModel().shiftMeasure(CFG.NUM_OF_MEASURES)
+      melodyData.resetCurve()
     }
   }
 
@@ -230,27 +231,6 @@ class JamSketch extends SimplePianoRoll implements TargetMover {
     RfcommServer.close();
   }
 
-  int height() {
-    height
-  }
-
-  int width() {
-    width
-  }
-
-  void sendEvent(int event) {
-    if (event == TargetMover.ONSET) {
-       mousePressed()
-    } else if (event == TargetMover.OFFSET) {
-       mouseReleased()
-    }
-  }
-
-  void setTargetXY(double x, double y) {
-    println("(${x}, ${y})")
-    mouseX = x
-    mouseY = y
-  }
 }
 JamSketch.CFG = evaluate(new File("./config.txt"))
 JamSketch.start("JamSketch")
