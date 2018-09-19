@@ -63,6 +63,7 @@ class JamSketchSlave extends JamSketch implements TargetMover {
           melodyData.curve1[currentX] = y
           println("melodyData.curve1[${currentX}]=${y}")
           fillCurve1(currentX)
+          melodyData.updateCurve(currentX % CFG.NUM_OF_MEASURES)
         }
     }
   }
