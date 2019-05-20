@@ -6,6 +6,9 @@ import jwinpointer.JWinPointerReader.PointerEventListener
 
 public class JWinFrame extends DispatchEventFrame implements PointerEventListener {
 
+	MelodyData mdata
+
+
     def targetListener
     private static final int EVENT_TYPE_DRAG = 1
 	private static final int EVENT_TYPE_HOVER = 2
@@ -15,6 +18,8 @@ public class JWinFrame extends DispatchEventFrame implements PointerEventListene
 	private static final int EVENT_TYPE_BUTTON_UP = 6
 	private static final int EVENT_TYPE_IN_RANGE = 7
 	private static final int EVENT_TYPE_OUT_OF_RANGE = 8
+
+	def i
 
 
 	public JWinFrame(title) {
@@ -50,6 +55,13 @@ public class JWinFrame extends DispatchEventFrame implements PointerEventListene
     public void pointerXYEvent(int deviceType, int pointerID, int eventType, boolean inverted, int x, int y, int pressure) {
     
         println("pointerXYEvent x=${x}, y=${y}, pressure=${pressure} eventType=${eventType} inverted=${inverted}")
+
+		i = x
+		target.pressure[i] = pressure
+
+		mdata.p[i] = pressure
+
+
 
         switch(eventType) {
         case EVENT_TYPE_DRAG:
