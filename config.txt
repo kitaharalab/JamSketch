@@ -10,31 +10,38 @@ class Config {
   int INITIAL_BLANK_MEASURES = 2
   int REPEAT_TIMES = 4
   int CALC_LENGTH = 1
-  String MODEL_FILE = "model20161104b.json"
+//  String MODEL_FILE = "model20161104b.json"
+  String MODEL_FILE = "model20180321.json"
   String LOG_DIR = "log/"
-  boolean EXPRESSION = true
+  boolean EXPRESSION = false
   boolean MELODY_RESETING = true
   boolean CURSOR_ENHANCED = true
   boolean ON_DRAG_ONLY = true
   int EYE_MOTION_SPEED = 30
   boolean FORCED_PROGRESS = false
-  String MOTION_CONTROLLER = null // null, EyeTrackerFrame, TobiiReceiver, or RfcommServer
+  String MOTION_CONTROLLER = null // EyeTrackerFrame, TobiiReceiver, or RfcommServer
 
   def OCTAVE_PROGRAM = [win: "octave-4.4.0.exe"]
 
-  int GA_TIME = 500
+  int GA_TIME_R = 50 //2000 //50
+  int GA_TIME = 500//10000 //500
   int GA_POPUL_SIZE = 200
   String GA_INIT = "tree"  // "random" or "tree"
-  
- 
+
+  def ENT_BIAS = 0.0
+  def RHYTHM_DENSITY = 4.0
+  def RHYTHM_ENGINE = "v2"
+  def SIM_THRESHOLD = 10
+
   def MODEL_FILENAME_BASE = "./expressive/models/takeTheATrain_KNN"
   def MODEL_FILENAMES =
     [dur: MODEL_FILENAME_BASE + "_durRat.model",
      energy: MODEL_FILENAME_BASE + "_energyRat.model",
      onset: MODEL_FILENAME_BASE + "_onsetDev.model"];
   def LIMITS =
-  ////    [onset: [0, 0], dur: [1.0, 1.0], energy: [0.0, 1.99]]
-    [onset: [-0.0833, 0.0833], dur: [0.0625, 1.25], energy: [0.0, 1.99]]
+      [onset: [0, 0], dur: [0.0625, 1.25], energy: [0.0, 1.99]]
+      //      [onset: [0, 0], dur: [1.0, 1.0], energy: [0.0, 1.99]]
+      //  [onset: [-0.0833, 0.0833], dur: [0.0625, 1.25], energy: [0.0, 1.99]]
     //[onset: [-0.1250, 0.1250], dur: [0.0625, 1.5], energy: [0.0, 1.99]]
     //[onset: [-0.0833, 0.0833], dur: [0.0, 1.25], energy: [0.0, 1.99]]
     //[onset: [-0.0625, 0.0625], dur: [0.0, 1.25], energy: [0.0, 1.99]]
