@@ -1,7 +1,0 @@
-#Tue Jul 09 10:28:05 JST 2019
-base.0=C\:\\Users\\fujii\\svn\\picolab\\CrestMuseTrunk\\app\\build\\intermediates\\transforms\\dexMerger\\debug\\10
-path.1=classes2.dex
-renamed.1=classes2.dex
-path.0=classes.dex
-renamed.0=classes.dex
-base.1=C\:\\Users\\fujii\\svn\\picolab\\CrestMuseTrunk\\app\\build\\intermediates\\transforms\\dexMerger\\debug\\10
