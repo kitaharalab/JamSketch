@@ -1,0 +1,168 @@
+-- Merging decision tree log ---
+manifest
+ADDED from C:\Users\fujii\svn\picolab\CrestMuseTrunk\app\src\main\AndroidManifest.xml:2:1-46:12
+INJECTED from C:\Users\fujii\svn\picolab\CrestMuseTrunk\app\src\main\AndroidManifest.xml:2:1-46:12
+INJECTED from C:\Users\fujii\svn\picolab\CrestMuseTrunk\app\src\main\AndroidManifest.xml:2:1-46:12
+INJECTED from C:\Users\fujii\svn\picolab\CrestMuseTrunk\app\src\main\AndroidManifest.xml:2:1-46:12
+MERGED from [com.android.support:multidex:1.0.3] C:\Users\fujii\.gradle\caches\transforms-2\files-2.1\1cf8d0af9acc7d95c93ae6c6b2642c12\AndroidManifest.xml:17:1-22:12
+MERGED from [com.android.support.constraint:constraint-layout:2.0.0-beta1] C:\Users\fujii\.gradle\caches\transforms-2\files-2.1\61070dc2b0915f701a976b1278920426\AndroidManifest.xml:2:1-11:12
+MERGED from [:crestmuse] C:\Users\fujii\svn\picolab\CrestMuseTrunk\crestmuse\build\intermediates\library_manifest\debug\AndroidManifest.xml:2:1-11:12
+MERGED from [:kshoji] C:\Users\fujii\svn\picolab\CrestMuseTrunk\kshoji\build\intermediates\library_manifest\debug\AndroidManifest.xml:2:1-11:12
+MERGED from [com.android.support:appcompat-v7:26.1.0] C:\Users\fujii\.gradle\caches\transforms-2\files-2.1\6d1efefdd0f227cc560dc767abc3c7d3\AndroidManifest.xml:17:1-31:12
+MERGED from [com.android.support:recyclerview-v7:26.1.0] C:\Users\fujii\.gradle\caches\transforms-2\files-2.1\aae5e3dd0b32fd15cf78cf01c85b862e\AndroidManifest.xml:17:1-28:12
+MERGED from [com.android.support:animated-vector-drawable:26.1.0] C:\Users\fujii\.gradle\caches\transforms-2\files-2.1\c92e32ff4314eac422ce94f02049e42b\AndroidManifest.xml:17:1-28:12
+MERGED from [com.android.support:support-vector-drawable:26.1.0] C:\Users\fujii\.gradle\caches\transforms-2\files-2.1\a1db914df0eb1cf569f779d31f5b2eb4\AndroidManifest.xml:17:1-28:12
+MERGED from [com.android.support:support-v4:26.1.0] C:\Users\fujii\.gradle\caches\transforms-2\files-2.1\01b5558ead5cee31e62854fa0d4d8420\AndroidManifest.xml:17:1-31:12
+MERGED from [com.android.support:support-fragment:26.1.0] C:\Users\fujii\.gradle\caches\transforms-2\files-2.1\49fd9fc70f4ea9e501c74341a457d970\AndroidManifest.xml:17:1-31:12
+MERGED from [com.android.support:support-core-ui:26.1.0] C:\Users\fujii\.gradle\caches\transforms-2\files-2.1\ec7b1232764f4aed31d03edfdda2a460\AndroidManifest.xml:17:1-31:12
+MERGED from [com.android.support:support-media-compat:26.1.0] C:\Users\fujii\.gradle\caches\transforms-2\files-2.1\89701639a816fdbd7b9c3d31a6993586\AndroidManifest.xml:17:1-31:12
+MERGED from [com.android.support:support-core-utils:26.1.0] C:\Users\fujii\.gradle\caches\transforms-2\files-2.1\b59e465083b0b20867e25cffa3fba345\AndroidManifest.xml:17:1-31:12
+MERGED from [com.android.support:support-compat:26.1.0] C:\Users\fujii\.gradle\caches\transforms-2\files-2.1\538b11e72bf40cd4cf3551f796c2bb75\AndroidManifest.xml:17:1-31:12
+MERGED from [android.arch.lifecycle:runtime:1.0.0] C:\Users\fujii\.gradle\caches\transforms-2\files-2.1\9281810c16ff56230b2c77c7740ebfff\AndroidManifest.xml:17:1-30:12
+INJECTED from C:\Users\fujii\svn\picolab\CrestMuseTrunk\app\src\main\AndroidManifest.xml:2:1-46:12
+INJECTED from C:\Users\fujii\svn\picolab\CrestMuseTrunk\app\src\main\AndroidManifest.xml:2:1-46:12
+INJECTED from C:\Users\fujii\svn\picolab\CrestMuseTrunk\app\src\main\AndroidManifest.xml:2:1-46:12
+	package
+		ADDED from C:\Users\fujii\svn\picolab\CrestMuseTrunk\app\src\main\AndroidManifest.xml:3:5-35
+		INJECTED from C:\Users\fujii\svn\picolab\CrestMuseTrunk\app\src\main\AndroidManifest.xml
+		INJECTED from C:\Users\fujii\svn\picolab\CrestMuseTrunk\app\src\main\AndroidManifest.xml
+	android:versionName
+		INJECTED from C:\Users\fujii\svn\picolab\CrestMuseTrunk\app\src\main\AndroidManifest.xml
+		ADDED from C:\Users\fujii\svn\picolab\CrestMuseTrunk\app\src\main\AndroidManifest.xml:2:1-46:12
+		INJECTED from C:\Users\fujii\svn\picolab\CrestMuseTrunk\app\src\main\AndroidManifest.xml
+	android:versionCode
+		INJECTED from C:\Users\fujii\svn\picolab\CrestMuseTrunk\app\src\main\AndroidManifest.xml
+		ADDED from C:\Users\fujii\svn\picolab\CrestMuseTrunk\app\src\main\AndroidManifest.xml:2:1-46:12
+		INJECTED from C:\Users\fujii\svn\picolab\CrestMuseTrunk\app\src\main\AndroidManifest.xml
+	xmlns:android
+		ADDED from C:\Users\fujii\svn\picolab\CrestMuseTrunk\app\src\main\AndroidManifest.xml:2:11-69
+application
+ADDED from C:\Users\fujii\svn\picolab\CrestMuseTrunk\app\src\main\AndroidManifest.xml:5:5-44:19
+MERGED from [com.android.support.constraint:constraint-layout:2.0.0-beta1] C:\Users\fujii\.gradle\caches\transforms-2\files-2.1\61070dc2b0915f701a976b1278920426\AndroidManifest.xml:9:5-20
+MERGED from [com.android.support.constraint:constraint-layout:2.0.0-beta1] C:\Users\fujii\.gradle\caches\transforms-2\files-2.1\61070dc2b0915f701a976b1278920426\AndroidManifest.xml:9:5-20
+MERGED from [com.android.support:appcompat-v7:26.1.0] C:\Users\fujii\.gradle\caches\transforms-2\files-2.1\6d1efefdd0f227cc560dc767abc3c7d3\AndroidManifest.xml:25:5-29:19
+MERGED from [com.android.support:appcompat-v7:26.1.0] C:\Users\fujii\.gradle\caches\transforms-2\files-2.1\6d1efefdd0f227cc560dc767abc3c7d3\AndroidManifest.xml:25:5-29:19
+MERGED from [com.android.support:recyclerview-v7:26.1.0] C:\Users\fujii\.gradle\caches\transforms-2\files-2.1\aae5e3dd0b32fd15cf78cf01c85b862e\AndroidManifest.xml:22:5-26:19
+MERGED from [com.android.support:recyclerview-v7:26.1.0] C:\Users\fujii\.gradle\caches\transforms-2\files-2.1\aae5e3dd0b32fd15cf78cf01c85b862e\AndroidManifest.xml:22:5-26:19
+MERGED from [com.android.support:animated-vector-drawable:26.1.0] C:\Users\fujii\.gradle\caches\transforms-2\files-2.1\c92e32ff4314eac422ce94f02049e42b\AndroidManifest.xml:22:5-26:19
+MERGED from [com.android.support:animated-vector-drawable:26.1.0] C:\Users\fujii\.gradle\caches\transforms-2\files-2.1\c92e32ff4314eac422ce94f02049e42b\AndroidManifest.xml:22:5-26:19
+MERGED from [com.android.support:support-vector-drawable:26.1.0] C:\Users\fujii\.gradle\caches\transforms-2\files-2.1\a1db914df0eb1cf569f779d31f5b2eb4\AndroidManifest.xml:22:5-26:19
+MERGED from [com.android.support:support-vector-drawable:26.1.0] C:\Users\fujii\.gradle\caches\transforms-2\files-2.1\a1db914df0eb1cf569f779d31f5b2eb4\AndroidManifest.xml:22:5-26:19
+MERGED from [com.android.support:support-v4:26.1.0] C:\Users\fujii\.gradle\caches\transforms-2\files-2.1\01b5558ead5cee31e62854fa0d4d8420\AndroidManifest.xml:25:5-29:19
+MERGED from [com.android.support:support-v4:26.1.0] C:\Users\fujii\.gradle\caches\transforms-2\files-2.1\01b5558ead5cee31e62854fa0d4d8420\AndroidManifest.xml:25:5-29:19
+MERGED from [com.android.support:support-fragment:26.1.0] C:\Users\fujii\.gradle\caches\transforms-2\files-2.1\49fd9fc70f4ea9e501c74341a457d970\AndroidManifest.xml:25:5-29:19
+MERGED from [com.android.support:support-fragment:26.1.0] C:\Users\fujii\.gradle\caches\transforms-2\files-2.1\49fd9fc70f4ea9e501c74341a457d970\AndroidManifest.xml:25:5-29:19
+MERGED from [com.android.support:support-core-ui:26.1.0] C:\Users\fujii\.gradle\caches\transforms-2\files-2.1\ec7b1232764f4aed31d03edfdda2a460\AndroidManifest.xml:25:5-29:19
+MERGED from [com.android.support:support-core-ui:26.1.0] C:\Users\fujii\.gradle\caches\transforms-2\files-2.1\ec7b1232764f4aed31d03edfdda2a460\AndroidManifest.xml:25:5-29:19
+MERGED from [com.android.support:support-media-compat:26.1.0] C:\Users\fujii\.gradle\caches\transforms-2\files-2.1\89701639a816fdbd7b9c3d31a6993586\AndroidManifest.xml:25:5-29:19
+MERGED from [com.android.support:support-media-compat:26.1.0] C:\Users\fujii\.gradle\caches\transforms-2\files-2.1\89701639a816fdbd7b9c3d31a6993586\AndroidManifest.xml:25:5-29:19
+MERGED from [com.android.support:support-core-utils:26.1.0] C:\Users\fujii\.gradle\caches\transforms-2\files-2.1\b59e465083b0b20867e25cffa3fba345\AndroidManifest.xml:25:5-29:19
+MERGED from [com.android.support:support-core-utils:26.1.0] C:\Users\fujii\.gradle\caches\transforms-2\files-2.1\b59e465083b0b20867e25cffa3fba345\AndroidManifest.xml:25:5-29:19
+MERGED from [com.android.support:support-compat:26.1.0] C:\Users\fujii\.gradle\caches\transforms-2\files-2.1\538b11e72bf40cd4cf3551f796c2bb75\AndroidManifest.xml:25:5-29:19
+MERGED from [com.android.support:support-compat:26.1.0] C:\Users\fujii\.gradle\caches\transforms-2\files-2.1\538b11e72bf40cd4cf3551f796c2bb75\AndroidManifest.xml:25:5-29:19
+MERGED from [android.arch.lifecycle:runtime:1.0.0] C:\Users\fujii\.gradle\caches\transforms-2\files-2.1\9281810c16ff56230b2c77c7740ebfff\AndroidManifest.xml:24:5-28:19
+MERGED from [android.arch.lifecycle:runtime:1.0.0] C:\Users\fujii\.gradle\caches\transforms-2\files-2.1\9281810c16ff56230b2c77c7740ebfff\AndroidManifest.xml:24:5-28:19
+	android:supportsRtl
+		ADDED from C:\Users\fujii\svn\picolab\CrestMuseTrunk\app\src\main\AndroidManifest.xml:9:9-35
+	android:label
+		ADDED from C:\Users\fujii\svn\picolab\CrestMuseTrunk\app\src\main\AndroidManifest.xml:8:9-41
+	android:icon
+		ADDED from C:\Users\fujii\svn\picolab\CrestMuseTrunk\app\src\main\AndroidManifest.xml:7:9-43
+	android:allowBackup
+		ADDED from C:\Users\fujii\svn\picolab\CrestMuseTrunk\app\src\main\AndroidManifest.xml:6:9-35
+	android:theme
+		ADDED from C:\Users\fujii\svn\picolab\CrestMuseTrunk\app\src\main\AndroidManifest.xml:10:9-40
+activity#jp.crestmuse.cmxtest.CMActivity
+ADDED from C:\Users\fujii\svn\picolab\CrestMuseTrunk\app\src\main\AndroidManifest.xml:11:9-17:20
+	android:name
+		ADDED from C:\Users\fujii\svn\picolab\CrestMuseTrunk\app\src\main\AndroidManifest.xml:11:19-45
+intent-filter#action:name:android.intent.action.MAIN+category:name:android.intent.category.LAUNCHER
+ADDED from C:\Users\fujii\svn\picolab\CrestMuseTrunk\app\src\main\AndroidManifest.xml:12:13-16:29
+action#android.intent.action.MAIN
+ADDED from C:\Users\fujii\svn\picolab\CrestMuseTrunk\app\src\main\AndroidManifest.xml:13:17-69
+	android:name
+		ADDED from C:\Users\fujii\svn\picolab\CrestMuseTrunk\app\src\main\AndroidManifest.xml:13:25-66
+category#android.intent.category.LAUNCHER
+ADDED from C:\Users\fujii\svn\picolab\CrestMuseTrunk\app\src\main\AndroidManifest.xml:15:17-77
+	android:name
+		ADDED from C:\Users\fujii\svn\picolab\CrestMuseTrunk\app\src\main\AndroidManifest.xml:15:27-74
+activity#jp.kthrlab.jamsketch.JamSketchActivity
+ADDED from C:\Users\fujii\svn\picolab\CrestMuseTrunk\app\src\main\AndroidManifest.xml:25:9-36:20
+	android:name
+		ADDED from C:\Users\fujii\svn\picolab\CrestMuseTrunk\app\src\main\AndroidManifest.xml:25:19-72
+uses-sdk
+INJECTED from C:\Users\fujii\svn\picolab\CrestMuseTrunk\app\src\main\AndroidManifest.xml reason: use-sdk injection requested
+INJECTED from C:\Users\fujii\svn\picolab\CrestMuseTrunk\app\src\main\AndroidManifest.xml
+INJECTED from C:\Users\fujii\svn\picolab\CrestMuseTrunk\app\src\main\AndroidManifest.xml
+MERGED from [com.android.support:multidex:1.0.3] C:\Users\fujii\.gradle\caches\transforms-2\files-2.1\1cf8d0af9acc7d95c93ae6c6b2642c12\AndroidManifest.xml:20:5-43
+MERGED from [com.android.support:multidex:1.0.3] C:\Users\fujii\.gradle\caches\transforms-2\files-2.1\1cf8d0af9acc7d95c93ae6c6b2642c12\AndroidManifest.xml:20:5-43
+MERGED from [com.android.support.constraint:constraint-layout:2.0.0-beta1] C:\Users\fujii\.gradle\caches\transforms-2\files-2.1\61070dc2b0915f701a976b1278920426\AndroidManifest.xml:5:5-7:41
+MERGED from [com.android.support.constraint:constraint-layout:2.0.0-beta1] C:\Users\fujii\.gradle\caches\transforms-2\files-2.1\61070dc2b0915f701a976b1278920426\AndroidManifest.xml:5:5-7:41
+MERGED from [:crestmuse] C:\Users\fujii\svn\picolab\CrestMuseTrunk\crestmuse\build\intermediates\library_manifest\debug\AndroidManifest.xml:7:5-9:41
+MERGED from [:crestmuse] C:\Users\fujii\svn\picolab\CrestMuseTrunk\crestmuse\build\intermediates\library_manifest\debug\AndroidManifest.xml:7:5-9:41
+MERGED from [:kshoji] C:\Users\fujii\svn\picolab\CrestMuseTrunk\kshoji\build\intermediates\library_manifest\debug\AndroidManifest.xml:7:5-9:41
+MERGED from [:kshoji] C:\Users\fujii\svn\picolab\CrestMuseTrunk\kshoji\build\intermediates\library_manifest\debug\AndroidManifest.xml:7:5-9:41
+MERGED from [com.android.support:appcompat-v7:26.1.0] C:\Users\fujii\.gradle\caches\transforms-2\files-2.1\6d1efefdd0f227cc560dc767abc3c7d3\AndroidManifest.xml:21:5-23:78
+MERGED from [com.android.support:appcompat-v7:26.1.0] C:\Users\fujii\.gradle\caches\transforms-2\files-2.1\6d1efefdd0f227cc560dc767abc3c7d3\AndroidManifest.xml:21:5-23:78
+MERGED from [com.android.support:recyclerview-v7:26.1.0] C:\Users\fujii\.gradle\caches\transforms-2\files-2.1\aae5e3dd0b32fd15cf78cf01c85b862e\AndroidManifest.xml:20:5-44
+MERGED from [com.android.support:recyclerview-v7:26.1.0] C:\Users\fujii\.gradle\caches\transforms-2\files-2.1\aae5e3dd0b32fd15cf78cf01c85b862e\AndroidManifest.xml:20:5-44
+MERGED from [com.android.support:animated-vector-drawable:26.1.0] C:\Users\fujii\.gradle\caches\transforms-2\files-2.1\c92e32ff4314eac422ce94f02049e42b\AndroidManifest.xml:20:5-44
+MERGED from [com.android.support:animated-vector-drawable:26.1.0] C:\Users\fujii\.gradle\caches\transforms-2\files-2.1\c92e32ff4314eac422ce94f02049e42b\AndroidManifest.xml:20:5-44
+MERGED from [com.android.support:support-vector-drawable:26.1.0] C:\Users\fujii\.gradle\caches\transforms-2\files-2.1\a1db914df0eb1cf569f779d31f5b2eb4\AndroidManifest.xml:20:5-44
+MERGED from [com.android.support:support-vector-drawable:26.1.0] C:\Users\fujii\.gradle\caches\transforms-2\files-2.1\a1db914df0eb1cf569f779d31f5b2eb4\AndroidManifest.xml:20:5-44
+MERGED from [com.android.support:support-v4:26.1.0] C:\Users\fujii\.gradle\caches\transforms-2\files-2.1\01b5558ead5cee31e62854fa0d4d8420\AndroidManifest.xml:21:5-23:54
+MERGED from [com.android.support:support-v4:26.1.0] C:\Users\fujii\.gradle\caches\transforms-2\files-2.1\01b5558ead5cee31e62854fa0d4d8420\AndroidManifest.xml:21:5-23:54
+MERGED from [com.android.support:support-fragment:26.1.0] C:\Users\fujii\.gradle\caches\transforms-2\files-2.1\49fd9fc70f4ea9e501c74341a457d970\AndroidManifest.xml:21:5-23:60
+MERGED from [com.android.support:support-fragment:26.1.0] C:\Users\fujii\.gradle\caches\transforms-2\files-2.1\49fd9fc70f4ea9e501c74341a457d970\AndroidManifest.xml:21:5-23:60
+MERGED from [com.android.support:support-core-ui:26.1.0] C:\Users\fujii\.gradle\caches\transforms-2\files-2.1\ec7b1232764f4aed31d03edfdda2a460\AndroidManifest.xml:21:5-23:58
+MERGED from [com.android.support:support-core-ui:26.1.0] C:\Users\fujii\.gradle\caches\transforms-2\files-2.1\ec7b1232764f4aed31d03edfdda2a460\AndroidManifest.xml:21:5-23:58
+MERGED from [com.android.support:support-media-compat:26.1.0] C:\Users\fujii\.gradle\caches\transforms-2\files-2.1\89701639a816fdbd7b9c3d31a6993586\AndroidManifest.xml:21:5-23:63
+MERGED from [com.android.support:support-media-compat:26.1.0] C:\Users\fujii\.gradle\caches\transforms-2\files-2.1\89701639a816fdbd7b9c3d31a6993586\AndroidManifest.xml:21:5-23:63
+MERGED from [com.android.support:support-core-utils:26.1.0] C:\Users\fujii\.gradle\caches\transforms-2\files-2.1\b59e465083b0b20867e25cffa3fba345\AndroidManifest.xml:21:5-23:61
+MERGED from [com.android.support:support-core-utils:26.1.0] C:\Users\fujii\.gradle\caches\transforms-2\files-2.1\b59e465083b0b20867e25cffa3fba345\AndroidManifest.xml:21:5-23:61
+MERGED from [com.android.support:support-compat:26.1.0] C:\Users\fujii\.gradle\caches\transforms-2\files-2.1\538b11e72bf40cd4cf3551f796c2bb75\AndroidManifest.xml:21:5-23:58
+MERGED from [com.android.support:support-compat:26.1.0] C:\Users\fujii\.gradle\caches\transforms-2\files-2.1\538b11e72bf40cd4cf3551f796c2bb75\AndroidManifest.xml:21:5-23:58
+MERGED from [android.arch.lifecycle:runtime:1.0.0] C:\Users\fujii\.gradle\caches\transforms-2\files-2.1\9281810c16ff56230b2c77c7740ebfff\AndroidManifest.xml:20:5-22:41
+MERGED from [android.arch.lifecycle:runtime:1.0.0] C:\Users\fujii\.gradle\caches\transforms-2\files-2.1\9281810c16ff56230b2c77c7740ebfff\AndroidManifest.xml:20:5-22:41
+INJECTED from C:\Users\fujii\svn\picolab\CrestMuseTrunk\app\src\main\AndroidManifest.xml
+INJECTED from C:\Users\fujii\svn\picolab\CrestMuseTrunk\app\src\main\AndroidManifest.xml
+	tools:overrideLibrary
+		ADDED from [com.android.support:appcompat-v7:26.1.0] C:\Users\fujii\.gradle\caches\transforms-2\files-2.1\6d1efefdd0f227cc560dc767abc3c7d3\AndroidManifest.xml:23:9-75
+	android:targetSdkVersion
+		INJECTED from C:\Users\fujii\svn\picolab\CrestMuseTrunk\app\src\main\AndroidManifest.xml
+		ADDED from C:\Users\fujii\svn\picolab\CrestMuseTrunk\app\src\main\AndroidManifest.xml
+		INJECTED from C:\Users\fujii\svn\picolab\CrestMuseTrunk\app\src\main\AndroidManifest.xml
+	android:minSdkVersion
+		INJECTED from C:\Users\fujii\svn\picolab\CrestMuseTrunk\app\src\main\AndroidManifest.xml
+		ADDED from C:\Users\fujii\svn\picolab\CrestMuseTrunk\app\src\main\AndroidManifest.xml
+		INJECTED from C:\Users\fujii\svn\picolab\CrestMuseTrunk\app\src\main\AndroidManifest.xml
+meta-data#android.support.VERSION
+ADDED from [com.android.support:appcompat-v7:26.1.0] C:\Users\fujii\.gradle\caches\transforms-2\files-2.1\6d1efefdd0f227cc560dc767abc3c7d3\AndroidManifest.xml:26:9-28:38
+MERGED from [com.android.support:recyclerview-v7:26.1.0] C:\Users\fujii\.gradle\caches\transforms-2\files-2.1\aae5e3dd0b32fd15cf78cf01c85b862e\AndroidManifest.xml:23:9-25:38
+MERGED from [com.android.support:recyclerview-v7:26.1.0] C:\Users\fujii\.gradle\caches\transforms-2\files-2.1\aae5e3dd0b32fd15cf78cf01c85b862e\AndroidManifest.xml:23:9-25:38
+MERGED from [com.android.support:animated-vector-drawable:26.1.0] C:\Users\fujii\.gradle\caches\transforms-2\files-2.1\c92e32ff4314eac422ce94f02049e42b\AndroidManifest.xml:23:9-25:38
+MERGED from [com.android.support:animated-vector-drawable:26.1.0] C:\Users\fujii\.gradle\caches\transforms-2\files-2.1\c92e32ff4314eac422ce94f02049e42b\AndroidManifest.xml:23:9-25:38
+MERGED from [com.android.support:support-vector-drawable:26.1.0] C:\Users\fujii\.gradle\caches\transforms-2\files-2.1\a1db914df0eb1cf569f779d31f5b2eb4\AndroidManifest.xml:23:9-25:38
+MERGED from [com.android.support:support-vector-drawable:26.1.0] C:\Users\fujii\.gradle\caches\transforms-2\files-2.1\a1db914df0eb1cf569f779d31f5b2eb4\AndroidManifest.xml:23:9-25:38
+MERGED from [com.android.support:support-v4:26.1.0] C:\Users\fujii\.gradle\caches\transforms-2\files-2.1\01b5558ead5cee31e62854fa0d4d8420\AndroidManifest.xml:26:9-28:38
+MERGED from [com.android.support:support-v4:26.1.0] C:\Users\fujii\.gradle\caches\transforms-2\files-2.1\01b5558ead5cee31e62854fa0d4d8420\AndroidManifest.xml:26:9-28:38
+MERGED from [com.android.support:support-fragment:26.1.0] C:\Users\fujii\.gradle\caches\transforms-2\files-2.1\49fd9fc70f4ea9e501c74341a457d970\AndroidManifest.xml:26:9-28:38
+MERGED from [com.android.support:support-fragment:26.1.0] C:\Users\fujii\.gradle\caches\transforms-2\files-2.1\49fd9fc70f4ea9e501c74341a457d970\AndroidManifest.xml:26:9-28:38
+MERGED from [com.android.support:support-core-ui:26.1.0] C:\Users\fujii\.gradle\caches\transforms-2\files-2.1\ec7b1232764f4aed31d03edfdda2a460\AndroidManifest.xml:26:9-28:38
+MERGED from [com.android.support:support-core-ui:26.1.0] C:\Users\fujii\.gradle\caches\transforms-2\files-2.1\ec7b1232764f4aed31d03edfdda2a460\AndroidManifest.xml:26:9-28:38
+MERGED from [com.android.support:support-media-compat:26.1.0] C:\Users\fujii\.gradle\caches\transforms-2\files-2.1\89701639a816fdbd7b9c3d31a6993586\AndroidManifest.xml:26:9-28:38
+MERGED from [com.android.support:support-media-compat:26.1.0] C:\Users\fujii\.gradle\caches\transforms-2\files-2.1\89701639a816fdbd7b9c3d31a6993586\AndroidManifest.xml:26:9-28:38
+MERGED from [com.android.support:support-core-utils:26.1.0] C:\Users\fujii\.gradle\caches\transforms-2\files-2.1\b59e465083b0b20867e25cffa3fba345\AndroidManifest.xml:26:9-28:38
+MERGED from [com.android.support:support-core-utils:26.1.0] C:\Users\fujii\.gradle\caches\transforms-2\files-2.1\b59e465083b0b20867e25cffa3fba345\AndroidManifest.xml:26:9-28:38
+MERGED from [com.android.support:support-compat:26.1.0] C:\Users\fujii\.gradle\caches\transforms-2\files-2.1\538b11e72bf40cd4cf3551f796c2bb75\AndroidManifest.xml:26:9-28:38
+MERGED from [com.android.support:support-compat:26.1.0] C:\Users\fujii\.gradle\caches\transforms-2\files-2.1\538b11e72bf40cd4cf3551f796c2bb75\AndroidManifest.xml:26:9-28:38
+	android:value
+		ADDED from [com.android.support:appcompat-v7:26.1.0] C:\Users\fujii\.gradle\caches\transforms-2\files-2.1\6d1efefdd0f227cc560dc767abc3c7d3\AndroidManifest.xml:28:13-35
+	android:name
+		ADDED from [com.android.support:appcompat-v7:26.1.0] C:\Users\fujii\.gradle\caches\transforms-2\files-2.1\6d1efefdd0f227cc560dc767abc3c7d3\AndroidManifest.xml:27:13-51
+meta-data#android.arch.lifecycle.VERSION
+ADDED from [android.arch.lifecycle:runtime:1.0.0] C:\Users\fujii\.gradle\caches\transforms-2\files-2.1\9281810c16ff56230b2c77c7740ebfff\AndroidManifest.xml:25:9-27:47
+	android:value
+		ADDED from [android.arch.lifecycle:runtime:1.0.0] C:\Users\fujii\.gradle\caches\transforms-2\files-2.1\9281810c16ff56230b2c77c7740ebfff\AndroidManifest.xml:27:13-44
+	android:name
+		ADDED from [android.arch.lifecycle:runtime:1.0.0] C:\Users\fujii\.gradle\caches\transforms-2\files-2.1\9281810c16ff56230b2c77c7740ebfff\AndroidManifest.xml:26:13-58
