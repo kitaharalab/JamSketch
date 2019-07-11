@@ -15,10 +15,16 @@ public class Control {
     }
 
     public Button addButton(String id) {
-        pApplet.registerMethod(id, pApplet);
+//        pApplet.registerMethod(id, pApplet);
         Button button = new Button(id, pApplet);
-        controllers.add(button);
+        addController(button);
         return button;
+    }
+
+    private void addController(Controller controller) {
+        controllers.add(controller);
+        pApplet.registerMethod("mouseEvent", controller);
+//        pApplet.registerMethod("touchEvent", controller);
     }
 
     public void draw() {

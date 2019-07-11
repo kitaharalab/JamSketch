@@ -1,6 +1,7 @@
 package jp.kthrlab.jamsketch;
 
 import processing.core.PApplet;
+import processing.event.MouseEvent;
 import processing.event.TouchEvent;
 
 public abstract class Controller {
@@ -35,6 +36,18 @@ public abstract class Controller {
     }
 
     public boolean overRect() {
+        if(pApplet.mouseX >= positionX && pApplet.mouseX <= positionX + width &&
+        pApplet.mouseY >= positionY && pApplet.mouseY <= positionY  + height) return true;
+
+        for (TouchEvent.Pointer touch : pApplet.touches) {
+            System.out.println(touch.x + ", " + touch.y);
+            if (touch.x >= positionX && touch.x <= positionX + width &&
+                    touch.y >= positionY && touch.y <= positionY + height) return true;
+        }
+        return false;
+    }
+
+    public boolean pOverRect() {
         for (TouchEvent.Pointer touch : pApplet.touches) {
             if (touch.x >= positionX && touch.x <= positionX + width &&
                     touch.y >= positionY && touch.y <= positionY + height) return true;
@@ -43,5 +56,9 @@ public abstract class Controller {
     }
 
     public abstract void draw();
+//    public abstract void touchEvent(TouchEvent event);
+    public abstract void mouseEvent(MouseEvent event);
+//    public abstract void touchStarted(TouchEvent event);
+//    public abstract void touchEnded(TouchEvent event);
 
 }

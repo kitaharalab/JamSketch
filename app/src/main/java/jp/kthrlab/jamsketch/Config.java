@@ -26,7 +26,7 @@ public class Config {
 
     //  def OCTAVE_PROGRAM = [win: "octave-4.0.1.exe"]
 
-    static int GA_TIME = 100;
+    static int GA_TIME = 50;
     static int GA_POPUL_SIZE = 200;
     static String GA_INIT = "tree";  // "random" or "tree"
 

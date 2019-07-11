@@ -8,7 +8,6 @@ import java.util.stream.IntStream;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
 
-import controlP5.ControlP5;
 import jp.crestmuse.cmx.filewrappers.SCCDataSet;
 import jp.crestmuse.cmx.misc.PianoRoll;
 import jp.crestmuse.cmx.processing.gui.SimplePianoRoll;
@@ -20,13 +19,7 @@ public class JamSketch extends SimplePianoRoll {
 
     private MelodyData melodyData;
     private boolean nowDrawing = false;
-    private String status ="aaa";
-    private ControlP5 p5ctrl;
     private Control control;
-
-//    Button button;
-//    Layout layout;
-//    final Handler handler = new Handler(Looper.getMainLooper());
 
     @Override
     public void settings() {
@@ -37,36 +30,23 @@ public class JamSketch extends SimplePianoRoll {
     @Override
     public void setup() {
         super.setup();
-        status = "setup()";
 
         orientation(LANDSCAPE);
 
-//        button = new Button(getActivity());
-//        button.setX(440);
-//        button.setY(645);
-//        button.setWidth(120);
-//        button.setHeight(40);
-//        button.setText("BUTTON");
-//        handler.post(() -> {
-//            ((FrameLayout)getWindow().getDecorView().getRootView()).addView(button);
-//        }) ;
         control = new Control(this);
         control.addButton("startMusic")
                 .setLabel("Start")
                 .setPosition(20, 645)
                 .setSize(120, 40);
 
-        p5ctrl = new ControlP5(this);
-//        p5ctrl.addButton("startMusic").
-//                setLabel("Start").setPosition(20, 645).setSize(120, 40);
-        p5ctrl.addButton("stopPlayMusic").
+        control.addButton("stopPlayMusic").
 //                activateBy(ControlP5.PRESS).
                 setLabel("Stop").setPosition(160, 645).setSize(120, 40);
 //        p5ctrl.addButton("resetMusic").
 //                setLabel("Reset").setPosition(160, 645).setSize(120, 40);
 //        p5ctrl.addButton("loadCurve").
 //                setLabel("Load").setPosition(300, 645).setSize(120, 40);
-        p5ctrl.addButton("showMidiOutChooser").
+        control.addButton("showMidiOutChooser").
                 setLabel("MidiOut").setPosition(300, 645).setSize(120, 40);
 
 
@@ -75,15 +55,6 @@ public class JamSketch extends SimplePianoRoll {
 //                .setPosition(440, 645)
 //                .setSize(120, 40);
 
-//        p5ctrl.addIcon("icon",10)
-//                .setPosition(100,100)
-//                .setSize(70,50)
-//                .setRoundedCorners(20)
-//                .setFont(createFont("fontawesome-webfont.ttf", 40))
-//                .setFontIcons(0x00f205, 0x00f204)
-//                .setColorBackground(color(255,100))
-//                .hideBackground()
-//                .setSwitch(true);
 
         initData();
 
@@ -95,7 +66,6 @@ public class JamSketch extends SimplePianoRoll {
 
     void initData() {
         System.out.println("initData()");
-        status = "initData()";
         String filename = Config.MIDFILENAME;
 //        try {
 ////            filename = getClass().getClassLoader().getResource(Config.MIDFILENAME).toURI().getPath();
@@ -147,18 +117,14 @@ public class JamSketch extends SimplePianoRoll {
             }
 
             enhanceCursor();
-//            drawProgress();
+            drawProgress();
         }
 
-//        control.draw();
         // test only
-        drawStatus();
-//        if (button != null)
-//            button.setVisibility(View.VISIBLE);
+//        drawTickPosition();
     }
 
     void drawCurve() {
-//        line(pmouseX, pmouseY, mouseX, mouseY);
         IntStream.range(0, melodyData.curve1.size()-1).forEach(i ->{
             if (melodyData.curve1.get(i) != null && melodyData.curve1.get(i + 1) != null) {
                 line(i, melodyData.curve1.get(i), i+1, melodyData.curve1.get(i + 1));
@@ -207,18 +173,17 @@ public class JamSketch extends SimplePianoRoll {
             int mtotal = dataModel.getMeasureNum() * Config.REPEAT_TIMES;
             textSize(32);
             fill(0, 0, 0);
-            text(m + " / " + mtotal, 600, 640);
+            text(m + " / " + mtotal, 600, 665);
         }
     }
 
-    void drawStatus() {
+    void drawTickPosition() {
         textSize(24);
         fill(0, 0, 0);
-        text(getTickPosition(), 600, 660);
+        text(getTickPosition(), 600, 680);
     }
 
     public void startMusic() {
-        status = "playMusic() called. isNowPlaying() = " + isNowPlaying();
 
         if (!isNowPlaying()) {
             // add for debug 20190624 fujii
@@ -232,12 +197,10 @@ public class JamSketch extends SimplePianoRoll {
             }
 
             playMusic();
-            status = "playMusic()";
         }
     }
 
     public void stopPlayMusic() {
-        status = "stopPlayMusic() called. isNowPlaying() = " + isNowPlaying();
         if (isNowPlaying()) {
 //            try {
 //                melodyData.scc.toWrapper().println(); //writefileAsSMF(midname);
@@ -250,7 +213,6 @@ public class JamSketch extends SimplePianoRoll {
 
             // add for debug 20190619 fujii
             ((SequencerImpl)getSequencer()).setLoopStartPoint(getTickPosition());
-            status = "stopMusic(). isNowPlaying() = " + isNowPlaying();
         }
     }
 
@@ -278,13 +240,11 @@ public class JamSketch extends SimplePianoRoll {
     }
 
     public void showMidiOutChooser() {
-        status = "showMidiOutChooser()";
         showMidiOutChooser(JamSketchActivity.getMyContext(), android.R.layout.simple_list_item_1);
 
     }
 
     public void loadCurve() {
-        status = "loadCurve() called.";
     }
 
     @Override
@@ -301,6 +261,7 @@ public class JamSketch extends SimplePianoRoll {
     public void mouseDragged() {
         storeCursorPosition();
     }
+
 
 //    @Override
 //    void keyReleased() {
