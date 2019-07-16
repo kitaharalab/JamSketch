@@ -2,17 +2,9 @@
 
 JamSketch is a jam session system that enables the user to enjoy improvisation just by drawing curves that represent the overall shape of melodies.
 
-## Installation
-
-Unzip jamsketch_lite.zip anywhere.
-
-## Usage
-
-Execute jamsketch_lite.exe on Windows.  
-Execute jamsketch_lite.jar on all platforms.
-
 ## Requirements
 
+* Android minSdkVersion 27
 * Java Runtime Environment(JRE) Version 8
 
 ## References
