@@ -20,6 +20,7 @@ public class JamSketch extends SimplePianoRoll {
     private MelodyData melodyData;
     private boolean nowDrawing = false;
     private Control control;
+    private boolean inited = false;
 
     @Override
     public void settings() {
@@ -40,14 +41,13 @@ public class JamSketch extends SimplePianoRoll {
                 .setSize(120, 40);
 
         control.addButton("stopPlayMusic").
-//                activateBy(ControlP5.PRESS).
                 setLabel("Stop").setPosition(160, 645).setSize(120, 40);
-//        p5ctrl.addButton("resetMusic").
-//                setLabel("Reset").setPosition(160, 645).setSize(120, 40);
+        control.addButton("resetMusic").
+                setLabel("Reset").setPosition(300, 645).setSize(120, 40);
 //        p5ctrl.addButton("loadCurve").
 //                setLabel("Load").setPosition(300, 645).setSize(120, 40);
         control.addButton("showMidiOutChooser").
-                setLabel("MidiOut").setPosition(300, 645).setSize(120, 40);
+                setLabel("MidiOut").setPosition(440, 645).setSize(120, 40);
 
 
 //        p5ctrl.addButton("printSequence")
@@ -55,8 +55,7 @@ public class JamSketch extends SimplePianoRoll {
 //                .setPosition(440, 645)
 //                .setSize(120, 40);
 
-
-        initData();
+//        initData();
 
     }
 
@@ -65,17 +64,11 @@ public class JamSketch extends SimplePianoRoll {
     }
 
     void initData() {
+
+        // TODO: add condition 'if (midiouts[0] != null)'
+
         System.out.println("initData()");
         String filename = Config.MIDFILENAME;
-//        try {
-////            filename = getClass().getClassLoader().getResource(Config.MIDFILENAME).toURI().getPath();
-////            System.out.println(System.getProperty("java.class.path"));
-//            URL url = getClass().getClassLoader().getResource(Config.MIDFILENAME);
-//            filename = getClass().getResource(Config.MIDFILENAME).toURI().getPath();
-//            System.out.println(filename);
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//        }
 //        println(melodyData.getFullChordProgression());
         melodyData = new MelodyData(filename, width,  this, this);
 
@@ -101,6 +94,7 @@ public class JamSketch extends SimplePianoRoll {
                             Config.INITIAL_BLANK_MEASURES + Config.NUM_OF_MEASURES
                     ));
 
+        inited = true;
     }
 
     @Override
@@ -109,7 +103,7 @@ public class JamSketch extends SimplePianoRoll {
         strokeWeight(3);
         stroke(0, 0, 255);
 
-        if (melodyData != null) {
+        if (inited) {
             drawCurve();
 
             if (getCurrentMeasure() == Config.NUM_OF_MEASURES - 1) {
@@ -173,7 +167,7 @@ public class JamSketch extends SimplePianoRoll {
             int mtotal = dataModel.getMeasureNum() * Config.REPEAT_TIMES;
             textSize(32);
             fill(0, 0, 0);
-            text(m + " / " + mtotal, 600, 665);
+            text(m + " / " + mtotal, 620, 665);
         }
     }
 
@@ -184,6 +178,12 @@ public class JamSketch extends SimplePianoRoll {
     }
 
     public void startMusic() {
+
+        // TODO: add condition 'if (midiouts[0] != null)'
+
+        if (!inited) {
+            initData();
+        }
 
         if (!isNowPlaying()) {
             // add for debug 20190624 fujii
@@ -217,10 +217,13 @@ public class JamSketch extends SimplePianoRoll {
     }
 
     void resetMusic() {
-        initData();
-        setTickPosition(0);
-        getDataModel().setFirstMeasure(Config.INITIAL_BLANK_MEASURES);
+        if (!isNowPlaying()) {
+
+            initData();
+            setTickPosition(0);
+            getDataModel().setFirstMeasure(Config.INITIAL_BLANK_MEASURES);
 //        makeLog("reset")
+        }
     }
 
 //    void printSequence() {
