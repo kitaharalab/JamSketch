@@ -63,16 +63,6 @@ public class MidiSystemAdapter {
             e.printStackTrace();
             MidiSystem.addMidiDevice(kMidiDevice);
 
-            // TODO: add if(isSynth)
-//            if (aInfo.getInputPortCount() > 0) {
-//                try {
-//                    // Condition 'MidiSystem.getSynthesizer() == null' is always 'false'
-//                    MidiSystem.getSynthesizer();
-//                } catch (MidiUnavailableException e1) {
-//                    e1.printStackTrace();
-//                    MidiSystem.addSynthesizer(new KSynthesizer(kMidiDevice));
-//                }
-//            }
         }
     }
 

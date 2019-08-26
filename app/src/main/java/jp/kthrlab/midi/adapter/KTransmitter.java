@@ -47,17 +47,19 @@ public class KTransmitter extends MidiSender implements MidiDeviceTransmitter {
 
     @Override
     public void onConnect(MidiReceiver receiver) {
-//        if (aMidiDevice == null) {
-//            aMidiDevice = kMidiDevice.getAMidiDevice();
-//        }
-//        if (aMidiOutputPort == null) {
-//            aMidiOutputPort = aMidiDevice.openOutputPort(aPortInfo.getPortNumber());
-//        }
-//        aMidiOutputPort.connect(receiver);
+
+        aMidiDevice = kMidiDevice.getAMidiDevice(false);
+
+        if (aMidiDevice != null) {
+            if (aMidiOutputPort == null) {
+                aMidiOutputPort = aMidiDevice.openOutputPort(aPortInfo.getPortNumber());
+            }
+            aMidiOutputPort.connect(receiver);
+        }
     }
 
     @Override
     public void onDisconnect(MidiReceiver receiver) {
-//        aMidiOutputPort.disconnect(receiver);
+        if (aMidiOutputPort != null) aMidiOutputPort.disconnect(receiver);
     }
 }

@@ -28,10 +28,10 @@ public class KMidiDevice implements jp.kshoji.javax.sound.midi.MidiDevice, Handl
 
     public static Info getKInfo(MidiDeviceInfo aMidiDeviceInfo) {
         Bundle bundle = aMidiDeviceInfo.getProperties();
-        return new Info(bundle.getString(MidiDeviceInfo.PROPERTY_NAME),
-                bundle.getString(MidiDeviceInfo.PROPERTY_MANUFACTURER),
+        return new Info(bundle.getString(MidiDeviceInfo.PROPERTY_NAME) == null ? "" : bundle.getString(MidiDeviceInfo.PROPERTY_NAME),
+                bundle.getString(MidiDeviceInfo.PROPERTY_MANUFACTURER) == null ? "" : bundle.getString(MidiDeviceInfo.PROPERTY_MANUFACTURER),
                 bundle.getString(MidiDeviceInfo.PROPERTY_SERIAL_NUMBER) == null ? "" : bundle.getString(MidiDeviceInfo.PROPERTY_SERIAL_NUMBER),
-                bundle.getString(MidiDeviceInfo.PROPERTY_PRODUCT));
+                bundle.getString(MidiDeviceInfo.PROPERTY_PRODUCT) == null ? "" : bundle.getString(MidiDeviceInfo.PROPERTY_PRODUCT));
     }
 
     public KMidiDevice(MidiManager aMidiManager, MidiDeviceInfo aMidiDeviceInfo) {
@@ -47,21 +47,20 @@ public class KMidiDevice implements jp.kshoji.javax.sound.midi.MidiDevice, Handl
 
         for (final MidiDeviceInfo.PortInfo portInfo : aMidiDeviceInfo.getPorts()) {
             System.out.println("portInfo.getType():" + portInfo.getType());
-//            if (portInfo.getType() == MidiDeviceInfo.PortInfo.TYPE_INPUT) {
+            if (portInfo.getType() == MidiDeviceInfo.PortInfo.TYPE_INPUT) {
                 kReceivers.add(new KReceiver(this, portInfo));
-//            } else if (portInfo.getType() == MidiDeviceInfo.PortInfo.TYPE_OUTPUT) {
+            } else if (portInfo.getType() == MidiDeviceInfo.PortInfo.TYPE_OUTPUT) {
                 kTransmitters.add(new KTransmitter(this, portInfo));
-//            }
+            }
         }
-
     }
 
-    public MidiDevice getAMidiDevice(boolean doOpen) {
-//        System.out.println("getAMidiDevice(" + doOpen + ") " + aMidiDeviceInfo);
+    public MidiDevice getAMidiDevice(boolean shouldOpen) {
+//        System.out.println("getAMidiDevice(" + shouldOpen + ") " + aMidiDeviceInfo);
 //        System.out.println("Thread.currentThread().dumpStack():");
 //        Thread.currentThread().dumpStack();
 
-        if (!isOpen() && doOpen) {
+        if (!isOpen() && shouldOpen) {
             aMidiManager.openDevice(aMidiDeviceInfo,
                     new MidiManager.OnDeviceOpenedListener() {
                         @Override
@@ -89,19 +88,6 @@ public class KMidiDevice implements jp.kshoji.javax.sound.midi.MidiDevice, Handl
         }
         return aMidiDevice;
     }
-
-
-//    @Override
-//    public void onDeviceOpened(MidiDevice device) {
-//        System.out.println("onDeviceOpened " + device.toString());
-//        if (device == null) {
-//            System.out.println("device == null");
-//        } else {
-//            System.out.println("device opend: " + device.getInfo().toString());
-//            aMidiDevice = device;
-//            isOpen = true;
-//        }
-//    }
 
     @NonNull
     @Override
