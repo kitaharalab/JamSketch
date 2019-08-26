@@ -10,6 +10,7 @@ import javax.xml.transform.TransformerException;
 
 import jp.crestmuse.cmx.filewrappers.SCCDataSet;
 import jp.crestmuse.cmx.misc.PianoRoll;
+import jp.crestmuse.cmx.processing.DeviceNotAvailableException;
 import jp.crestmuse.cmx.processing.gui.SimplePianoRoll;
 import jp.kshoji.javax.sound.midi.InvalidMidiDataException;
 import jp.kshoji.javax.sound.midi.Sequencer;
@@ -25,7 +26,6 @@ public class JamSketch extends SimplePianoRoll {
     @Override
     public void settings() {
         size(1200, 700);
-//        showMidiOutChooser();
     }
 
     @Override
@@ -178,11 +178,13 @@ public class JamSketch extends SimplePianoRoll {
     }
 
     public void startMusic() {
-
-        // TODO: add condition 'if (midiouts[0] != null)'
-
         if (!inited) {
-            initData();
+            try {
+                initData();
+            } catch (DeviceNotAvailableException e) {
+                e.printStackTrace();
+                showMidiOutChooser();
+            }
         }
 
         if (!isNowPlaying()) {
@@ -195,9 +197,10 @@ public class JamSketch extends SimplePianoRoll {
                 getDataModel().setFirstMeasure(Config.INITIAL_BLANK_MEASURES);
                 System.out.println("reset>>> MicrosecondPosition:" + seqencer.getMicrosecondPosition() + " MicrosecondLength:" + seqencer.getMicrosecondLength() + " getFirstMeasure():" + getDataModel().getFirstMeasure());
             }
-
             playMusic();
         }
+
+
     }
 
     public void stopPlayMusic() {
@@ -211,7 +214,7 @@ public class JamSketch extends SimplePianoRoll {
 //            }
             stopMusic();
 
-            // add for debug 20190619 fujii
+            // add 20190619 fujii
             ((SequencerImpl)getSequencer()).setLoopStartPoint(getTickPosition());
         }
     }
@@ -226,25 +229,17 @@ public class JamSketch extends SimplePianoRoll {
         }
     }
 
-//    void printSequence() {
-//        Track track = ((SequencerImpl)getSequencer()).getPlayingTrack();
-//        for (int i = 0; i < ((SequencerImpl)getSequencer()).getPlayingTrack().size(); i++) {
-//            println(i, track.get(i).getTick(), track.get(i).getMessage().getStatus(), track.get(i).getMessage());
-//        }
-//    }
-
     // add for debug 20190624 fujii
-    @Override
-    protected void musicStopped() {
-        super.musicStopped();
-        System.out.println("musicStopped() isNowPlaying() = " + isNowPlaying());
-        Sequencer seqencer = getSequencer();
-        System.out.println("musicStopped() MicrosecondPosition:" + seqencer.getMicrosecondPosition() + " MicrosecondLength:" + seqencer.getMicrosecondLength());
-    }
+//    @Override
+//    protected void musicStopped() {
+//        super.musicStopped();
+//        System.out.println("musicStopped() isNowPlaying() = " + isNowPlaying());
+//        Sequencer seqencer = getSequencer();
+//        System.out.println("musicStopped() MicrosecondPosition:" + seqencer.getMicrosecondPosition() + " MicrosecondLength:" + seqencer.getMicrosecondLength());
+//    }
 
     public void showMidiOutChooser() {
         showMidiOutChooser(JamSketchActivity.getMyContext(), android.R.layout.simple_list_item_1);
-
     }
 
     public void loadCurve() {
@@ -262,7 +257,9 @@ public class JamSketch extends SimplePianoRoll {
 
     @Override
     public void mouseDragged() {
-        storeCursorPosition();
+        if (inited) {
+            storeCursorPosition();
+        }
     }
 
 
