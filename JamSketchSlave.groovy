@@ -18,8 +18,6 @@ class JamSketchSlave extends JamSketch implements TargetMover {
 
     initData()
 
-    // add WindowListener (windowClosing) which calls exit();
-    super.setupExternalMessages()
   }
 
   void processLastMeasure() {
