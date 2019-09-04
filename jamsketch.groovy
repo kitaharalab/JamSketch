@@ -11,6 +11,7 @@ import javax.swing.filechooser.*
 
 class JamSketch extends SimplePianoRoll {
 
+  GuideData guideData
   MelodyData melodyData
   boolean nowDrawing = false
   String username = ""
@@ -37,10 +38,10 @@ class JamSketch extends SimplePianoRoll {
     initData()
 
     // add WindowListener (windowClosing) which calls exit();
-    super.setupExternalMessages()
   }
 
   void initData() {
+    if (CFG.SHOW_GUIDE) guideData = new GuideData(width - 100)
     melodyData = new MelodyData(CFG.MIDFILENAME, width, this, this)
     println(melodyData.getFullChordProgression())
     smfread(melodyData.scc.getMIDISequence())
@@ -53,26 +54,37 @@ class JamSketch extends SimplePianoRoll {
 
   void draw() {
     super.draw()    
-    strokeWeight(3)
-    stroke(0, 0, 255)
-    
+
+    if (guideData != null) drawGuideCurve()
     drawCurve()
     
-    if (getCurrentMeasure() == CFG.NUM_OF_MEASURES - 1) {
-      processLastMeasure()
-    }
+    if (getCurrentMeasure() == CFG.NUM_OF_MEASURES - 1) processLastMeasure()
     
     enhanceCursor()
     drawProgress()
   }
 
   void drawCurve() {
+    strokeWeight(3)
+    stroke(0, 0, 255)
     (0..<(melodyData.curve1.size()-1)).each { i ->
       //println("${melodyData.curve1[i]}, ${melodyData.curve1[i+1]}")
       if (melodyData.curve1[i] != null && melodyData.curve1[i+1] != null) {
         line(i, melodyData.curve1[i] as int, i+1, melodyData.curve1[i+1] as int)
       }
     }    
+  }
+
+  void drawGuideCurve() {
+    def xFrom = 100
+    strokeWeight(3)
+    stroke(224, 224, 224)
+    (0..<(guideData.curveGuideView.size()-1)).each { i ->
+      if (guideData.curveGuideView[i] != null && guideData.curveGuideView[i+1] != null) {
+        line(i+xFrom, guideData.curveGuideView[i] as int, i+1+xFrom, guideData.curveGuideView[i+1] as int)
+      }
+    }
+
   }
 
   void storeCursorPosition() {
@@ -97,6 +109,7 @@ class JamSketch extends SimplePianoRoll {
     if (CFG.MELODY_RESETING) {
       getDataModel().shiftMeasure(CFG.NUM_OF_MEASURES)
       melodyData.resetCurve()
+      if (guideData != null) guideData.shiftCurve()
     }
   }
 
@@ -144,12 +157,12 @@ class JamSketch extends SimplePianoRoll {
   void makeLog(action) {
     def logname = "output_" + (new Date()).toString().replace(" ", "_").replace(":", "-")
     if (action == "melody") {
-      def midname = "${CFG.LOG_DIR}/${logname}_melody.mid"
-      melodyData.scc.toWrapper().toMIDIXML().writefileAsSMF(midname)
-      println("saved as ${midname}")
-      def sccname = "${CFG.LOG_DIR}/${logname}_melody.sccxml"
-      melodyData.scc.toWrapper().writefile(sccname)
-      println("saved as ${sccname}")
+//      def midname = "${CFG.LOG_DIR}/${logname}_melody.mid"
+//      melodyData.scc.toWrapper().toMIDIXML().writefileAsSMF(midname)
+//      println("saved as ${midname}")
+//      def sccname = "${CFG.LOG_DIR}/${logname}_melody.sccxml"
+//      melodyData.scc.toWrapper().writefile(sccname)
+//      println("saved as ${sccname}")
       def jsonname = "${CFG.LOG_DIR}/${logname}_curve.json"
       saveStrings(jsonname, [JsonOutput.toJson(melodyData.curve1)] as String[])
       println("saved as ${jsonname}")
@@ -227,8 +240,8 @@ class JamSketch extends SimplePianoRoll {
 
   public void exit() {
     println("exit() called.")
-    super.exit();
-    RfcommServer.close();
+    super.exit()
+    if (CFG.MOTION_CONTROLLER.any{mCtrl == "RfcommServer"}) RfcommServer.close()
   }
 
 }
