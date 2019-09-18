@@ -1,0 +1,26 @@
+apply plugin: 'groovy'
+apply plugin: 'application'
+
+sourceSets {
+    main {
+        java.srcDirs = []
+        groovy.srcDirs = [projectDir]
+    }
+}
+
+buildDir = projectDir
+
+//println(projectDir)
+//println(buildDir)
+//println(sourceSets.main.java.srcDirs)
+
+dependencies {
+    implementation fileTree(dir: 'libs', include: ['*.jar'], exclude: [])
+    implementation project(path: ':cmx_pc')
+//    implementation fileTree(exclude: ['processing-core-android.jar'], dir: '../cmx_platforms/libs')
+}
+
+//compileJava.options.encoding = "UTF-8"
+
+sourceCompatibility = "1.8"
+targetCompatibility = "1.8"
