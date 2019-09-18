@@ -1,0 +1,6 @@
+include ':app', ':master', ':cmx_android', ':cmx_pc'//, ':javax.sound.midi', ':MIDIDriver'
+
+ project(':cmx_android').projectDir = file('../cmx/cmx_android')
+ project(':cmx_pc').projectDir = file('../cmx/cmx_pc')
+// project(':javax.sound.midi').projectDir = file('../javax.sound.midi-for-Android/javax.sound.midi')
+// project(':MIDIDriver').projectDir = file('../USB-MIDI-Driver/MIDIDriver')
