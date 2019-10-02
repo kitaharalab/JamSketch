@@ -6,7 +6,8 @@ import android.media.midi.MidiManager;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
-import androidx.annotation.NonNull;
+import android.support.annotation.NonNull;
+//import androidx.annotation.NonNull;
 
 import java.io.IOException;
 import java.util.ArrayList;

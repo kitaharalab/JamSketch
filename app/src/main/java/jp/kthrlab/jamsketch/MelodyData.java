@@ -42,8 +42,11 @@ public class MelodyData {
   int width;
   SimplePianoRoll pianoroll;
   CMXApplet cmx;
+  private JamSketchActivity jamSketchActivity;
 
-  public  MelodyData(String filename, int width, CMXApplet cmxcontrol, SimplePianoRoll pianoroll) {
+
+    public  MelodyData(String filename, int width, CMXApplet cmxcontrol, SimplePianoRoll pianoroll, JamSketchActivity jamSketchActivity) {
+      this.jamSketchActivity = jamSketchActivity;
       cmx = cmxcontrol;
       this.width = width;
     this.pianoroll = pianoroll;
@@ -52,7 +55,7 @@ public class MelodyData {
 
       try {
 //          scc = cmxcontrol.readSMFAsSCC(getClass().getResourceAsStream(filename)).toDataSet();
-          scc = cmxcontrol.readSMFAsSCC(JamSketchActivity.getMyResources().getAssets().open(filename)).toDataSet();
+          scc = cmxcontrol.readSMFAsSCC(jamSketchActivity.getResources().getAssets().open(filename)).toDataSet();
       } catch (TransformerException e) {
           e.printStackTrace();
       } catch (Exception e) {
@@ -62,7 +65,7 @@ public class MelodyData {
 	       (Config.INITIAL_BLANK_MEASURES + Config.NUM_OF_MEASURES) *
                    Config.BEATS_PER_MEASURE * scc.getDivision(), Config.REPEAT_TIMES - 1);
     target_part = scc.getFirstPartWithChannel(1);
-    model = new MelodyModel(cmxcontrol, new SCCGenerator());
+    model = new MelodyModel(cmxcontrol, new SCCGenerator(), jamSketchActivity);
 //    if (R.bool.EXPRESSION) {
 //      expgen = new ExpressionGenerator();
 //      expgen.start(scc.getFirstPartWithChannel(1),

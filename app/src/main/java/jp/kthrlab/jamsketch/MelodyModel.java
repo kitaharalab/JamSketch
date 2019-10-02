@@ -47,8 +47,10 @@ class MelodyModel {
   String GA_INIT;
   int BEATS_PER_MEASURE, DIVISION;
   List<ChordSymbol2> chordprog = new ArrayList<ChordSymbol2>();
+  private JamSketchActivity jamSketchActivity;
 
-  MelodyModel(CMXApplet cmxcontrol, MelodyData.SCCGenerator sccgenerator) {
+  MelodyModel(CMXApplet cmxcontrol, MelodyData.SCCGenerator sccgenerator, JamSketchActivity jamSketchActivity) {
+    this.jamSketchActivity = jamSketchActivity;
     mr = cmxcontrol.createMusicRepresentation(Config.NUM_OF_MEASURES, Config.DIVISION);
     mr.addMusicLayerCont("curve");
 //    mr.addMusicLayer("melody", (0..11) as int[]);
@@ -88,7 +90,7 @@ class MelodyModel {
 
   private String getContents (String path) {
     try {
-      return new BufferedReader(new InputStreamReader(JamSketchActivity.getMyResources().getAssets().open(path))).lines().collect(Collectors.joining());// res.getAssets().open(path). //Files.lines(Paths.get(URI.create(path))).collect(Collectors.joining());
+      return new BufferedReader(new InputStreamReader(jamSketchActivity.getResources().getAssets().open(path))).lines().collect(Collectors.joining());// res.getAssets().open(path). //Files.lines(Paths.get(URI.create(path))).collect(Collectors.joining());
     }
     catch (IOException e) {
       e.printStackTrace();

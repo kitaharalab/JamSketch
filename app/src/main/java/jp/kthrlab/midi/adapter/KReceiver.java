@@ -2,7 +2,8 @@ package jp.kthrlab.midi.adapter;
 
 import android.media.midi.MidiReceiver;
 
-import androidx.annotation.NonNull;
+//import androidx.annotation.NonNull;
+import android.support.annotation.NonNull;
 
 import java.io.IOException;
 
