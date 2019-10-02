@@ -187,7 +187,7 @@ class MelodyModel {
 		       (e[i].tick() % div4 == 0 ? "on" : "off"))
 	String dur = (e[i].duration() >= div4 ? "long" : "short")
 	String key = chord + "_" + beat + "_" + dur
-	lik += Math.log(chord_beat_dur_unigram[key][s[i]] + 0.001)
+	lik += Math.log((chord_beat_dur_unigram[key][s[i]] as double) + (0.001 as double))
       }
       lik
     }

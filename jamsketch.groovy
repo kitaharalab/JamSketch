@@ -1,13 +1,9 @@
-import groovy.transform.*
-import jp.crestmuse.cmx.filewrappers.*
-import jp.crestmuse.cmx.processing.*
-import jp.crestmuse.cmx.processing.gui.*
-import groovy.json.*
-import jp.crestmuse.cmx.misc.*
-import groovy.json.*
-import controlP5.*
+import controlP5.ControlP5
+import groovy.json.JsonOutput
+import jp.crestmuse.cmx.processing.gui.SimplePianoRoll
+
 import javax.swing.*
-import javax.swing.filechooser.*
+import javax.swing.filechooser.FileNameExtensionFilter
 
 class JamSketch extends SimplePianoRoll {
 
@@ -41,11 +37,11 @@ class JamSketch extends SimplePianoRoll {
   }
 
   void initData() {
-    if (CFG.SHOW_GUIDE) guideData = new GuideData(width - 100)
+    if (CFG.SHOW_GUIDE) guideData = new GuideData(CFG.MIDFILENAME, width - 100, this)
     melodyData = new MelodyData(CFG.MIDFILENAME, width, this, this)
     println(melodyData.getFullChordProgression())
     smfread(melodyData.scc.getMIDISequence())
-    def part = melodyData.scc.getFirstPartWithChannel(1)
+    def part = melodyData.scc.getFirstPartWithChannel(CFG.CHANNEL_ACC)
     setDataModel(
       part.getPianoRollDataModel(
 	    CFG.INITIAL_BLANK_MEASURES, CFG.INITIAL_BLANK_MEASURES + CFG.NUM_OF_MEASURES

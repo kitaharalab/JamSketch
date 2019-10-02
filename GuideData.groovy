@@ -1,5 +1,4 @@
 import groovy.json.JsonSlurper
-
 import static JamSketch.CFG
 
 class GuideData {
@@ -7,13 +6,21 @@ class GuideData {
     def curveGuideView // y coord per pixel
     def from = 0
     def size
+    def scc
 
-    GuideData(size) {
+    GuideData(filename, size, cmxcontrol) {
         this.size = size
+        scc = cmxcontrol.readSMFAsSCC(filename)
+        def guide_part = scc.getFirstPartWithChannel(CFG.CHANNEL_GUIDE)
+
+        curveGuide = createCurve(guide_part)
+        updateCurve(from, size)
+    }
+
+    def createCurve(part) {
         // TODO: create curveGuide
         def json = new JsonSlurper()
-        curveGuide = json.parseText((new File("curve.json")).text)
-        updateCurve(from, size)
+        return json.parseText((new File("curve.json")).text)
     }
 
     def shiftCurve() {

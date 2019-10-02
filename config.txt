@@ -40,6 +40,8 @@ class Config {
     //[onset: [-0.0625, 0.0625], dur: [0.0, 1.25], energy: [0.0, 1.99]]
 
    boolean SHOW_GUIDE = false
+   int CHANNEL_GUIDE = 2
+   int CHANNEL_ACC = 1
 }
 
 new Config()

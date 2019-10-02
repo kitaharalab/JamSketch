@@ -1,8 +1,12 @@
-import jp.crestmuse.cmx.inference.*
-import jp.crestmuse.cmx.filewrappers.*
-import static jp.crestmuse.cmx.misc.ChordSymbol2.*
-				     //import static Config.*
+import jp.crestmuse.cmx.filewrappers.SCCUtils
+import jp.crestmuse.cmx.inference.MusicCalculator
+import jp.crestmuse.cmx.inference.MusicRepresentation
+
 import static JamSketch.CFG
+
+//import static Config.*
+
+import static jp.crestmuse.cmx.misc.ChordSymbol2.NON_CHORD
 
 class MelodyData {
   def curve1 // y coord per pixel
@@ -27,11 +31,11 @@ class MelodyData {
 	       scc.division,
 	       (CFG.INITIAL_BLANK_MEASURES + CFG.NUM_OF_MEASURES) *
 	       CFG.BEATS_PER_MEASURE * scc.division, CFG.REPEAT_TIMES - 1)
-    target_part = scc.getFirstPartWithChannel(1)
+    target_part = scc.getFirstPartWithChannel(CFG.CHANNEL_ACC)
     model = new MelodyModel(cmxcontrol, new SCCGenerator())
     if (CFG.EXPRESSION) {
       expgen = new ExpressionGenerator()
-      expgen.start(scc.getFirstPartWithChannel(1),
+      expgen.start(scc.getFirstPartWithChannel(CFG.CHANNEL_ACC),
      		 getFullChordProgression(), CFG.BEATS_PER_MEASURE)
     }
   }
