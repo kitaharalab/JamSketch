@@ -1,4 +1,17 @@
-apply plugin: 'com.android.application'
+plugins {
+    id 'com.android.application'
+}
+
+repositories {
+    jcenter()
+    google()
+    mavenCentral()
+    maven {
+        url "http://maven.imagej.net/content/groups/public/"
+    }
+
+    flatDir {dirs 'libs'}
+}
 
 android {
     compileSdkVersion 28
@@ -8,7 +21,8 @@ android {
         targetSdkVersion 28
         versionCode 1
         versionName "1.0"
-        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+//        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
     buildTypes {
         release {
@@ -18,23 +32,65 @@ android {
     }
 
     compileOptions {
-        sourceCompatibility = '8'
-        targetCompatibility = '8'
+        sourceCompatibility = '1.8'
+        targetCompatibility = '1.8'
     }
 
     packagingOptions {
+        exclude 'assets/shaders/*.glsl'
         exclude 'META-INF/groovy-release-info.properties'
         exclude 'META-INF/INDEX.LIST'
+        exclude 'META-INF/DEPENDENCIES'
+//        exclude 'META-INF/LICENSE'
+//        exclude 'META-INF/LICENSE.txt'
+//        exclude 'META-INF/license.txt'
+//        exclude 'META-INF/NOTICE'
+//        exclude 'META-INF/NOTICE.txt'
+//        exclude 'META-INF/notice.txt'
+//        exclude 'META-INF/ASL2.0'
     }
 
 }
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
-    implementation 'androidx.annotation:annotation:1.1.0'
-    implementation 'androidx.appcompat:appcompat:1.0.2'
+     implementation(name: 'javax.sound.midi-release', ext: 'aar')
+     implementation(name: 'MIDIDriver-release', ext: 'aar')
+
+    //noinspection GradleCompatible
+    implementation 'com.android.support:appcompat-v7:28.0.0'
+    implementation 'com.android.support:support-annotations:28.0.0'
+//    implementation 'androidx.annotation:annotation:1.1.0'
+//    implementation 'androidx.appcompat:appcompat:1.0.2'
     testImplementation 'junit:junit:4.12'
-    androidTestImplementation 'androidx.test:runner:1.2.0'
-    androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'
-    api project(path: ':cmx_android')
+    androidTestImplementation 'com.android.support.test:runner:1.0.2'
+    androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
+//    androidTestImplementation 'androidx.test:runner:1.2.0'
+//    androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'
+    implementation project(path: ':cmx_android')
+
+    // cmx_common
+//    // https://mvnrepository.com/artifact/org.apache.commons/commons-math3
+//    implementation 'org.apache.commons:commons-math3:3.6.1'
+//    // https://mvnrepository.com/artifact/be.ac.ulg.montefiore.run.jahmm/jahmm
+//    implementation 'be.ac.ulg.montefiore.run.jahmm:jahmm:0.6.2'
+
+
+//    println project(':cmx_android').projectDir
+//    runtimeOnly (name: 'javax.sound.midi-release', ext: 'aar')
+//    runtimeOnly (name: 'MIDIDriver-release', ext: 'aar')
+
+    // Google Drive APIs
+    // com.google.android.gms:play-services-auth:17.0.0 requires AndroidX
+    implementation 'com.google.android.gms:play-services-auth:16.0.1'
+    implementation 'com.google.http-client:google-http-client-gson:1.32.1'
+    implementation('com.google.api-client:google-api-client-android:1.30.8') {
+        exclude group: 'org.apache.httpcomponents'
+    }
+    implementation('com.google.apis:google-api-services-drive:v3-rev99-1.23.0') {
+        exclude group: 'org.apache.httpcomponents'
+    }
+//    implementation 'com.google.api-client:google-api-client:1.30.4'
+//    implementation 'com.google.apis:google-api-services-drive:v3-rev173-1.25.0'
+    implementation 'com.google.auth:google-auth-library-oauth2-http:0.20.0'
 }
