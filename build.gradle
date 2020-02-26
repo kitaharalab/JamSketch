@@ -29,6 +29,11 @@ dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'], exclude: [])
     implementation project(path: ':cmx_pc')
 //    implementation fileTree(exclude: ['processing-core-android.jar'], dir: '../cmx_platforms/libs')
+    // https://mvnrepository.com/artifact/org.codehaus.groovy/groovy
+    implementation 'org.codehaus.groovy:groovy:2.5.6'
+// https://mvnrepository.com/artifact/org.apache.ivy/ivy
+    implementation 'org.apache.ivy:ivy:2.4.0'
+
 }
 
 //compileJava.options.encoding = "UTF-8"
