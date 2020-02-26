@@ -1,20 +1,35 @@
 package jp.kthrlab.jamsketch;
 
+import android.content.Intent;
+import android.net.Uri;
+import android.util.Log;
+
+import com.google.gson.Gson;
+
 import org.xml.sax.SAXException;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
+import java.io.InputStream;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Locale;
 import java.util.stream.IntStream;
 
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
 
 import jp.crestmuse.cmx.filewrappers.SCCDataSet;
 import jp.crestmuse.cmx.misc.PianoRoll;
 import jp.crestmuse.cmx.processing.DeviceNotAvailableException;
 import jp.crestmuse.cmx.processing.gui.SimplePianoRoll;
+import jp.crestmuse.cmx.sound.SoundUtils;
 import jp.kshoji.javax.sound.midi.InvalidMidiDataException;
+import jp.kshoji.javax.sound.midi.MidiUnavailableException;
 import jp.kshoji.javax.sound.midi.Sequencer;
 import jp.kshoji.javax.sound.midi.impl.SequencerImpl;
 
@@ -24,10 +39,10 @@ public class JamSketch extends SimplePianoRoll {
     private MelodyData melodyData;
     private boolean nowDrawing = false;
     private Control control;
-    private boolean inited = false;
-    private List<List<Integer>> cachedCurve1 = new ArrayList<>();
+    private boolean initiated = false;
     private DriveServiceHelper mDriveServiceHelper;
     private JamSketchActivity jamSketchActivity;
+    private Checkbox sendGranted;
 
     public JamSketch(JamSketchActivity jamSketchActivity) {
         this.jamSketchActivity = jamSketchActivity;
@@ -47,17 +62,28 @@ public class JamSketch extends SimplePianoRoll {
         control = new Control(this);
         control.addButton("startMusic")
                 .setLabel("Start")
-                .setPosition(20, 645)
-                .setSize(120, 40);
+                .setPosition(10, 640)
+                .setSize(100, 50);
 
         control.addButton("stopPlayMusic").
-                setLabel("Stop").setPosition(160, 645).setSize(120, 40);
+                setLabel("Stop").setPosition(120, 640).setSize(100, 50);
         control.addButton("resetMusic").
-                setLabel("Reset").setPosition(300, 645).setSize(120, 40);
+                setLabel("Reset").setPosition(230, 640).setSize(100, 50);
 //        p5ctrl.addButton("loadCurve").
 //                setLabel("Load").setPosition(300, 645).setSize(120, 40);
         control.addButton("showMidiOutChooser").
-                setLabel("MidiOut").setPosition(440, 645).setSize(120, 40);
+                setLabel("MidiOut").setPosition(340, 640).setSize(100, 50);
+
+        sendGranted = control.addCheckbox("sendGranted");
+        sendGranted.setLabel("Send melody to kthrlab.jp")
+                .setLabelSize(130, 50)
+                .setPosition(800, 655)
+                .setSize(20, 20);
+
+        control.addButton("sendLike").
+                setLabel("Good↑").setPosition(980, 640).setSize(100, 50);
+        control.addButton("sendUm").
+                setLabel("Bad↓").setPosition(1090, 640).setSize(100, 50);
 
     }
 
@@ -65,11 +91,20 @@ public class JamSketch extends SimplePianoRoll {
         println("got an event for icon", value);
     }
 
+    void checkMidiOutDeviceInfo() {
+        try {
+            if (SoundUtils.getMidiOutDeviceInfo().size() <= 0) {
+                final String appPackageName = "net.volcanomobile.fluidsynthmidi"; // getPackageName() from Context or Activity object
+                startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://play.google.com/store/apps/details?id=" + appPackageName)));
+            }
+        } catch (MidiUnavailableException e) {
+            e.printStackTrace();
+        }
+    }
+
     void initData() {
+        Log.d(TAG, "initData()");
 
-        // TODO: add condition 'if (midiouts[0] != null)'
-
-        System.out.println("initData()");
         String filename = Config.MIDFILENAME;
 //        println(melodyData.getFullChordProgression());
         melodyData = new MelodyData(filename, width,  this, this, jamSketchActivity);
@@ -96,7 +131,7 @@ public class JamSketch extends SimplePianoRoll {
                             Config.INITIAL_BLANK_MEASURES + Config.NUM_OF_MEASURES
                     ));
 
-        inited = true;
+        initiated = true;
     }
 
     @Override
@@ -104,7 +139,7 @@ public class JamSketch extends SimplePianoRoll {
         super.draw();
         strokeWeight(3);
 
-        if (inited) {
+        if (initiated) {
             drawCurve();
 
             if (getCurrentMeasure() == Config.NUM_OF_MEASURES - 1) processLastMeasure();
@@ -164,12 +199,12 @@ public class JamSketch extends SimplePianoRoll {
             int mtotal = dataModel.getMeasureNum() * Config.REPEAT_TIMES;
             textSize(32);
             fill(0, 0, 0);
-            text(m + " / " + mtotal, 620, 665);
+            text(m + " / " + mtotal, 590, 665);
         }
     }
 
     public void startMusic() {
-        if (!inited) {
+        if (!initiated) {
             try {
                 initData();
             } catch (DeviceNotAvailableException e) {
@@ -201,82 +236,80 @@ public class JamSketch extends SimplePianoRoll {
         }
     }
 
-    void resetMusic() {
+    public void resetMusic() {
         if (!isNowPlaying()) {
 
             initData();
             setTickPosition(0);
             getDataModel().setFirstMeasure(Config.INITIAL_BLANK_MEASURES);
-//        makeLog("reset")
+            makeLog("reset");
         }
     }
 
+    public void sendLike() {
+        makeLog("like");
+    }
+
+    public void sendUm() {
+        makeLog("um");
+    }
+
     private void makeLog(String action) {
-//        if ("melody".equals(action)) cacheLog();
-//        if( mDriveServiceHelper == null) mDriveServiceHelper = jamSketchActivity.getDriveServiceHelper();
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy_MM_dd_HH-mm-ss_E", Locale.ENGLISH);
+        String logname = sdf.format(Calendar.getInstance().getTime());
+
+        if( mDriveServiceHelper == null) mDriveServiceHelper = jamSketchActivity.getDriveServiceHelper();
 //        System.out.println("mDriveServiceHelper = " + (mDriveServiceHelper != null));
-//        if (mDriveServiceHelper != null) {
-//            try {
-//                byte[] smfByteArray = melodyData.scc.toWrapper().toMIDIXML().getSMFByteArray();
-//                mDriveServiceHelper.uploadFile("test.mid", new ByteArrayInputStream(smfByteArray, 0, smfByteArray.length))
-//                        .addOnSuccessListener(fileId -> Log.d(TAG, fileId))
-//                        .addOnFailureListener(exception ->
-//                                Log.e(TAG, "Couldn't create file.", exception));
-//                ;
-//            } catch (TransformerException e) {
-//                e.printStackTrace();
-//            }
-//        }
+        if (mDriveServiceHelper != null) {
+            try {
+                if ("melody".equals(action)) {
+                    if (sendGranted.checked()) {
+                        // midi
+                        uploadFile(logname + "_melody.mid",
+                                new ByteArrayInputStream(melodyData.scc.toWrapper().toMIDIXML().getSMFByteArray()),
+                                "audio/midi");
+
+                        // scc
+                        ByteArrayOutputStream outputStreamScc = new ByteArrayOutputStream();
+                        TransformerFactory.newInstance().newTransformer().transform(new DOMSource(melodyData.scc.toWrapper().getXMLDocument()), new StreamResult(outputStreamScc));
+                        uploadFile(logname + "_melody.sccxml.zip",
+                                new ByteArrayInputStream(outputStreamScc.toByteArray()),
+                                "text/xml");
+
+                        // json
+                        uploadFile(logname + "_curve.json",
+                                new ByteArrayInputStream(new Gson().toJson(melodyData.curve1).getBytes()),
+                                "application/json");
+
+//                        // screenshot
+//                        ByteArrayOutputStream outputStreamImg = new ByteArrayOutputStream();
+//                        get();
+//                        save("test");
+                    }
+
+                } else {
+                    uploadFile(logname + "_" + action + ".txt",
+                            new ByteArrayInputStream(action.getBytes()),
+                            "text/plain");
+                }
+
+            } catch (TransformerException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
-    private void cacheLog() {
-//      melodyData.scc.toWrapper().toMIDIXML().writefileAsSMF(midname)
-        cachedCurve1.add(melodyData.curve1);
+    private void uploadFile(String fileName, InputStream inputStream, String mimeType) {
+        mDriveServiceHelper.uploadFile(fileName, inputStream, mimeType)
+                .addOnSuccessListener(fileId -> Log.d(TAG, fileId))
+                .addOnFailureListener(exception ->
+                        Log.e(TAG,"Couldn't create file.", exception));
+
     }
-
-    private void uploadLog() {
-// Build a new authorized API client service.
-    }
-
-    /**
-     * Creates a new file via the Drive REST API.
-     */
-//    private void createFile() {
-//        if (mDriveServiceHelper != null) {
-//            Log.d(getClass().getSimpleName(), "Creating a file.");
-//
-//            mDriveServiceHelper.createFile()
-//                    .addOnSuccessListener(fileId -> readFile(fileId))
-//                    .addOnFailureListener(exception ->
-//                            Log.e(getClass().getSimpleName(), "Couldn't create file.", exception));
-//        }
-//    }
-
-    /**
-     * Retrieves the title and content of a file identified by {@code fileId} and populates the UI.
-     */
-//    private void readFile(String fileId) {
-//        if (mDriveServiceHelper != null) {
-//            Log.d(getClass().getSimpleName(), "Reading file " + fileId);
-//
-//            mDriveServiceHelper.readFile(fileId)
-//                    .addOnSuccessListener(nameAndContent -> {
-//                        String name = nameAndContent.first;
-//                        String content = nameAndContent.second;
-//
-////                        mFileTitleEditText.setText(name);
-////                        mDocContentEditText.setText(content);
-//
-////                        setReadWriteMode(fileId);
-//                    })
-//                    .addOnFailureListener(exception ->
-//                            Log.e(getClass().getSimpleName(), "Couldn't read file.", exception));
-//        }
-//    }
-
 
     public void showMidiOutChooser() {
-        showMidiOutChooser(jamSketchActivity, android.R.layout.simple_list_item_1);
+        checkMidiOutDeviceInfo();
+        showMidiOutChooser(jamSketchActivity.getSupportFragmentManager(), android.R.layout.simple_list_item_1);
     }
 
     public void loadCurve() {
@@ -294,7 +327,7 @@ public class JamSketch extends SimplePianoRoll {
 
     @Override
     public void mouseDragged() {
-        if (inited) {
+        if (initiated) {
             storeCursorPosition();
         }
     }

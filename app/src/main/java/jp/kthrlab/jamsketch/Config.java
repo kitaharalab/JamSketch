@@ -12,7 +12,7 @@ public class Config {
     static int DIVISION = 12;
     static int BEATS_PER_MEASURE = 4;
     static int INITIAL_BLANK_MEASURES = 2;
-    static int REPEAT_TIMES = 2;
+    static int REPEAT_TIMES = 4;
     static int CALC_LENGTH = 1;
     static String MODEL_FILE = "model20161104b.json";
     static String LOG_DIR = "log/";

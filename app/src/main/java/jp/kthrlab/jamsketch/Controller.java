@@ -12,6 +12,8 @@ public abstract class Controller {
     protected float positionY;
     protected  String label;
     protected  String id;
+    protected float labelWidth = 0;
+    protected float labelHeight = 0;
 
     public Controller (String id, PApplet pApplet) {
         this.pApplet = pApplet;
@@ -35,9 +37,32 @@ public abstract class Controller {
         return this;
     }
 
+    public Controller setLabelSize(float labelWidth, float labelHeight) {
+        this.labelWidth = labelWidth;
+        this.labelHeight = labelHeight;
+        return this;
+    }
+
     public boolean overRect() {
+//        if(pApplet.mouseX >= positionX && pApplet.mouseX <= positionX + width &&
+//        pApplet.mouseY >= positionY && pApplet.mouseY <= positionY  + height) return true;
+//
+//        for (TouchEvent.Pointer touch : pApplet.touches) {
+//            System.out.println(touch.x + ", " + touch.y);
+//            if (touch.x >= positionX && touch.x <= positionX + width &&
+//                    touch.y >= positionY && touch.y <= positionY + height) return true;
+//        }
+//        return false;
+        return overRect(positionX, positionY, width, height);
+    }
+
+    public  boolean overRect(int margin) {
+        return overRect(positionX - margin, positionY + margin, width + (margin * 2), height + (margin * 2));
+    }
+
+    public boolean overRect(float positionX, float positionY, int width, int height) {
         if(pApplet.mouseX >= positionX && pApplet.mouseX <= positionX + width &&
-        pApplet.mouseY >= positionY && pApplet.mouseY <= positionY  + height) return true;
+                pApplet.mouseY >= positionY && pApplet.mouseY <= positionY  + height) return true;
 
         for (TouchEvent.Pointer touch : pApplet.touches) {
             System.out.println(touch.x + ", " + touch.y);
@@ -46,6 +71,7 @@ public abstract class Controller {
         }
         return false;
     }
+
 
     public boolean pOverRect() {
         for (TouchEvent.Pointer touch : pApplet.touches) {

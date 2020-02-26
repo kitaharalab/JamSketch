@@ -6,7 +6,7 @@ import processing.event.TouchEvent;
 
 public class Button extends Controller {
 
-    private boolean startedInside = false;
+    protected boolean startedInside = false;
 
     public Button(String id, PApplet pApplet) {
         super(id, pApplet);
@@ -24,7 +24,7 @@ public class Button extends Controller {
         pApplet.rect(positionX, positionY, width, height);
         pApplet.fill(255, 255, 255);
         pApplet.textAlign(PApplet.CENTER, PApplet.CENTER);
-        pApplet.text(label.toUpperCase(), positionX, positionY, width, height);
+        pApplet.text(label, positionX, positionY, width, height);
 
     }
 

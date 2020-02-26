@@ -17,14 +17,19 @@ public class Control {
     public Button addButton(String id) {
 //        pApplet.registerMethod(id, pApplet);
         Button button = new Button(id, pApplet);
-        addController(button);
+        addController(button, "mouseEvent");
         return button;
     }
 
-    private void addController(Controller controller) {
+    public Checkbox addCheckbox(String id) {
+        Checkbox checkbox = new Checkbox(id, pApplet);
+        addController(checkbox, "mouseEvent");
+        return  checkbox;
+    }
+
+    private void addController(Controller controller, String methodName) {
         controllers.add(controller);
-        pApplet.registerMethod("mouseEvent", controller);
-//        pApplet.registerMethod("touchEvent", controller);
+        pApplet.registerMethod(methodName, controller);
     }
 
     public void draw() {

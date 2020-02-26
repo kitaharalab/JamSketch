@@ -7,6 +7,18 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
 
+import com.google.api.client.extensions.android.http.AndroidHttp;
+import com.google.api.client.json.gson.GsonFactory;
+import com.google.api.services.drive.Drive;
+import com.google.api.services.drive.DriveScopes;
+import com.google.auth.Credentials;
+import com.google.auth.http.HttpCredentialsAdapter;
+import com.google.auth.oauth2.GoogleCredentials;
+import com.google.auth.oauth2.ServiceAccountCredentials;
+
+import java.io.IOException;
+import java.util.Collections;
+
 import jp.kshoji.javax.sound.midi.UsbMidiSystem;
 import jp.kthrlab.midi.adapter.MidiSystemAdapter;
 import processing.android.CompatUtils;
@@ -18,29 +30,15 @@ import processing.core.PApplet;
 
 public class JamSketchActivity extends AppCompatActivity {
     private static final String TAG = "JamSketchActivity";
-//    private static final int REQUEST_CODE_SIGN_IN = 1;
-//    private DriveServiceHelper mDriveServiceHelper;
+
+    private DriveServiceHelper mDriveServiceHelper;
 
     private PApplet sketch;
     UsbMidiSystem ums;
 
-//    static Resources res = null;
-//    static Context context = null;
-//
-//    public static Context getMyContext() {
-//        return context;
-//    }
-//    public static Resources getMyResources() {
-//        return res;
-//    }
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-//        // Authenticate the user. For most apps, this should be done when the user performs an
-//        // action that requires Drive access rather than in onCreate.
-//        requestSignIn();
 
         FrameLayout frame = new FrameLayout(this);
         frame.setId(CompatUtils.getUniqueViewId());
@@ -52,9 +50,6 @@ public class JamSketchActivity extends AppCompatActivity {
         ums.initialize();
 
         new MidiSystemAdapter(this).adaptAndroidMidiDeviceToKshoji();
-
-//        res = getResources();
-//        context = this;
 
         sketch = new JamSketch(this);
         PFragment fragment = new PFragment(sketch);
@@ -78,72 +73,49 @@ public class JamSketchActivity extends AppCompatActivity {
         }
     }
 
-//    @Override
-//    public void onActivityResult(int requestCode, int resultCode, Intent resultData) {
-//        switch (requestCode) {
-//            case REQUEST_CODE_SIGN_IN:
-//                if (resultCode == Activity.RESULT_OK && resultData != null) {
-//                    handleSignInResult(resultData);
-//                }
-//                break;
-//        }
-//
-//        super.onActivityResult(requestCode, resultCode, resultData);
-//
-//    }
-
     @Override
     protected void onDestroy() {
         super.onDestroy();
         ums.terminate();
     }
 
-//    /**
-//     * Handles the {@code result} of a completed sign-in activity initiated from {@link
-//     * #requestSignIn()}.
-//     */
-//    private void handleSignInResult(Intent result) {
-//        GoogleSignIn.getSignedInAccountFromIntent(result)
-//                .addOnSuccessListener(googleAccount -> {
-//                    Log.d(TAG, "Signed in as " + googleAccount.getEmail());
-//
-//                    // Use the authenticated account to sign in to the Drive service.
-//                    GoogleAccountCredential credential =
-//                            GoogleAccountCredential.usingOAuth2(
-//                                    this, Collections.singleton(DriveScopes.DRIVE_FILE));
-//                    credential.setSelectedAccount(googleAccount.getAccount());
-//                    Drive googleDriveService =
-//                            new Drive.Builder(
-//                                    AndroidHttp.newCompatibleTransport(),
-//                                    new GsonFactory(),
-//                                    credential)
-//                                    .setApplicationName("JamSketch")
-//                                    .build();
-//
-//                    // The DriveServiceHelper encapsulates all REST API and SAF functionality.
-//                    // Its instantiation is required before handling any onClick actions.
-//                    mDriveServiceHelper = new DriveServiceHelper(googleDriveService);
-//                })
-//                .addOnFailureListener(exception -> Log.e(TAG, "Unable to sign in.", exception));
-//    }
-//
-//    public DriveServiceHelper getDriveServiceHelper() {return mDriveServiceHelper;}
-//
-//    /**
-//     * Starts a sign-in activity using {@link #REQUEST_CODE_SIGN_IN}.
-//     */
-//    private void requestSignIn() {
-//        Log.d(TAG, "Requesting sign-in");
-//
-//        GoogleSignInOptions signInOptions =
-//                new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-//                        .requestEmail()
-//                        .requestScopes(new Scope(DriveScopes.DRIVE_FILE))
-//                        .build();
-//        GoogleSignInClient client = GoogleSignIn.getClient(this, signInOptions);
-//
-//        // The result of the sign-in Intent is handled in onActivityResult.
-//        startActivityForResult(client.getSignInIntent(), REQUEST_CODE_SIGN_IN);
-//    }
+    public DriveServiceHelper getDriveServiceHelper() {return mDriveServiceHelper;}
+
+    private GoogleCredentials getServiceAccountCredential() {
+//        GoogleCredential credential = null;
+        GoogleCredentials credentials = null;
+        try {
+//            credential = GoogleCredential.fromStream(getResources().getAssets().open("credential/                    .createScoped(Collections.singleton(DriveScopes.DRIVE_FILE));
+            credentials = ServiceAccountCredentials.fromStream(getResources().openRawResource(R.raw.credential))
+                    .createScoped(Collections.singleton(DriveScopes.DRIVE_FILE));
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return credentials;
+    }
+
+    public void createDriveServiceHelper() {
+//        // Authenticate the user. For most apps, this should be done when the user performs an
+//        // action that requires Drive access rather than in onCreate.
+        createDriveServiceHelper(getServiceAccountCredential());
+    }
+
+    private void createDriveServiceHelper(Credentials credentials) {
+
+                            Drive googleDriveService =
+                            new Drive.Builder(
+                                    AndroidHttp.newCompatibleTransport(),
+                                    new GsonFactory(),
+                                    new HttpCredentialsAdapter(credentials))
+                                    .setApplicationName("JamSketch")
+                                    .build();
+
+        // The DriveServiceHelper encapsulates all REST API and SAF functionality.
+        // Its instantiation is required before handling any onClick actions.
+        mDriveServiceHelper = new DriveServiceHelper(googleDriveService);
+
+    }
 
 }

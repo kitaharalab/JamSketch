@@ -263,6 +263,13 @@ public class MelodyData {
                 target_part.addNoteElement(onset, onset+duration, notenum, 100, 100);
 
                 // add for debug 20190612 fujii
+                // Fixme java.lang.NullPointerException: Attempt to invoke virtual method 'jp.kshoji.javax.sound.midi.MidiMessage jp.kshoji.javax.sound.midi.MidiEvent.getMessage()' on a null object reference
+                //        at jp.kshoji.javax.sound.midi.Track$TrackUtils.sortEvents(Track.java:137)
+                //        at jp.kshoji.javax.sound.midi.Track$TrackUtils.mergeSequenceToTrack(Track.java:122)
+                //        at jp.kshoji.javax.sound.midi.impl.SequencerImpl$SequencerThread.refreshPlayingTrack(SequencerImpl.java:489)
+                //        at jp.kshoji.javax.sound.midi.impl.SequencerImpl$SequencerThread.access$1700(SequencerImpl.java:76)
+                //        at jp.kshoji.javax.sound.midi.impl.SequencerImpl.refreshPlayingTrack(SequencerImpl.java:850)
+                //        at jp.kthrlab.jamsketch.MelodyData$SCCGenerator.updated(MelodyData.java:266)
                 ((SequencerImpl)cmx.getSequencer()).refreshPlayingTrack();
 
             }
