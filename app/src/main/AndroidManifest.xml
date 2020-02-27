@@ -4,7 +4,7 @@
     package="jp.kthrlab.jamsketch">
 
     <!-- Permissions required by GoogleAuthUtil -->
-    <!-- <uses-permission android:name="android.permission.INTERNET" /> -->
+     <uses-permission android:name="android.permission.INTERNET" />
 
     <application
         tools:replace="android:appComponentFactory"

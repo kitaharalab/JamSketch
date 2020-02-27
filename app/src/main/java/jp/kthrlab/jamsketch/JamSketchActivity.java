@@ -25,9 +25,6 @@ import processing.android.CompatUtils;
 import processing.android.PFragment;
 import processing.core.PApplet;
 
-//import androidx.annotation.NonNull;
-//import androidx.appcompat.app.AppCompatActivity;
-
 public class JamSketchActivity extends AppCompatActivity {
     private static final String TAG = "JamSketchActivity";
 
