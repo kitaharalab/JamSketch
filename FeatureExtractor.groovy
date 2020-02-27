@@ -1,14 +1,18 @@
-import jp.crestmuse.cmx.filewrappers.*
-import jp.crestmuse.cmx.elements.*
-import dk.ange.octave.*
-import dk.ange.cotave.type.*
-import jp.crestmuse.cmx.math.*
-import static jp.crestmuse.cmx.math.MathUtils.*
-import static jp.crestmuse.cmx.math.Operations.*
-import static java.lang.Math.*
-import groovy.transform.*
-//import static Config.*
+import dk.ange.octave.OctaveEngineFactory
+import groovy.transform.CompileStatic
+import jp.crestmuse.cmx.elements.MutableNote
+import jp.crestmuse.cmx.filewrappers.SCCUtils
+import jp.crestmuse.cmx.math.DoubleArray
+import jp.crestmuse.cmx.math.DoubleMatrix
+import jp.crestmuse.cmx.math.Operations
+
 import static JamSketch.CFG
+import static jp.crestmuse.cmx.math.MathUtils.fromOctave
+import static jp.crestmuse.cmx.math.MathUtils.toOctave
+//import static Config.*
+
+import static jp.crestmuse.cmx.math.Operations.abs
+import static jp.crestmuse.cmx.math.Operations.sign
 
 
 class FeatureExtractor {

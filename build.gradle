@@ -7,10 +7,9 @@ repositories {
     google()
     mavenCentral()
     jcenter()
-    maven {
-        url "http://maven.imagej.net/content/groups/public/"
-    }
+    maven {url "http://maven.imagej.net/content/groups/public/" }
     maven {url "https://artifacts.alfresco.com/nexus/content/repositories/public/"}
+    maven {url "https://dl.bintray.com/groovy/maven/"}
 }
 
 sourceSets {
@@ -44,8 +43,10 @@ dependencies {
     // https://mvnrepository.com/artifact/com.googlecode.javacv/javacv
     implementation 'com.googlecode.javacv:javacv:0.1'
     // https://mvnrepository.com/artifact/controlp5/controlp5
-
     implementation 'controlp5:controlp5:2.2.4'
+    // https://mvnrepository.com/artifact/dk.ange/javaoctave
+    implementation 'dk.ange:javaoctave:0.6.4'
+
 
 
 
