@@ -19,16 +19,21 @@ abstract class JamSketchEngineAbstract implements JamSketchEngine {
     def json = new JsonSlurper()
     model = json.parseText((new File(cfg.MODEL_FILE)).text)
     cmx = CMXController.getInstance()
-    mr = cmx.createMusicRepresentation(cfg.NUM_OF_MEASURES, cfg.DIVISION)
+    mr = cmx.createMusicRepresentation(cfg.NUM_OF_MEASURES,
+                                       cfg.DIVISION)
     mr.addMusicLayerCont(OUTLINE_LAYER)
     mr.addMusicLayer(MELODY_LAYER, (0..11) as int[])
-    mr.addMusicLayer(CHORD_LAYER, [C, F, G] as ChordSymbol2[], cfg.DIVISION)
+    mr.addMusicLayer(CHORD_LAYER,
+                     [C, F, G] as ChordSymbol2[],
+                     cfg.DIVISION)
     cfg.chordprog.eachWithIndex{ c, i ->
       mr.getMusicElement(CHORD_LAYER, i, 0).setEvidence(c)
     }
-    def sccgen = new SCCGenerator(target_part, scc.division, OUTLINE_LAYER, cfg)
+    def sccgen = new SCCGenerator(target_part, scc.division,
+    OUTLINE_LAYER, cfg)
     mr.addMusicCalculator(MELODY_LAYER, sccgen)
-    mr.addMusicCalculator(OUTLINE_LAYER, musicCalculatorForOutline())
+    mr.addMusicCalculator(OUTLINE_LAYER,
+                          musicCalculatorForOutline())
   }
 
   abstract def musicCalculatorForOutline()
@@ -43,7 +48,8 @@ abstract class JamSketchEngineAbstract implements JamSketchEngine {
   }
 
   double getMelodicOutline(int measure, int tick) {
-    mr.getMusicElement(OUTLINE_LAYER, measure, tick).getMostLikely()
+    mr.getMusicElement(OUTLINE_LAYER, measure, tick).
+      getMostLikely()
   }
 
   abstract def outlineUpdated(measure, tick)
@@ -53,7 +59,8 @@ abstract class JamSketchEngineAbstract implements JamSketchEngine {
   void resetMelodicOutline() {
     (0..<cfg.NUM_OF_MEASURES).each { i ->
       (0..<cfg.DIVISION).each { j ->
-	mr.getMusicElement(OUTLINE_LAYER, i, j).setEvidence(Double.NaN)
+	mr.getMusicElement(OUTLINE_LAYER, i, j).
+          setEvidence(Double.NaN)
       }
     }
   }
@@ -63,6 +70,7 @@ abstract class JamSketchEngineAbstract implements JamSketchEngine {
   }
 
   ChordSymbol2 getChord(int measure, int tick) {
-    mr.getMusicElement(CHORD_LAYER, measure, tick).getMostLikely()
+    mr.getMusicElement(CHORD_LAYER, measure, tick).
+      getMostLikely()
   }
 }

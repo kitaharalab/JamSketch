@@ -14,5 +14,13 @@ class JamSketchEngineSimple extends JamSketchEngineAbstract {
   def automaticUpdate() {
     true
   }
-  
+
+  Map<String,Double> parameters() {
+    [:]
+  }
+
+  Map<String,String> paramDesc() {
+    [:]
+  }
+
 }

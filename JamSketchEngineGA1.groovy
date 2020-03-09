@@ -5,6 +5,9 @@ import static java.lang.Double.*
 
 class JamSketchEngineGA1 extends JamSketchEngineAbstract {
 
+  int lastUpdateMeasure = -1
+  long lastUpdateTime = -1
+
   double RHYTHM_THRESHOLD = 0.25
   def RHYTHMS = [[1, 0, 0, 0, 0, 0], [1, 0, 0, 1, 0, 0],
 		 [1, 0, 0, 1, 0, 1], [1, 0, 1, 1, 0, 1],
@@ -33,9 +36,14 @@ class JamSketchEngineGA1 extends JamSketchEngineAbstract {
   }
 
   def outlineUpdated(measure, tick) {
-    if (tick == cfg.DIVISION - 1) {
+    long currentTime = System.nanoTime()
+    if (tick == cfg.DIVISION - 1 &&
+        lastUpdateMeasure != measure &&
+	currentTime - lastUpdateTime >= 100000) {
       applyRhythm(measure, decideRhythm(measure, RHYTHM_THRESHOLD))
       mr.getMusicElement(OUTLINE_LAYER, measure, tick).resumeUpdate()
+      lastUpdateMeasure = measure
+      lastUpdateTime = currentTime
     }
   }
 
@@ -47,7 +55,12 @@ class JamSketchEngineGA1 extends JamSketchEngineAbstract {
     println(rhythm)
     rhythm.eachWithIndex{ r, i ->
       def e = mr.getMusicElement(MELODY_LAYER, measure, i)
-      e.setTiedFromPrevious(r == 0)
+      if (measure == 0 && i == 0) {
+        e.setRest(r == 0)
+	e.setTiedFromPrevious(false)
+      } else {
+        e.setTiedFromPrevious(r == 0)
+      }
     }
   }
   

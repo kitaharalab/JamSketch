@@ -1,8 +1,8 @@
 class JamSketchEngineGA2 extends JamSketchEngineGA1 {
   def rmodel = null
 
-  def parameters() {
-    super().parameters() + [RHYTHM_DENSITY: cfg.RHYTHM_DENSITY]
+  Map<String,Double> parameters() {
+    super.parameters() + [RHYTHM_DENSITY: cfg.RHYTHM_DENSITY]
   }
   
   def decideRhythm(measure, thresh) {

@@ -16,7 +16,7 @@ class MelodyData2 {
 	       (cfg.INITIAL_BLANK_MEASURES + cfg.NUM_OF_MEASURES) *
 	       cfg.BEATS_PER_MEASURE * scc.division, cfg.REPEAT_TIMES - 1)
     def target_part = scc.getFirstPartWithChannel(1)
-    engine = new JamSketchEngineGA1()
+    engine = new JamSketchEngineSimple()
 //    engine = Class.forName(cfg.JAMSKETCH_ENGINE).newInstance()
     engine.init(scc, target_part, cfg)
     resetCurve()

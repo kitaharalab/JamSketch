@@ -23,9 +23,10 @@ class RhythmModel {
   int GA_TIME
   double R_TH = 0.25
   //  double RHYTHM_DENSITY
-  double engine
+  def engine
   
   RhythmModel(engine, CFG) {
+    this.engine = engine
     def json = new JsonSlurper()
     def model = json.parseText((new File(CFG.MODEL_FILE)).text)
     rhythmtree = makeRhythmTree(model.rhythmtree)
@@ -178,7 +179,7 @@ class RhythmModel {
       -Math.sqrt(e)
     }
 
-    @CompileStatic
+//    @CompileStatic
     double calcRhythmDensity(List<Integer> s) {
       double e = (engine.parameters().RHYTHM_DENSITY - (int)s.sum())
       //        double e = (rhythmDensity - (int)s.sum())
