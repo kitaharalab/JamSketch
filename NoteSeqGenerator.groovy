@@ -8,6 +8,7 @@ class NoteSeqGenerator implements MusicCalculator {
 
   String noteLayer, chordLayer
   Map<String,List<Double>> trigram
+  List<List<Double>> bigram
   Map<String,List<Double>> chord_beat_dur_unigram
   double entropy_mean
   double w1 = 0.5
@@ -26,8 +27,20 @@ class NoteSeqGenerator implements MusicCalculator {
     this.beatsPerMeas = beatsPerMeas
     this.entropy_bias = entropy_bias
     trigram = model.trigram
+    bigram = model.bigram
     chord_beat_dur_unigram = model.chord_beat_dur_unigram
     entropy_mean = model.entropy.mean
+  }
+
+  @CompileStatic
+  Object prev(MusicElement e, int rep, Object ifnull) {
+    if (e == null) {
+      ifnull
+    } else if (rep == 0) {
+      e.mostLikely
+    } else {
+      prev(e.prev(), rep-1, ifnull)
+    }
   }
 
   @CompileStatic
@@ -37,13 +50,12 @@ class NoteSeqGenerator implements MusicCalculator {
     double value = e_curve.getMostLikely() as double
     if (!Double.isNaN(value)) {
       MusicElement e_melo = mr.getMusicElement(noteLayer, measure, tick)
-
-      boolean b =
-	decideRhythm(value, e_curve.prev().getMostLikely(), tick, e_melo, mr)
-
+      boolean b = decideRhythm(value,
+	             (Double)prev(e_curve, 1, Double.NaN), 
+                     tick, e_melo, mr)
       if (!b) {
-      int prev1 = e_melo.prev().getMostLikely() as int
-      int prev2 = e_melo.prev().prev().getMostLikely() as int
+        int prev1 = (Integer)prev(e_melo, 1, -1)
+	int prev2 = (Integer)prev(e_melo, 2, -1)
       ChordSymbol2 c = mr.getMusicElement(chordLayer, measure, tick).
       getMostLikely() as ChordSymbol2
       List<Double> scores = []
@@ -82,11 +94,23 @@ class NoteSeqGenerator implements MusicCalculator {
 
   @CompileStatic
   double calcLogTrigram(int number, int prev1, int prev2) {
+    if (prev2 == -1) {
+      if (prev1 == -1) {
+        0
+      } else {
+        println("      " + prev1)
+	println("      " + number)
+	println(bigram)
+	println(bigram[prev1][number])
+        Math.log(bigram[prev1][number])
+      }
+    } else {
     String key = prev2 + "," + prev1
     if (trigram.containsKey(key)) {
       Math.log(trigram[key][number])
     } else {
       Math.log(0.001 as double)
+    }
     }
   }
   
