@@ -1,23 +1,14 @@
 package jp.kthrlab.jamsketch;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.content.res.Resources;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
-
-import com.google.api.client.extensions.android.http.AndroidHttp;
-import com.google.api.client.json.gson.GsonFactory;
-import com.google.api.services.drive.Drive;
-import com.google.api.services.drive.DriveScopes;
-import com.google.auth.Credentials;
-import com.google.auth.http.HttpCredentialsAdapter;
-import com.google.auth.oauth2.GoogleCredentials;
-import com.google.auth.oauth2.ServiceAccountCredentials;
-
-import java.io.IOException;
-import java.util.Collections;
 
 import jp.kshoji.javax.sound.midi.UsbMidiSystem;
 import jp.kthrlab.midi.adapter.MidiSystemAdapter;
@@ -27,15 +18,54 @@ import processing.core.PApplet;
 
 public class JamSketchActivity extends AppCompatActivity {
     private static final String TAG = "JamSketchActivity";
-
-    private DriveServiceHelper mDriveServiceHelper;
+    private static Resources resources;
 
     private PApplet sketch;
     UsbMidiSystem ums;
+    SharedPreferences sharedPreferences;
+
+    public static Resources getMyResources() {
+        return resources;
+    }
+//    public String getSharedPreferencesString(String key, String defValue) {
+//        return sharedPreferences.getString(key, defValue);
+//    }
+//
+//    public void putSharedPreferencesString(String key, String value) {
+//        sharedPreferences.edit()
+//                .putString(key, value)
+//                .apply();
+//    }
+//
+    public boolean getSharedPreferencesBoolean(String key, boolean defValue) {
+        return sharedPreferences.getBoolean(key, defValue);
+    }
+
+    public void putSharedPreferencesBoolean(String key, boolean value) {
+        sharedPreferences.edit()
+                .putBoolean(key, value)
+                .apply();
+    }
+//
+//    public int getSharedPreferencesInt(String key, int defValue) {
+//        return sharedPreferences.getInt(key, defValue);
+//    }
+//
+//    public void putSharedPreferencesInt(String key, int value) {
+//        sharedPreferences.edit()
+//                .putInt(key, value)
+//                .apply();
+//    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        resources = getResources();
+        sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+
+//        if (getSharedPreferencesBoolean(JamSketchOnboardingFragment.SHOW_ONBOARDING_PREF_NAME, Config.SHOW_ONBOARDING)) {
+//            startActivity(new Intent(this, OnboardingActivity.class));
+//        }
 
         FrameLayout frame = new FrameLayout(this);
         frame.setId(CompatUtils.getUniqueViewId());
@@ -74,45 +104,6 @@ public class JamSketchActivity extends AppCompatActivity {
     protected void onDestroy() {
         super.onDestroy();
         ums.terminate();
-    }
-
-    public DriveServiceHelper getDriveServiceHelper() {return mDriveServiceHelper;}
-
-    private GoogleCredentials getServiceAccountCredential() {
-//        GoogleCredential credential = null;
-        GoogleCredentials credentials = null;
-        try {
-//            credential = GoogleCredential.fromStream(getResources().getAssets().open("credential/                    .createScoped(Collections.singleton(DriveScopes.DRIVE_FILE));
-            credentials = ServiceAccountCredentials.fromStream(getResources().openRawResource(R.raw.credential))
-                    .createScoped(Collections.singleton(DriveScopes.DRIVE_FILE));
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        return credentials;
-    }
-
-    public void createDriveServiceHelper() {
-//        // Authenticate the user. For most apps, this should be done when the user performs an
-//        // action that requires Drive access rather than in onCreate.
-        createDriveServiceHelper(getServiceAccountCredential());
-    }
-
-    private void createDriveServiceHelper(Credentials credentials) {
-
-                            Drive googleDriveService =
-                            new Drive.Builder(
-                                    AndroidHttp.newCompatibleTransport(),
-                                    new GsonFactory(),
-                                    new HttpCredentialsAdapter(credentials))
-                                    .setApplicationName("JamSketch")
-                                    .build();
-
-        // The DriveServiceHelper encapsulates all REST API and SAF functionality.
-        // Its instantiation is required before handling any onClick actions.
-        mDriveServiceHelper = new DriveServiceHelper(googleDriveService);
-
     }
 
 }

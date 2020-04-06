@@ -1,6 +1,6 @@
-plugins {
-    id 'com.android.application'
-}
+apply plugin: 'com.android.application'
+apply plugin: 'kotlin-android'
+apply plugin: 'kotlin-android-extensions'
 
 repositories {
     jcenter()
@@ -59,6 +59,12 @@ dependencies {
     //noinspection GradleCompatible
     implementation 'com.android.support:appcompat-v7:28.0.0'
     implementation 'com.android.support:support-annotations:28.0.0'
+
+    // Onboarding
+    // https://mvnrepository.com/artifact/com.android.support/leanback-v17
+    implementation 'com.android.support:leanback-v17:28.0.0'
+
+
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'com.android.support.test:runner:1.0.2'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
@@ -70,22 +76,15 @@ dependencies {
     // https://mvnrepository.com/artifact/be.ac.ulg.montefiore.run.jahmm/jahmm
     implementation 'be.ac.ulg.montefiore.run.jahmm:jahmm:0.6.2'
 
-
-//    println project(':cmx_android').projectDir
-//    runtimeOnly (name: 'javax.sound.midi-release', ext: 'aar')
-//    runtimeOnly (name: 'MIDIDriver-release', ext: 'aar')
-
-    // Google Drive APIs
-    // com.google.android.gms:play-services-auth:17.0.0 requires AndroidX
     implementation 'com.google.android.gms:play-services-auth:16.0.1'
     implementation 'com.google.http-client:google-http-client-gson:1.32.1'
-    implementation('com.google.api-client:google-api-client-android:1.30.8') {
-        exclude group: 'org.apache.httpcomponents'
-    }
-    implementation('com.google.apis:google-api-services-drive:v3-rev99-1.23.0') {
-        exclude group: 'org.apache.httpcomponents'
-    }
-//    implementation 'com.google.api-client:google-api-client:1.30.4'
-//    implementation 'com.google.apis:google-api-services-drive:v3-rev173-1.25.0'
-    implementation 'com.google.auth:google-auth-library-oauth2-http:0.20.0'
+
+    // Kotlin
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
+
+    // JSON
+    // https://mvnrepository.com/artifact/com.beust/klaxon
+    implementation 'com.beust:klaxon:5.2'
+
+
 }

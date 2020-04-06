@@ -26,13 +26,13 @@
             <!--</intent-filter>-->
             <!--<meta-data android:name="android.hardware.usb.action.USB_DEVICE_ATTACHED" android:resource="@xml/device_filter" />-->
         </activity>
-        <!--<activity android:name=".jamsketch.GroovyActivity">-->
-            <!--<intent-filter>-->
-                <!--<action android:name="android.intent.action.MAIN" />-->
+        <activity
+            android:name=".OnboardingActivity"
+            android:enabled="true"
+            android:exported="true"
+            android:theme="@style/Theme.Leanback.Onboarding">
+        </activity>
 
-                <!--<category android:name="android.intent.category.LAUNCHER" />-->
-            <!--</intent-filter>-->
-        <!--</activity>-->
     </application>
 
 </manifest>
