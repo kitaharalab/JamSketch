@@ -47,7 +47,7 @@ class NoteSeqGenerator(
   }
 
 //  @CompileStatic
-  fun prev(e: MusicElement, rep: Int, ifnull: Any): Any {
+  fun prev(e: MusicElement?, rep: Int, ifnull: Any): Any {
     if (e == null) {
       return ifnull
     } else if (rep == 0) {
