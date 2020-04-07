@@ -158,7 +158,9 @@ public class JamSketch extends SimplePianoRoll {
     }
 
     void storeCursorPosition() {
-        if ((Config.ON_DRAG_ONLY || nowDrawing) && isInside(mouseX, mouseY) && getSequencer().getTickPosition() < getSequencer().getTickLength()) {
+        if ((Config.ON_DRAG_ONLY || nowDrawing) &&
+                isInside(mouseX, mouseY) &&
+                getSequencer().getTickPosition() < getSequencer().getTickLength()) {
             int m1 = x2measure(mouseX);
             int m0 = x2measure(pmouseX);
 //            System.out.println("m1:" + m1 + ", m0:" + m0 + ", mouseX:" + mouseX + ", pmouseX:" + pmouseX);
@@ -167,8 +169,8 @@ public class JamSketch extends SimplePianoRoll {
                     IntStream.rangeClosed(pmouseX, mouseX).forEach(i -> {
                         melodyData.getCurve1().set(i, mouseY);
                     });
+                    melodyData.updateCurve(pmouseX, mouseX);
                 }
-                melodyData.updateCurve(pmouseX, mouseX);
 //                if (m1 > m0) {
 //                    melodyData.updateCurve(m0 % Config.NUM_OF_MEASURES);
 //                }
