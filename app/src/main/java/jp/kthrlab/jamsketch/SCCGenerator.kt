@@ -3,14 +3,25 @@ package jp.kthrlab.jamsketch
 import jp.crestmuse.cmx.filewrappers.SCCDataSet
 import jp.crestmuse.cmx.inference.MusicCalculator
 import jp.crestmuse.cmx.inference.MusicRepresentation
+import jp.crestmuse.cmx.misc.PianoRoll
+import jp.crestmuse.cmx.processing.CMXController
+import jp.crestmuse.cmx.processing.gui.SimplePianoRoll
+import jp.kshoji.javax.sound.midi.impl.SequencerImpl
 
 
 class SCCGenerator (
     private var target_part: SCCDataSet.Part,
     private var sccdiv: Int,
     private var curveLayer: String,
-    private var CFG: Config
+    private var CFG: Config //,
+//    private var cmx: CMXController
 ) : MusicCalculator {
+
+    var cmx: CMXController? = null
+        get() = field
+        set(value) {
+            field  = value
+        }
 
     companion object {
         var firstMeasure = Config.INITIAL_BLANK_MEASURES
@@ -30,34 +41,37 @@ class SCCGenerator (
                         (Config.DIVISION / Config.BEATS_PER_MEASURE)
                 var onset = ((firstMeasure + measure) * Config.DIVISION + tick) * sccdiv /
                         (Config.DIVISION / Config.BEATS_PER_MEASURE)
-                //	if (onset > pianoroll.getTickPosition()) {
-                synchronized(this) {
-                    //	    def oldnotes =
-                    //	      SCCUtils.getNotesBetween(target_part, onset,
-                    //				       onset+duration, sccdiv, true, true)
-                    //data.target_part.getNotesBetween2(onset, onset+duration)
-                    //	      target_part.remove(oldnotes)
-                    // edit 2020.03.04
-                    target_part.noteList.forEach { note ->
-                        if (note.onset() < onset && onset <= note.offset()) {
-                            target_part.remove(note)
-                            target_part.addNoteElement(note.onset(), (onset-1).toLong(),
-                                    note.notenum(),
-                                    note.velocity(),
-                                    note.offVelocity())
+
+//                println("onset = ((${firstMeasure} + ${measure}) * ${Config.DIVISION} + ${tick}) * ${sccdiv} / (${Config.DIVISION} / ${Config.BEATS_PER_MEASURE}) = ${onset}")
+//                if (onset > cmx.getTickPosition()) {//pianoroll.getTickPosition()) {
+                    synchronized(this) {
+                        //	    def oldnotes =
+                        //	      SCCUtils.getNotesBetween(target_part, onset,
+                        //				       onset+duration, sccdiv, true, true)
+                        //data.target_part.getNotesBetween2(onset, onset+duration)
+                        //	      target_part.remove(oldnotes)
+                        // edit 2020.03.04
+                        target_part.noteList.forEach { note ->
+                            if (note.onset() < onset && onset <= note.offset()) {
+                                target_part.remove(note)
+                                target_part.addNoteElement(note.onset(), (onset-1).toLong(),
+                                        note.notenum(),
+                                        note.velocity(),
+                                        note.offVelocity())
+                            }
+                            if (onset <= note.onset() && note.offset() <= onset+duration) {
+                                target_part.remove(note)
+                            }
+                            if (note.onset() < onset+duration &&
+                                    onset+duration < note.offset()) {
+                                //		  note.setOnset(onset+duration)
+                            }
                         }
-                        if (onset <= note.onset() && note.offset() <= onset+duration) {
-                            target_part.remove(note)
-                        }
-                        if (note.onset() < onset+duration &&
-                                onset+duration < note.offset()) {
-                            //		  note.setOnset(onset+duration)
-                        }
+                        target_part.addNoteElement(onset.toLong(), (onset+duration).toLong(), notenum,
+                                100, 100)
                     }
-                    target_part.addNoteElement(onset.toLong(), (onset+duration).toLong(), notenum,
-                            100, 100)
-                    //	  }
-                }
+                (cmx!!.getSequencer() as SequencerImpl).refreshPlayingTrack()
+//                }
             }
         }
 

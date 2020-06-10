@@ -42,7 +42,7 @@ public class JamSketch extends SimplePianoRoll {
     private boolean initiated = false;
     private CloudFunctionsHelper cloudFunctionsHelper;
     private JamSketchActivity jamSketchActivity;
-    private Checkbox sendGranted;
+//    private Checkbox sendGranted;
 
     public JamSketch(JamSketchActivity jamSketchActivity) {
         this.jamSketchActivity = jamSketchActivity;
@@ -74,11 +74,11 @@ public class JamSketch extends SimplePianoRoll {
         control.addButton("showMidiOutChooser").
                 setLabel("MidiOut").setPosition(370, 640).setSize(110, 50);
 
-        sendGranted = control.addCheckbox("sendGranted");
-        sendGranted.setLabel("Send melody to kthrlab.jp")
-                .setLabelSize(130, 50)
-                .setPosition(800, 655)
-                .setSize(20, 20);
+//        sendGranted = control.addCheckbox("sendGranted");
+//        sendGranted.setLabel("Send melody to kthrlab.jp")
+//                .setLabelSize(130, 50)
+//                .setPosition(800, 655)
+//                .setSize(20, 20);
 
         control.addButton("sendGood").
                 setLabel("Good↑").setPosition(960, 640).setSize(110, 50);
@@ -119,17 +119,15 @@ public class JamSketch extends SimplePianoRoll {
                 e.printStackTrace();
             } catch (SAXException e) {
                 e.printStackTrace();
-//            } catch (InvalidMidiDataException e) {
-//                e.printStackTrace();
             } catch (InvalidMidiDataException e) {
                 e.printStackTrace();
             }
         SCCDataSet.Part part = melodyData.getScc().getFirstPartWithChannel(1);
-            setDataModel(
-                    part.getPianoRollDataModel(
-                            Config.INITIAL_BLANK_MEASURES,
-                            Config.INITIAL_BLANK_MEASURES + Config.NUM_OF_MEASURES
-                    ));
+        setDataModel(
+                part.getPianoRollDataModel(
+                        Config.INITIAL_BLANK_MEASURES,
+                        Config.INITIAL_BLANK_MEASURES + Config.NUM_OF_MEASURES
+                ));
 
         initiated = true;
     }
@@ -163,7 +161,6 @@ public class JamSketch extends SimplePianoRoll {
                 getSequencer().getTickPosition() < getSequencer().getTickLength()) {
             int m1 = x2measure(mouseX);
             int m0 = x2measure(pmouseX);
-//            System.out.println("m1:" + m1 + ", m0:" + m0 + ", mouseX:" + mouseX + ", pmouseX:" + pmouseX);
             if (0 <= m0) {
                 if (pmouseX < mouseX) {
                     IntStream.rangeClosed(pmouseX, mouseX).forEach(i -> {
@@ -217,15 +214,6 @@ public class JamSketch extends SimplePianoRoll {
         }
 
         if (!isNowPlaying()) {
-            // add for debug 20190624 fujii
-            Sequencer seqencer = getSequencer();
-            System.out.println("startMusic() MicrosecondPosition:" + seqencer.getMicrosecondPosition() + " MicrosecondLength:" + seqencer.getMicrosecondLength() + " getFirstMeasure():" + getDataModel().getFirstMeasure());
-            if (seqencer.getMicrosecondPosition() >= seqencer.getMicrosecondLength()) {
-                seqencer.setLoopStartPoint(0);
-                setTickPosition(0);
-                getDataModel().setFirstMeasure(Config.INITIAL_BLANK_MEASURES);
-                System.out.println("reset>>> MicrosecondPosition:" + seqencer.getMicrosecondPosition() + " MicrosecondLength:" + seqencer.getMicrosecondLength() + " getFirstMeasure():" + getDataModel().getFirstMeasure());
-            }
             playMusic();
         }
     }
@@ -241,19 +229,44 @@ public class JamSketch extends SimplePianoRoll {
 
     public void resetMusic() {
         if (!isNowPlaying()) {
-
             initData();
-            setTickPosition(0);
-            getDataModel().setFirstMeasure(Config.INITIAL_BLANK_MEASURES);
-            makeLog("reset");
+            resetData();
+            resetSequencer();
+            println("reset");
+//            makeLog("reset");
         }
     }
 
-    public void sendLike() {
+    private void resetData() {
+        getDataModel().setFirstMeasure(Config.INITIAL_BLANK_MEASURES);
+        melodyData.getEngine().setFirstMeasure(getDataModel().getFirstMeasure());
+        System.out.println("getCurrentMeasure() = " + getCurrentMeasure() + ", getCurrentBeat() = " + getCurrentBeat());
+    }
+
+    private void resetSequencer() {
+        setTickPosition(0);
+        Sequencer seqencer = getSequencer();
+        seqencer.setLoopStartPoint(0);
+        ((SequencerImpl)seqencer).refreshPlayingTrack();
+        System.out.println("resetSequencer>>> MicrosecondPosition:" + seqencer.getMicrosecondPosition() + " MicrosecondLength:" + seqencer.getMicrosecondLength() + " getFirstMeasure():" + getDataModel().getFirstMeasure());
+    }
+
+    @Override
+    protected void musicStopped() {
+        super.musicStopped();
+        System.out.println("getMicrosecondPosition() = " + getMicrosecondPosition());
+        System.out.println("getSequencer().getMicrosecondPosition() = " + getSequencer().getMicrosecondPosition());
+        System.out.println("getSequencer().getMicrosecondLength() = " + getSequencer().getMicrosecondLength());
+        if (getMicrosecondPosition() >= getSequencer().getMicrosecondLength()) {
+            resetMusic();
+        }
+    }
+
+    public void sendGood() {
         makeLog("good");
     }
 
-    public void sendUm() {
+    public void sendBad() {
         makeLog("bad");
     }
 
@@ -263,7 +276,9 @@ public class JamSketch extends SimplePianoRoll {
 
         try {
             if ("melody".equals(action)) {
-                if (sendGranted.checked()) {
+
+                // Send logs
+//                if (sendGranted.checked()) {
                     // midi
                     uploadFile(logname + "_melody.mid",
                             new ByteArrayInputStream(melodyData.getScc().toWrapper().toMIDIXML().getSMFByteArray()),
@@ -285,7 +300,7 @@ public class JamSketch extends SimplePianoRoll {
 //                        ByteArrayOutputStream outputStreamImg = new ByteArrayOutputStream();
 //                        get();
 //                        save("test");
-                }
+//                }
 
             } else {
                 uploadFile(logname + "_" + action + ".txt",
@@ -304,7 +319,6 @@ public class JamSketch extends SimplePianoRoll {
                 .addOnSuccessListener(fileId -> Log.d(TAG, fileId))
                 .addOnFailureListener(exception ->
                         Log.e(TAG,"Couldn't create file.", exception));
-
     }
 
     public void showMidiOutChooser() {
@@ -324,8 +338,8 @@ public class JamSketch extends SimplePianoRoll {
     public void mouseReleased() {
         nowDrawing = false;
         if (isInside(mouseX, mouseY)) {
-            println(x2measure(mouseX));
-            println(Config.NUM_OF_MEASURES);
+//            println(x2measure(mouseX));
+//            println(Config.NUM_OF_MEASURES);
             if (!melodyData.getEngine().automaticUpdate()) {
                 melodyData.getEngine().outlineUpdated(
                         x2measure(mouseX) % Config.NUM_OF_MEASURES,
@@ -336,8 +350,11 @@ public class JamSketch extends SimplePianoRoll {
 
     @Override
     public void mouseDragged() {
-        if (initiated) {
-            storeCursorPosition();
+        if (initiated && isNowPlaying()) {
+//            println("mouseX = " + mouseX + ", beat2x = " + beat2x(Config.NUM_OF_MEASURES, getCurrentBeat()));
+            if(mouseX > beat2x(getCurrentMeasure(), getCurrentBeat()) + 10) {
+                storeCursorPosition();
+            }
         }
     }
 

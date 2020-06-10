@@ -1,6 +1,16 @@
 <resources>
-    <string name="app_name">JamSketch</string>
-    <string name="other_client_id">403548423268-c3rj6p2slj1hcgqpeefldangdc66c7kt.apps.googleusercontent.com</string>
-    <string name="android_client_id">403548423268-dt9a04ebbmj78uai74kef7mleofm8bnc.apps.googleusercontent.com</string>
-    <string name="script_client_id">403548423268-ilqr95r4mv16o495kve979nj45nhmvrq.apps.googleusercontent.com</string>
+    <string name="app_name" translatable="false">JamSketch</string>
+<!--    <string name="other_client_id">403548423268-c3rj6p2slj1hcgqpeefldangdc66c7kt.apps.googleusercontent.com</string>-->
+<!--    <string name="android_client_id">403548423268-dt9a04ebbmj78uai74kef7mleofm8bnc.apps.googleusercontent.com</string>-->
+<!--    <string name="script_client_id">403548423268-ilqr95r4mv16o495kve979nj45nhmvrq.apps.googleusercontent.com</string>-->
+    <string name="onboard_welcom" translatable="false">Play JamSketch today!</string>
+    <string name="onboard_select_midiout_title">Connect your synthesizer</string>
+    <string name="onboard_select_midiout_description">or install a software synthesizer, then select the device as a MIDI output device.
+</string>
+    <string name="onboard_start_app">Start JamSketch</string>
+    <string name="onboard_draw_curve_title">Draw curves</string>
+    <string name="onboard_draw_curve_description">melodies are automatically generated.</string>
+    <string name="onboard_eval_app">Evaluate JamSketch</string>
+    <string name="onboard_send_melody_title">Notes</string>
+    <string name="onboard_send_melody_description">At the last measure, JamSketch sends the generated melody automatically \nto Kitahara laboratory for research purposes. \nNo personal information is included in the transmitted data.</string>
 </resources>

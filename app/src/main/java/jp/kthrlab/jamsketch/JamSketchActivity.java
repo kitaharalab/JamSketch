@@ -19,6 +19,7 @@ import processing.core.PApplet;
 public class JamSketchActivity extends AppCompatActivity {
     private static final String TAG = "JamSketchActivity";
     private static Resources resources;
+    private FrameLayout frame;
 
     private PApplet sketch;
     UsbMidiSystem ums;
@@ -63,27 +64,30 @@ public class JamSketchActivity extends AppCompatActivity {
         resources = getResources();
         sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
 
-//        if (getSharedPreferencesBoolean(JamSketchOnboardingFragment.SHOW_ONBOARDING_PREF_NAME, Config.SHOW_ONBOARDING)) {
-//            startActivity(new Intent(this, OnboardingActivity.class));
-//        }
-
-        FrameLayout frame = new FrameLayout(this);
+        frame = new FrameLayout(this);
         frame.setId(CompatUtils.getUniqueViewId());
-//        setContentView(R.layout.activity_jam_sketch);
         setContentView(frame, new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
-                                                        ViewGroup.LayoutParams.MATCH_PARENT));
+                ViewGroup.LayoutParams.MATCH_PARENT));
 
         ums = new UsbMidiSystem(this);
         ums.initialize();
-
         new MidiSystemAdapter(this).adaptAndroidMidiDeviceToKshoji();
 
+        if (getSharedPreferencesBoolean(JamSketchOnboardingFragment.SHOW_ONBOARDING_PREF_NAME, Config.SHOW_ONBOARDING)) {
+            startOnboarding();
+        } else {
+            startJamSketch();
+        }
+    }
+
+    public void startOnboarding() {
+        new JamSketchOnboardingFragment().setView(frame, this);
+    }
+
+    public void startJamSketch() {
         sketch = new JamSketch(this);
         PFragment fragment = new PFragment(sketch);
         fragment.setView(frame, this);
-
-        // midiouts[]
-//        ((JamSketch)sketch).showMidiOutChooser();
     }
 
     @Override
@@ -105,5 +109,7 @@ public class JamSketchActivity extends AppCompatActivity {
         super.onDestroy();
         ums.terminate();
     }
+
+
 
 }

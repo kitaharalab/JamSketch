@@ -51,6 +51,8 @@ abstract class JamSketchEngineAbstract : JamSketchEngine {
     }
     var sccgen = SCCGenerator(target_part as SCCDataSet.Part, scc.division,
     OUTLINE_LAYER, cfg)
+    sccgen.cmx = cmx
+
     mr!!.addMusicCalculator(MELODY_LAYER, sccgen)
     mr!!.addMusicCalculator(OUTLINE_LAYER,
                           musicCalculatorForOutline())

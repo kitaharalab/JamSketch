@@ -1,10 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    package="jp.kthrlab.jamsketch">
+    package="jp.kthrlab.jamsketch"
+    tools:ignore="ImpliedTouchscreenHardware,MissingLeanbackLauncher">
 
     <!-- Permissions required by GoogleAuthUtil -->
-     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-feature
+        android:name="android.software.leanback"
+        android:required="false" />
+    <uses-permission android:name="android.permission.INTERNET" />
 
     <application
         tools:replace="android:appComponentFactory"
@@ -26,13 +30,6 @@
             <!--</intent-filter>-->
             <!--<meta-data android:name="android.hardware.usb.action.USB_DEVICE_ATTACHED" android:resource="@xml/device_filter" />-->
         </activity>
-        <activity
-            android:name=".OnboardingActivity"
-            android:enabled="true"
-            android:exported="true"
-            android:theme="@style/Theme.Leanback.Onboarding">
-        </activity>
-
     </application>
 
 </manifest>

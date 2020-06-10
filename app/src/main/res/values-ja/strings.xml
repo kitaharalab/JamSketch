@@ -1,0 +1,10 @@
+<resources>
+    <string name="onboard_select_midiout_title">シンセサイザーを接続</string>
+    <string name="onboard_select_midiout_description">またはソフトウェアシンセサイザーをインストールし、\nMIDI出力デバイスとして設定します。</string>
+    <string name="onboard_start_app">JamSketchをスタート</string>
+    <string name="onboard_draw_curve_title">カーブを描く</string>
+    <string name="onboard_draw_curve_description">メロディが自動的に生成されます。</string>
+    <string name="onboard_eval_app">JamSketchを評価</string>
+    <string name="onboard_send_melody_title">注意事項</string>
+    <string name="onboard_send_melody_description">JamSketchは最後の小節で、研究を目的として生成されたメロディを北原研究室へ\n自動的に送信します。送信されるデータに個人情報は一切含まれません。</string>
+</resources>

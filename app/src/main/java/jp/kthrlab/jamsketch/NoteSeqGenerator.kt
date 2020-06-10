@@ -1,15 +1,14 @@
 package jp.kthrlab.jamsketch
 
 //import groovy.transform.*
+import android.os.Handler
+import android.os.HandlerThread
 import com.beust.klaxon.JsonObject
 import com.beust.klaxon.lookup
 import jp.crestmuse.cmx.inference.MusicCalculator
 import jp.crestmuse.cmx.inference.MusicElement
 import jp.crestmuse.cmx.inference.MusicRepresentation
 import jp.crestmuse.cmx.misc.ChordSymbol2
-import jp.crestmuse.cmx.processing.CMXApplet
-import jp.crestmuse.cmx.processing.CMXController
-import jp.kshoji.javax.sound.midi.impl.SequencerImpl
 
 class NoteSeqGenerator(
         private var noteLayer: String,
@@ -18,12 +17,6 @@ class NoteSeqGenerator(
         private var entropy_bias: Double,
         private val model: Any
 ) : MusicCalculator {
-
-  var cmx: CMXController? = null
-    get() = field
-    set(value) {
-      field  = value
-    }
 
   var trigram: Map<String,List<Double>>? = null
   var bigram: List<List<Double>>? = null
@@ -35,7 +28,9 @@ class NoteSeqGenerator(
   var w4 = 2.0
   var RHYTHM_THRS = 0.1
   var RHYTHM_WEIGHTS = listOf(1.0, 0.2, 0.4, 0.8, 0.2, 0.4,
-          1.0, 0.2, 0.4, 0.8, 0.2, 0.4);
+          1.0, 0.2, 0.4, 0.8, 0.2, 0.4)
+  var handlerThread = HandlerThread("noteSeqGenerator_thread")
+  var handler:Handler? = null
 
   init {
     if (model is JsonObject) {
@@ -44,6 +39,8 @@ class NoteSeqGenerator(
       chord_beat_dur_unigram = model.map["chord_beat_dur_unigram"] as Map<String, List<Double>>
       entropy_mean = model.lookup<Double>("entropy.mean")[0]
     }
+    handlerThread.start()
+    handler = Handler((handlerThread.getLooper()))
   }
 
 //  @CompileStatic
@@ -62,35 +59,40 @@ class NoteSeqGenerator(
     var e_curve = mr.getMusicElement(layer, measure, tick)
     var value = e_curve.getMostLikely() as Double
     if (!value.isNaN()) {
-      var e_melo = mr.getMusicElement(noteLayer, measure, tick)
-      var b = decideRhythm(value,
-	             prev(e_curve, 1, Double.NaN) as Double,
-                     tick, e_melo, mr)
-      if (!b) {
-        var prev1 = prev(e_melo, 1, -1)
-	    var prev2 = prev(e_melo, 2, -1)
-        var c = mr.getMusicElement(chordLayer, measure, tick).
-          getMostLikely() as ChordSymbol2
-        var scores: MutableList<Double?> = MutableList(12){null}
-        var prevlist = mutableListOf<Int>()
 
-        for (i in 0 until tick) {
-	      prevlist.add(
-                  mr.getMusicElement(noteLayer, measure, i).getMostLikely() as Int)
+      val th = Thread(Runnable {
+        var e_melo = mr.getMusicElement(noteLayer, measure, tick)
+        var b = decideRhythm(value,
+                prev(e_curve, 1, Double.NaN) as Double,
+                tick, e_melo, mr)
+        if (!b) {
+          var prev1 = prev(e_melo, 1, -1)
+          var prev2 = prev(e_melo, 2, -1)
+          var c = mr.getMusicElement(chordLayer, measure, tick).
+          getMostLikely() as ChordSymbol2
+          var scores: MutableList<Double?> = MutableList(12){null}
+          var prevlist = mutableListOf<Int>()
+
+          for (i in 0 until tick) {
+            prevlist.add(
+                    mr.getMusicElement(noteLayer, measure, i).getMostLikely() as Int)
+          }
+          (0..11).forEach { i ->
+            var value12 = value - (value / 12).toInt() * 12
+            var simil = -Math.log((value12 - i) * (value12 - i))
+            var logtrigram = calcLogTrigram(i, prev1 as Int, prev2 as Int)
+            var logchord = calcLogChordBeatUnigram(i, c, tick, beatsPerMeas,
+                    e_melo.duration(), mr)
+            var entdiff = calcEntropyDiff(i, prevlist)
+            scores[i] = w1 * simil + w2 * logtrigram + w3 * logchord +
+                    w4 * (-entdiff)
+          }
+          e_melo.setEvidence(argmax(scores))
         }
-        (0..11).forEach { i ->
-          var value12 = value - (value / 12).toInt() * 12
-          var simil = -Math.log((value12 - i) * (value12 - i))
-          var logtrigram = calcLogTrigram(i, prev1 as Int, prev2 as Int)
-          var logchord = calcLogChordBeatUnigram(i, c, tick, beatsPerMeas,
-                  e_melo.duration(), mr)
-          var entdiff = calcEntropyDiff(i, prevlist)
-          scores[i] = w1 * simil + w2 * logtrigram + w3 * logchord +
-                  w4 * (-entdiff)
-      }
-      e_melo.setEvidence(argmax(scores))
-        (cmx!!.getSequencer() as SequencerImpl).refreshPlayingTrack()
-      }
+      })
+      handler?.post(th)
+//      th.start()
+      System.err.println("_________________thread started")
     }
   }
 

@@ -8,7 +8,7 @@ import jp.crestmuse.cmx.processing.gui.SimplePianoRoll
 class MelodyData2(
         private var filename: String,
         private var width: Int,
-        private var cmxcontrol: CMXApplet,
+        private var cmx: CMXApplet,
         private var pianoroll: SimplePianoRoll,
         private var cfg: Config
 ) {
@@ -48,6 +48,7 @@ class MelodyData2(
     var size2: Int = nMeas * div
     for (i in from..thru) {
       var nn: Double? = if(curve1!![i] == null) null else pianoroll.y2notenum(curve1!![i]!!.toDouble())
+        println("var nn: ${nn} curve1!![i] == ${curve1!![i]}")
       var ii: Int = i - 100
       var position: Int = (ii * size2 / (curve1!!.size - 100))
       if (position >= 0) {

@@ -7,7 +7,6 @@ class JamSketchEngineSimple : JamSketchEngineAbstract() {
   override fun musicCalculatorForOutline(): MusicCalculator {
     var noteSeqGenerator = NoteSeqGenerator(MELODY_LAYER, CHORD_LAYER, Config.BEATS_PER_MEASURE,
             Config.ENT_BIAS, model!!)
-    noteSeqGenerator.cmx = cmx
     return noteSeqGenerator
   }
 
