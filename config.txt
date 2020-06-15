@@ -10,7 +10,7 @@ class Config {
   int INITIAL_BLANK_MEASURES = 2
   int REPEAT_TIMES = 4
   int CALC_LENGTH = 1
-  String MODEL_FILE = "model20161104b.json"
+  String MODEL_FILE = "model20180321.json"
   String LOG_DIR = "log/"
   boolean EXPRESSION = false
   boolean MELODY_RESETING = true
@@ -22,11 +22,19 @@ class Config {
 
   def OCTAVE_PROGRAM = [win: "octave-4.0.1.exe"]
 
+  int GA_TIME_R = 100
   int GA_TIME = 500
   int GA_POPUL_SIZE = 200
   String GA_INIT = "tree"  // "random" or "tree"
-  
- 
+
+  def JAMSKETCH_ENGINE = "JamSketchEngineSimple"
+
+  def ENT_BIAS = 0.0
+  def RHYTHM_DENSITY = 6.0
+  def SIM_THRESHOLD = 10
+
+
+
   def MODEL_FILENAME_BASE = "./expressive/models/takeTheATrain_KNN"
   def MODEL_FILENAMES =
     [dur: MODEL_FILENAME_BASE + "_durRat.model",

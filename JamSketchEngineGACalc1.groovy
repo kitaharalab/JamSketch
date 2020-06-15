@@ -3,60 +3,44 @@ import jp.crestmuse.cmx.inference.*
 import jp.crestmuse.cmx.inference.models.*
 import org.apache.commons.math3.genetics.*
 import java.util.concurrent.*
-import groovy.json.*
-import jp.crestmuse.cmx.misc.*
-//import static Config.*
-import static JamSketch.CFG
 
-class MelodyModel {
+class JamSketchEngineGACalc1 implements GACalculator<Integer,Double> {
+//class JamSketchEngineGACalc1 extends GACalculator<Integer,Double> {
 
   class MelodyTree {
     int note,freq
     List<MelodyTree> next = []
     }
   
-  def mr
+  //  double W1 = 1.0, W2 = 1.0
+  Map<String,List<Double>> trigram
   double[][] bigram
   double[][] delta_bigram
   Map<String,List<Double>> chord_beat_dur_unigram
   double entropy_mean
   MelodyTree melodytree
-  
   int GA_TIME, GA_POPUL_SIZE
   String GA_INIT
   int BEATS_PER_MEASURE, DIVISION
-  List<ChordSymbol2> chordprog
+  //  double ENT_BIAS
+  JamSketchEngineGA1 engine
+
+  List<List<List<Integer>>> favorites = []
   
-  MelodyModel(cmxcontrol, sccgenerator) {
-    mr = cmxcontrol.createMusicRepresentation(CFG.NUM_OF_MEASURES, CFG.DIVISION)
-    mr.addMusicLayerCont("curve")
-    mr.addMusicLayer("melody", (0..11) as int[])
-    def json = new JsonSlurper()
-    def model = json.parseText((new File(CFG.MODEL_FILE)).text)
+  JamSketchEngineGACalc1(model, CFG, engine) {
+    trigram = model.trigram
     bigram = model.bigram
     delta_bigram = model.delta_bigram
     chord_beat_dur_unigram = model.chord_beat_dur_unigram
     entropy_mean = model.entropy.mean
     melodytree = makeMelodyTree(model.melodytree)
-    def hmm = new HMMContWithGAImpl(new MyGACalc(),
-				    (int)(CFG.GA_POPUL_SIZE / 2),
-				    CFG.GA_POPUL_SIZE, (double)0.2,
-				    new UniformCrossover(0.5), (double)0.8,
-				    new BinaryMutation(), (double)0.2,
-				    new TournamentSelection(10))
-    def calc = new MostSimpleHMMContCalculator("curve", "melody", hmm, mr)
-    calc.setCalcLength(CFG.CALC_LENGTH * CFG.DIVISION)
-    calc.enableSeparateThread(true)
-    mr.addMusicCalculator("curve", calc)
-    mr.addMusicCalculator("melody", sccgenerator)
-
     GA_TIME = CFG.GA_TIME
     GA_POPUL_SIZE = CFG.GA_POPUL_SIZE
     GA_INIT = CFG.GA_INIT
     BEATS_PER_MEASURE = CFG.BEATS_PER_MEASURE
     DIVISION = CFG.DIVISION
-    chordprog = CFG.chordprog
-    
+    //    ENT_BIAS = CFG.ENT_BIAS
+    this.engine = engine
   }
 
   def makeMelodyTree(map) {
@@ -71,16 +55,7 @@ class MelodyModel {
     }
   }
 
-  def updateMusicRepresentation(measure) {
-    println measure
-    def e = mr.getMusicElement("curve", measure + 1, -1)
-    e.resumeUpdate()
-    mr.reflectTies("curve", "melody")
-    mr.reflectRests("curve", "melody")
-  }
 
-  class MyGACalc extends GACalculator<Integer,Double> {
-    
     @CompileStatic
     StoppingCondition getStoppingCondition() {
       //new FixedGenerationCount(5)
@@ -90,19 +65,25 @@ class MelodyModel {
     @CompileStatic
     void populationUpdated(Population p, int gen, List<MusicElement> e) {
       Chromosome c = p.getFittestChromosome()
-      println("Population,${e[0].measure()},${e[0].tick()},${gen}," +
-      	      "${c.getFitness()},\"${c}\"")
-      //      println(p.getFittestChromosome().getFitness());
+      //      println("Population,${e[0].measure()},${e[0].tick()},${gen}," +
+      //      	      "${c.getFitness()},\"${c}\"")
+      //      //      println(p.getFittestChromosome().getFitness());
     }
     
+    Random random = new Random()
+
     @CompileStatic
     List<Integer> createInitial(int size) {
-      if (GA_INIT.equalsIgnoreCase("random"))
-	createInitialRandom(size)
-      else if (GA_INIT.equalsIgnoreCase("tree"))
+      if (favorites[size] != null) {
+	favorites[size][random.nextInt(favorites[size].size())]
+      } else {
+	if (GA_INIT.equalsIgnoreCase("random"))
+	  createInitialRandom(size)
+	  else if (GA_INIT.equalsIgnoreCase("tree"))
         createInitialFromTree(size)
-      else
-	throw new IllegalArgumentException("GA_INIT \"${GA_INIT}\" is not supported")
+	else
+	  throw new IllegalArgumentException("GA_INIT \"${GA_INIT}\" is not supported")
+      }
     }
     
     @CompileStatic
@@ -134,13 +115,20 @@ class MelodyModel {
     
     @CompileStatic
     double calcFitness(List<Integer> s, List<Double> o, List<MusicElement> e) {
+      double W1 = engine.parameters().W1
+      double W2 = engine.parameters().W2
+      double ENT_BIAS = engine.parameters().ENT_BIAS
       double mse = -calcRMSE(s, o)
-      double lik = calcLogTransLikelihood(s)
-      double delta = calcLogDeltaTransLikelihood(s)
+      double lik = calcLogTrigramLikelihood(s)
+      //double lik = calcLogTransLikelihood(s)
+      //      double delta = calcLogDeltaTransLikelihood(s)
       double entr = calcEntropy(s, 12)
-      double entrdiff = -(entr-entropy_mean) * (entr-entropy_mean)
+      double entrdiff =
+	-(entr-entropy_mean-ENT_BIAS) * (entr-entropy_mean-ENT_BIAS)
       double chord = calcLogChordBeatUnigramLikelihood(s, e)
-      3 * mse + 2 * lik + 1 * delta + 3 * chord + 20 * entrdiff
+      W1 * mse + W2 * (lik + chord) + 5.0 * entrdiff
+      //3 * mse + 2 * lik + 0 * delta + 3 * chord + 20 * entrdiff
+      //3 * mse + 2 * lik + 1 * delta + 3 * chord + 20 * entrdiff
       //      3 * mse + 2 * lik + delta + 3 * chord + 10 * entrdiff
     }
 
@@ -156,11 +144,22 @@ class MelodyModel {
     }
 
     @CompileStatic
+    double calcLogTrigramLikelihood(List<Integer> s) {
+      double lik = 0.0
+      int length = s.size() - 2;
+      for (int i = 0; i < length; i++) {
+	String key = s[i] + "," + s[i+1]
+	lik += Math.log((trigram.containsKey(key) ? trigram[key][s[i+2]] : 0.001) as double)
+      }
+      lik
+    }
+    
+    @CompileStatic
     double calcLogTransLikelihood(List<Integer> s) {
       double lik = 0.0
       int length = s.size() - 1;
       for (int i = 0; i < length; i++) {
-	lik += Math.log(bigram[s[i]][s[i+1]])
+	lik += Math.log(bigram[s[i]][s[i+1]] as double)
       }
       lik
     }
@@ -170,7 +169,7 @@ class MelodyModel {
       double lik = 0.0
       int length = s.size() - 2
       for (int i = 0; i < length; i++) {
-	lik += Math.log(delta_bigram[s[i+1]-s[i]][s[i+2]-s[i+1]])
+	lik += Math.log(delta_bigram[s[i+1]-s[i]][s[i+2]-s[i+1]] as double)
       }
       lik
     }
@@ -181,13 +180,19 @@ class MelodyModel {
       double lik = 0.0
       int length = s.size() - 1
       for (int i = 0; i < length; i++) {
-	String chord = chordprog[i/DIVISION as int].toString()
+	String chord = engine.getChord(i/DIVISION as int, 0).toString()
+	//String chord = chordprog[i/DIVISION as int].toString()
 	int div4 = DIVISION / BEATS_PER_MEASURE as int
 	String beat = (e[i].tick() == 0 ? "head" :
 		       (e[i].tick() % div4 == 0 ? "on" : "off"))
-	String dur = (e[i].duration() >= div4 ? "long" : "short")
-	String key = chord + "_" + beat + "_" + dur
-	lik += Math.log((chord_beat_dur_unigram[key][s[i]] as double) + (0.001 as double))
+	//String dur = (e[i].duration() >= div4 ? "mid" : "short")
+	String dur =
+	  (e[i].duration() >= 2 * div4 ? "long" :
+	   (e[i].duration() >= div4 ? "mid" : "short"))
+	  String key = chord + "_" + beat + "_" + dur
+	  //String key = chord + "_" + beat
+	//String key = chord
+	  lik += Math.log(((chord_beat_dur_unigram[key][s[i]] ?: 0) + 0.001) as double)
       }
       lik
     }
@@ -209,8 +214,5 @@ class MelodyModel {
       }
       entropy
     }
-  }
 
 }
-
-
