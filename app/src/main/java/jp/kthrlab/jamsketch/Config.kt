@@ -21,6 +21,7 @@ public class Config {
         const val MIDFILENAME = "blues01.mid"
         val chordprog = listOf<ChordSymbol2>(ChordSymbol2.C, ChordSymbol2.F, ChordSymbol2.C, ChordSymbol2.C, ChordSymbol2.F, ChordSymbol2.F, ChordSymbol2.C, ChordSymbol2.C, ChordSymbol2.G, ChordSymbol2.F, ChordSymbol2.C, ChordSymbol2.G)
         const val NUM_OF_MEASURES = 12
+        const val NUM_OF_RESET_AHEAD = 0
         const val DIVISION = 12
         const val BEATS_PER_MEASURE = 4
         const val INITIAL_BLANK_MEASURES = 2

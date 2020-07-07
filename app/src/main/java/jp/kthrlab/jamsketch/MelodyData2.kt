@@ -4,6 +4,7 @@ import jp.crestmuse.cmx.filewrappers.SCCDataSet
 import jp.crestmuse.cmx.processing.CMXApplet
 import jp.crestmuse.cmx.processing.CMXController
 import jp.crestmuse.cmx.processing.gui.SimplePianoRoll
+import kotlin.math.roundToInt
 
 class MelodyData2(
         private var filename: String,
@@ -49,8 +50,8 @@ class MelodyData2(
     for (i in from..thru) {
       var nn: Double? = if(curve1!![i] == null) null else pianoroll.y2notenum(curve1!![i]!!.toDouble())
         println("var nn: ${nn} curve1!![i] == ${curve1!![i]}")
-      var ii: Int = i - 100
-      var position: Int = (ii * size2 / (curve1!!.size - 100))
+      var ii: Int = i - pianoroll.keyboardWidth.roundToInt()
+      var position: Int = (ii * size2 / (curve1!!.size - pianoroll.keyboardWidth.roundToInt()))
       if (position >= 0) {
           println("engine.setMelodicOutline((${position} / ${div}), ${position} % ${div}, ${nn}})")
         engine.setMelodicOutline((position / div), position % div, nn)

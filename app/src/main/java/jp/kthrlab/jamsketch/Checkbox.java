@@ -21,7 +21,7 @@ public class Checkbox extends Button {
     public void draw() {
 
         // draw checkbox
-        pApplet.textSize(textSize);
+        pApplet.textSize(textSize * ((JamSketch)pApplet).scale);
         if (checked) {
             pApplet.noStroke();
             pApplet.fill(0, 0, 255);

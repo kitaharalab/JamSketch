@@ -14,7 +14,7 @@ public class Button extends Controller {
 
     @Override
     public void draw() {
-        pApplet.textSize(20);
+        pApplet.textSize(10 * ((JamSketch)pApplet).scale);
         pApplet.noStroke();
         if (overRect()) {
             pApplet.fill(0, 0, 255);
