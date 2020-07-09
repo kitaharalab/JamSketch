@@ -13,8 +13,7 @@ class SCCGenerator (
     private var target_part: SCCDataSet.Part,
     private var sccdiv: Int,
     private var curveLayer: String,
-    private var CFG: Config //,
-//    private var cmx: CMXController
+    private var CFG: Config
 ) : MusicCalculator {
 
     var cmx: CMXController? = null
@@ -43,7 +42,7 @@ class SCCGenerator (
                         (Config.DIVISION / Config.BEATS_PER_MEASURE)
 
 //                println("onset = ((${firstMeasure} + ${measure}) * ${Config.DIVISION} + ${tick}) * ${sccdiv} / (${Config.DIVISION} / ${Config.BEATS_PER_MEASURE}) = ${onset}")
-//                if (onset > cmx.getTickPosition()) {//pianoroll.getTickPosition()) {
+                if (onset > CMXController.getInstance().getTickPosition()) {
                     synchronized(this) {
                         //	    def oldnotes =
                         //	      SCCUtils.getNotesBetween(target_part, onset,
@@ -70,8 +69,8 @@ class SCCGenerator (
                         target_part.addNoteElement(onset.toLong(), (onset+duration).toLong(), notenum,
                                 100, 100)
                     }
-                (cmx!!.getSequencer() as SequencerImpl).refreshPlayingTrack()
-//                }
+                    (cmx!!.getSequencer() as SequencerImpl).refreshPlayingTrack()
+                }
             }
         }
 

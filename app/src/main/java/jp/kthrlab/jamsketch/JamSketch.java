@@ -183,12 +183,10 @@ public class JamSketch extends SimplePianoRoll {
             int m1 = x2measure(mouseX);
             int m0 = x2measure(pmouseX);
             if (0 <= m0) {
-                if (pmouseX < mouseX) {
-                    IntStream.rangeClosed(pmouseX, mouseX).forEach(i -> {
-                        melodyData.getCurve1().set(i, mouseY);
-                    });
-                    melodyData.updateCurve(pmouseX, mouseX);
-                }
+                IntStream.rangeClosed(pmouseX, mouseX).forEach(i -> {
+                    melodyData.getCurve1().set(i, mouseY);
+                });
+                melodyData.updateCurve(pmouseX, mouseX);
 //                if (m1 > m0) {
 //                    melodyData.updateCurve(m0 % Config.NUM_OF_MEASURES);
 //                }
@@ -394,7 +392,8 @@ public class JamSketch extends SimplePianoRoll {
     public void mouseDragged() {
         if (initiated && isNowPlaying()) {
 //            println("mouseX = " + mouseX + ", beat2x = " + beat2x(Config.NUM_OF_MEASURES, getCurrentBeat()));
-            if(mouseX > beat2x(getCurrentMeasure(), getCurrentBeat()) + 10) {
+            if(pmouseX < mouseX &&
+                    mouseX > beat2x(getCurrentMeasure(), getCurrentBeat())) {
                 storeCursorPosition();
             }
         }

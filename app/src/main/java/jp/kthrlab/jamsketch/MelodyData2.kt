@@ -36,7 +36,6 @@ class MelodyData2(
         resetCurve()
     }
 
-
   fun resetCurve() {
 //    curve1 =  [null] * width
     curve1 = arrayOfNulls<Int>(width).toMutableList() //[null] * width
