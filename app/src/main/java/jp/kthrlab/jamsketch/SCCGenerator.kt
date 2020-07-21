@@ -6,6 +6,7 @@ import jp.crestmuse.cmx.inference.MusicRepresentation
 import jp.crestmuse.cmx.misc.PianoRoll
 import jp.crestmuse.cmx.processing.CMXController
 import jp.crestmuse.cmx.processing.gui.SimplePianoRoll
+import jp.kshoji.javax.sound.midi.Sequencer
 import jp.kshoji.javax.sound.midi.impl.SequencerImpl
 
 
@@ -29,6 +30,7 @@ class SCCGenerator (
     override fun updated(measure: Int, tick: Int, layer: String, mr: MusicRepresentation) {
         //      def sccdiv = scc.getDivision()
         //def firstMeasure = pianoroll.getDataModel().getFirstMeasure()
+        synchronized(this) {
         var e = mr.getMusicElement(layer, measure, tick)
         if (!e.rest() && !e.tiedFromPrevious()) {
             //def curvevalue = curve2[measure * CFG.DIVISION + tick]
@@ -43,7 +45,6 @@ class SCCGenerator (
 
 //                println("onset = ((${firstMeasure} + ${measure}) * ${Config.DIVISION} + ${tick}) * ${sccdiv} / (${Config.DIVISION} / ${Config.BEATS_PER_MEASURE}) = ${onset}")
                 if (onset > CMXController.getInstance().getTickPosition()) {
-                    synchronized(this) {
                         //	    def oldnotes =
                         //	      SCCUtils.getNotesBetween(target_part, onset,
                         //				       onset+duration, sccdiv, true, true)
@@ -69,7 +70,8 @@ class SCCGenerator (
                         target_part.addNoteElement(onset.toLong(), (onset+duration).toLong(), notenum,
                                 100, 100)
                     }
-                    (cmx!!.getSequencer() as SequencerImpl).refreshPlayingTrack()
+                    var sequencer:Sequencer = cmx!!.getSequencer()
+                    if(sequencer is SequencerImpl) sequencer.refreshPlayingTrack()
                 }
             }
         }

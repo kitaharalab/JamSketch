@@ -176,24 +176,6 @@ public class JamSketch extends SimplePianoRoll {
         });
     }
 
-    void storeCursorPosition() {
-        if ((Config.ON_DRAG_ONLY || nowDrawing) &&
-                isInside(mouseX, mouseY) &&
-                getSequencer().getTickPosition() < getSequencer().getTickLength()) {
-            int m1 = x2measure(mouseX);
-            int m0 = x2measure(pmouseX);
-            if (0 <= m0) {
-                IntStream.rangeClosed(pmouseX, mouseX).forEach(i -> {
-                    melodyData.getCurve1().set(i, mouseY);
-                });
-                melodyData.updateCurve(pmouseX, mouseX);
-//                if (m1 > m0) {
-//                    melodyData.updateCurve(m0 % Config.NUM_OF_MEASURES);
-//                }
-            }
-        }
-    }
-
     void processLastMeasure() {
         makeLog("melody");
         if (Config.MELODY_RESETING) {
@@ -268,7 +250,7 @@ public class JamSketch extends SimplePianoRoll {
         setTickPosition(0);
         Sequencer seqencer = getSequencer();
         seqencer.setLoopStartPoint(0);
-        ((SequencerImpl)seqencer).refreshPlayingTrack();
+        if (seqencer instanceof SequencerImpl) ((SequencerImpl)seqencer).refreshPlayingTrack();
         System.out.println("resetSequencer>>> MicrosecondPosition:" + seqencer.getMicrosecondPosition() + " MicrosecondLength:" + seqencer.getMicrosecondLength() + " getFirstMeasure():" + getDataModel().getFirstMeasure());
     }
 
@@ -301,21 +283,16 @@ public class JamSketch extends SimplePianoRoll {
                 // midi
                 uploadFile(logname + "_melody.mid",
                         melodyData,
-//                            new ByteArrayInputStream(melodyData.getScc().toWrapper().toMIDIXML().getSMFByteArray()),
                         "audio/midi");
 
                 // sccxml
-//                    ByteArrayOutputStream outputStreamScc = new ByteArrayOutputStream();
-//                    TransformerFactory.newInstance().newTransformer().transform(new DOMSource(melodyData.getScc().toWrapper().getXMLDocument()), new StreamResult(outputStreamScc));
                 uploadFile(logname + "_melody.sccxml",
                         melodyData,
-//                            new ByteArrayInputStream(outputStreamScc.toByteArray()),
                         "text/xml");
 
                 // json
                 uploadFile(logname + "_curve.json",
                         melodyData,
-//                            new ByteArrayInputStream(new Gson().toJson(melodyData.getCurve1()).getBytes()),
                         "application/json");
 
 //                        // screenshot
@@ -393,12 +370,23 @@ public class JamSketch extends SimplePianoRoll {
         if (initiated && isNowPlaying()) {
 //            println("mouseX = " + mouseX + ", beat2x = " + beat2x(Config.NUM_OF_MEASURES, getCurrentBeat()));
             if(pmouseX < mouseX &&
-                    mouseX > beat2x(getCurrentMeasure(), getCurrentBeat())) {
-                storeCursorPosition();
+                    mouseX > beat2x(getCurrentMeasure(), getCurrentBeat()) + 10) {
+                if ((Config.ON_DRAG_ONLY || nowDrawing) &&
+                        isInside(mouseX, mouseY) &&
+                        getSequencer().getTickPosition() < getSequencer().getTickLength()) {
+                    int m1 = x2measure(mouseX);
+                    int m0 = x2measure(pmouseX);
+                    if (0 <= m0) {
+                        IntStream.rangeClosed(pmouseX, mouseX).forEach(i -> {
+                            // store cursor position
+                            melodyData.getCurve1().set(i, mouseY);
+                        });
+                        melodyData.updateCurve(pmouseX, mouseX);
+                    }
+                }
             }
         }
     }
-
 
 //    @Override
 //    void keyReleased() {
