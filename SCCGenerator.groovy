@@ -1,5 +1,6 @@
 import groovy.transform.*
 import jp.crestmuse.cmx.inference.*
+import jp.crestmuse.cmx.processing.CMXController
 
 class SCCGenerator implements MusicCalculator {
 
@@ -23,43 +24,49 @@ class SCCGenerator implements MusicCalculator {
       def e = mr.getMusicElement(layer, measure, tick)
       if (!e.rest() && !e.tiedFromPrevious()) {
 	//def curvevalue = curve2[measure * CFG.DIVISION + tick]
-	def curvevalue =
-	  mr.getMusicElement(curveLayer, measure, tick).getMostLikely()
-	if (curvevalue != null) {
-	  int notenum = getNoteNum(e.getMostLikely(), curvevalue)
-	int duration = e.duration() * sccdiv /
-	(CFG.DIVISION / CFG.BEATS_PER_MEASURE)
-	int onset = ((firstMeasure + measure) * CFG.DIVISION + tick) * sccdiv /
-	(CFG.DIVISION / CFG.BEATS_PER_MEASURE)
-	//	if (onset > pianoroll.getTickPosition()) {
-	  synchronized(this) {
-	    //	    def oldnotes =
-	    //	      SCCUtils.getNotesBetween(target_part, onset,
-	    //				       onset+duration, sccdiv, true, true)
-	      //data.target_part.getNotesBetween2(onset, onset+duration)
-	    //	      target_part.remove(oldnotes)
-	      // edit 2020.03.04
-	      target_part.eachnote { note ->
-		if (note.onset() < onset && onset <= note.offset()) {
-		  target_part.remove(note)
-		  target_part.addNoteElement(note.onset(), onset-1,
-					     note.notenum(),
-					     note.velocity(),
-					     note.offVelocity())
+		def curvevalue =
+		  mr.getMusicElement(curveLayer, measure, tick).getMostLikely()
+		if (curvevalue != null) {
+		  int notenum = getNoteNum(e.getMostLikely(), curvevalue)
+		int duration = e.duration() * sccdiv /
+		(CFG.DIVISION / CFG.BEATS_PER_MEASURE)
+		int onset = ((firstMeasure + measure) * CFG.DIVISION + tick) * sccdiv /
+		(CFG.DIVISION / CFG.BEATS_PER_MEASURE)
+		//	if (onset > pianoroll.getTickPosition()) {
+			synchronized(this) {
+				if (onset > CMXController.getInstance().getTickPosition()) {
+					//	    def oldnotes =
+					//	      SCCUtils.getNotesBetween(target_part, onset,
+					//				       onset+duration, sccdiv, true, true)
+					//data.target_part.getNotesBetween2(onset, onset+duration)
+					//	      target_part.remove(oldnotes)
+					// edit 2020.03.04
+					target_part.eachnote { note ->
+						if (note.onset() < onset && onset <= note.offset()) {
+							target_part.remove(note)
+//							println("cond1 remove ${note}")
+							target_part.addNoteElement(note.onset(), onset-1,
+									note.notenum(),
+									note.velocity(),
+									note.offVelocity())
+//							println("cond1 add ${note.onset}, ${onset-1}, ${note.notenum()}")
+						}
+						if (onset <= note.onset() && note.offset() <= onset+duration) {
+							target_part.remove(note)
+//							println("cond2 remove ${note}")
+						}
+						if (note.onset() < onset+duration &&
+								onset+duration < note.offset()) {
+							//		  note.setOnset(onset+duration)
+						}
+					}
+					target_part.addNoteElement(onset, onset+duration, notenum,
+							100, 100)
+//					println("all add ${onset}, ${onset+duration}, ${notenum}")
+					//	  }
+				}
+			}
 		}
-		if (onset <= note.onset() && note.offset() <= onset+duration) {
-		  target_part.remove(note)
-		}
-		if (note.onset() < onset+duration &&
-		    onset+duration < note.offset()) {
-		  //		  note.setOnset(onset+duration)
-		}
-	      }
-	      target_part.addNoteElement(onset, onset+duration, notenum,
-					 100, 100)
-	      //	  }
-	}
-	}
       }
 
       if (CFG.EXPRESSION) {

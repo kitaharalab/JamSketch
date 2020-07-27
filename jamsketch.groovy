@@ -1,6 +1,13 @@
 import controlP5.ControlP5
 import groovy.json.JsonOutput
+import groovy.json.JsonSlurper
+import jdk.nashorn.internal.runtime.regexp.joni.Config
+import jp.crestmuse.cmx.filewrappers.CMXFileWrapper
+import jp.crestmuse.cmx.filewrappers.MIDIXMLWrapper
+import jp.crestmuse.cmx.filewrappers.SCCDataSet
+import jp.crestmuse.cmx.processing.CMXController
 import jp.crestmuse.cmx.processing.gui.SimplePianoRoll
+import jp.crestmuse.cmx.sound.MusicPlaySynchronizer
 
 import javax.swing.*
 import javax.swing.filechooser.FileNameExtensionFilter
@@ -11,7 +18,8 @@ class JamSketch extends SimplePianoRoll {
   MelodyData2 melodyData
   boolean nowDrawing = false
   String username = ""
-
+  int fullMeasure
+  int mCurrentMeasure
   
   static def CFG
 
@@ -35,7 +43,6 @@ class JamSketch extends SimplePianoRoll {
     }
 
     initData()
-
     // add WindowListener (windowClosing) which calls exit();
   }
 
@@ -50,6 +57,7 @@ class JamSketch extends SimplePianoRoll {
 	    CFG.INITIAL_BLANK_MEASURES,
             CFG.INITIAL_BLANK_MEASURES + CFG.NUM_OF_MEASURES
       ))
+    fullMeasure = dataModel.getMeasureNum() * CFG.REPEAT_TIMES;
   }
 
   void draw() {
@@ -57,7 +65,7 @@ class JamSketch extends SimplePianoRoll {
     if (guideData != null)
       drawGuideCurve()
     drawCurve()
-    if (getCurrentMeasure() == CFG.NUM_OF_MEASURES - 1)
+    if (getCurrentMeasure() == CFG.NUM_OF_MEASURES - CFG.NUM_OF_RESET_AHEAD)
       processLastMeasure()
     melodyData.engine.setFirstMeasure(getDataModel().
       getFirstMeasure())
@@ -88,32 +96,33 @@ class JamSketch extends SimplePianoRoll {
              i+1+xFrom, guideData.curveGuideView[i+1] as int)
       }
     }
+  }
 
+  void updateCurve() {
+    melodyData.updateCurve(pmouseX, mouseX)
   }
 
   void storeCursorPosition() {
+    (pmouseX..mouseX).each { i ->
+      melodyData.curve1[i] = mouseY
+    }
+  }
+
+  boolean isUpdatable() {
     if ((!CFG.ON_DRAG_ONLY || nowDrawing) &&
-         isInside(mouseX, mouseY)) {
+            isInside(mouseX, mouseY)) {
       int m1 = x2measure(mouseX)
       int m0 = x2measure(pmouseX)
-      if (0 <= m0) {  
-        if (pmouseX < mouseX) {
-          (pmouseX..mouseX).each { i ->
-            melodyData.curve1[i] = mouseY
-          }
-	  melodyData.updateCurve(pmouseX, mouseX)
-        }
-//        if (m1 > m0) {
-//          melodyData.updateCurve(m0 % CFG.NUM_OF_MEASURES)
-//        }
-      }
+      0 <= m0 && pmouseX < mouseX
+    } else {
+      false
     }
   }
 
   void processLastMeasure() {
     makeLog("melody")
-    if (CFG.MELODY_RESETING) {
-      getDataModel().shiftMeasure(CFG.NUM_OF_MEASURES)
+    if (CFG.MELODY_RESETTING) {
+      if (mCurrentMeasure < (fullMeasure - CFG.NUM_OF_RESET_AHEAD)) getDataModel().shiftMeasure(CFG.NUM_OF_MEASURES)
       melodyData.resetCurve()
       if (guideData != null) guideData.shiftCurve()
     }
@@ -129,14 +138,14 @@ class JamSketch extends SimplePianoRoll {
   void drawProgress() {
     if (isNowPlaying()) {
       def dataModel = getDataModel()
-      int m = getCurrentMeasure() +
+      mCurrentMeasure = getCurrentMeasure() +
               dataModel.getFirstMeasure() -
               CFG.INITIAL_BLANK_MEASURES + 1
       int mtotal = dataModel.getMeasureNum() *
                    CFG.REPEAT_TIMES
       textSize(32)
       fill(0, 0, 0)
-      text(m + " / " + mtotal, 460, 675)    
+      text(mCurrentMeasure + " / " + mtotal, 460, 675)
     }
   }
   
@@ -158,25 +167,37 @@ class JamSketch extends SimplePianoRoll {
   void resetMusic() {
     initData()
     setTickPosition(0)
-    getDataModel().setFirstMeasure(CFG.INITIAL_BLANK_MEASURES)
+    dataModel.setFirstMeasure(CFG.INITIAL_BLANK_MEASURES)
     makeLog("reset")
+  }
+
+  @Override
+  void musicStopped() {
+    super.musicStopped()
+    if (microsecondPosition >= sequencer.getMicrosecondLength())
+      resetMusic()
   }
 
   void makeLog(action) {
     def logname = "output_" + (new Date()).toString().replace(" ", "_").replace(":", "-")
     if (action == "melody") {
-//      def midname = "${CFG.LOG_DIR}/${logname}_melody.mid"
-//      melodyData.scc.toWrapper().toMIDIXML().writefileAsSMF(midname)
-//      println("saved as ${midname}")
-//      def sccname = "${CFG.LOG_DIR}/${logname}_melody.sccxml"
-//      melodyData.scc.toWrapper().writefile(sccname)
-//      println("saved as ${sccname}")
+      def midname = "${CFG.LOG_DIR}/${logname}_melody.mid"
+      melodyData.scc.toWrapper().toMIDIXML().writefileAsSMF(midname)
+      println("saved as ${midname}")
+      def sccname = "${CFG.LOG_DIR}/${logname}_melody.sccxml"
+      melodyData.scc.toWrapper().writefile(sccname)
+      println("saved as ${sccname}")
       def jsonname = "${CFG.LOG_DIR}/${logname}_curve.json"
       saveStrings(jsonname, [JsonOutput.toJson(melodyData.curve1)] as String[])
       println("saved as ${jsonname}")
       def pngname = "${CFG.LOG_DIR}/${logname}_screenshot.png"
       save(pngname)
       println("saved as ${pngname}")
+
+      // for debug
+      new File("${CFG.LOG_DIR}/${logname}_noteList.txt").text = (melodyData.scc as SCCDataSet).getFirstPartWithChannel(1).getNoteList().toString()
+//      new File("${CFG.LOG_DIR}/${logname}_noteOnlyList.txt").text = (melodyData.scc as SCCDataSet).getFirstPartWithChannel(1).getNoteOnlyList().toString()
+
     } else {
       def txtname = "${CFG.LOG_DIR}/${logname}_${action}.txt"
       saveStrings(txtname, [action] as String[])
@@ -185,31 +206,38 @@ class JamSketch extends SimplePianoRoll {
   }
 
   void loadCurve() {
-    def filter = new FileNameExtensionFilter(".json or .txt", "json", "txt")
-    def chooser = new JFileChooser(currentDirectory: new File("."),
-				   fileFilter: filter)
-    if (chooser.showOpenDialog(this) == JFileChooser.APPROVE_OPTION) {
-      if (chooser.selectedFile.name.endsWith(".json")) {
-      	melodyData.curve1 = json.parseText(chooser.selectedFile.text)
-      } else if (chooser.selectedFile.name.endsWith(".txt")) {
-        println("Reading ${chooser.selectedFile.absolutePath}")
-        def table = loadTable(chooser.selectedFile.absolutePath, "csv")
+    selectInput("Select a file to process:", "loadFileSelected")
+  }
+
+  void loadFileSelected(File selection) {
+    if (selection == null) {
+      println("Window was closed or the user hit cancel.")
+    } else {
+      def absolutePath = selection.getAbsolutePath()
+      println("User selected " + absolutePath)
+      if (absolutePath.endsWith(".json")) {
+        def json = new JsonSlurper()
+        melodyData.curve1 = json.parseText(selection.text)
+        melodyData.updateCurve(0, width)
+      } else if (selection.getCanonicalPath().endsWith(".txt")) {
+        println("Reading ${absolutePath}")
+        def table = loadTable(absolutePath, "csv")
         melodyData.curve1 = [null] * width
         int n = table.getRowCount()
         int m = melodyData.curve1.size() - 100
-        for (int i in 100..<(melodyData.curve1.size()-1)) {
-          int from = (i-100) * n / m
-          int thru = ((i+1)-100) * n / m - 1
+        for (int i in 100..<(melodyData.curve1.size() - 1)) {
+          int from = (i - 100) * n / m
+          int thru = ((i + 1) - 100) * n / m - 1
           melodyData.curve1[i] =
-            (from..thru).collect{notenum2y(table.getFloat(it, 0))}.sum() /
-            (from..thru).size()
+                  (from..thru).collect { notenum2y(table.getFloat(it, 0)) }.sum() /
+                          (from..thru).size()
         }
+        melodyData.updateCurve(0, width)
+      }else {
+        println("File is not supported")
+        return
       }
-    } else {
-      println("File is not supported")
-      return
     }
-    melodyData.updateCurve('all')
   }
 
   void mousePressed() {
@@ -230,7 +258,13 @@ class JamSketch extends SimplePianoRoll {
   }
 
   void mouseDragged() {
-    storeCursorPosition()
+    if(pmouseX < mouseX &&
+            mouseX > beat2x(getCurrentMeasure(), getCurrentBeat()) + 10) {
+      if (isUpdatable()) {
+        storeCursorPosition()
+        updateCurve()
+      }
+    }
   }
 
   void keyReleased() {

@@ -48,7 +48,10 @@ class JamSketchSlave extends JamSketch implements TargetMover {
 
   void mouseDragged() {
     if (motionController == null) {
-      storeCursorPosition()
+      if (isUpdatable()) {
+        storeCursorPosition()
+        updateCurve()
+      }
     }
   }
 
@@ -92,10 +95,10 @@ class JamSketchSlave extends JamSketch implements TargetMover {
           melodyData.curve1[i] = melodyData.curve1[i + 1] - diff
         }
       }
-    }
-  }
+    }e
+}
 
-  private int getPreviousValueIndex(currentValueIndex) {
+private int getPrviousValueIndex(currentValueIndex) {
     for (i in currentValueIndex - 1 .. startPosition) {
       if (melodyData.curve1[i] != null) return i
       if (i == startPosition) return -1
