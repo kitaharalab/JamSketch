@@ -5,6 +5,7 @@ class Config {
   String MIDFILENAME = "blues01.mid"
   List<ChordSymbol2> chordprog = [C, F, C, C, F, F, C, C, G, F, C, G]
   int NUM_OF_MEASURES = 12
+  int NUM_OF_RESET_AHEAD = 1
   int DIVISION = 12
   int BEATS_PER_MEASURE = 4
   int INITIAL_BLANK_MEASURES = 2
@@ -13,7 +14,7 @@ class Config {
   String MODEL_FILE = "model20180321.json"
   String LOG_DIR = "log/"
   boolean EXPRESSION = false
-  boolean MELODY_RESETING = true
+  boolean MELODY_RESETTING = true
   boolean CURSOR_ENHANCED = true
   boolean ON_DRAG_ONLY = true
   int EYE_MOTION_SPEED = 30
@@ -27,7 +28,7 @@ class Config {
   int GA_POPUL_SIZE = 200
   String GA_INIT = "tree"  // "random" or "tree"
 
-  def JAMSKETCH_ENGINE = "JamSketchEngineSimple"
+  def JAMSKETCH_ENGINE = "JamSketchEngineGA2" //"JamSketchEngineSimple"
 
   def ENT_BIAS = 0.0
   def RHYTHM_DENSITY = 6.0
