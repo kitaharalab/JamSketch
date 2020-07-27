@@ -149,7 +149,7 @@ public class JamSketch extends SimplePianoRoll {
                         Config.INITIAL_BLANK_MEASURES,
                         Config.INITIAL_BLANK_MEASURES + Config.NUM_OF_MEASURES
                 ));
-
+        fullMeasure = getDataModel().getMeasureNum() * Config.REPEAT_TIMES;
         initiated = true;
     }
 
@@ -179,7 +179,7 @@ public class JamSketch extends SimplePianoRoll {
     void processLastMeasure() {
         makeLog("melody");
         if (Config.MELODY_RESETING) {
-            if (currentMeasure < fullMeasure) {
+            if (currentMeasure < (fullMeasure - Config.NUM_OF_RESET_AHEAD)) {
                 getDataModel().shiftMeasure(Config.NUM_OF_MEASURES);
             }
             melodyData.resetCurve();
@@ -199,7 +199,6 @@ public class JamSketch extends SimplePianoRoll {
             PianoRoll.DataModel dataModel = getDataModel();
             currentMeasure = getCurrentMeasure() + dataModel.getFirstMeasure() -
                     Config.INITIAL_BLANK_MEASURES + 1;
-            fullMeasure = dataModel.getMeasureNum() * Config.REPEAT_TIMES;
             textSize(16*scale);
             fill(0, 0, 0);
             text(currentMeasure + " / " + fullMeasure, (margin*6 + buttonWidth*5), buttonY + buttonHeight/2);

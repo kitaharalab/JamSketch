@@ -2,3 +2,4 @@
 log/
 .idea/
 /app/src/main/java/jp/kthrlab/jamsketch/credentials.json
+*.iml
