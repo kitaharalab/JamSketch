@@ -69,9 +69,10 @@ class SCCGenerator (
                         }
                         target_part.addNoteElement(onset.toLong(), (onset+duration).toLong(), notenum,
                                 100, 100)
+
+                        var sequencer:Sequencer = cmx!!.getSequencer()
+                        if(sequencer is SequencerImpl) sequencer.refreshPlayingTrack()
                     }
-                    var sequencer:Sequencer = cmx!!.getSequencer()
-                    if(sequencer is SequencerImpl) sequencer.refreshPlayingTrack()
                 }
             }
         }
