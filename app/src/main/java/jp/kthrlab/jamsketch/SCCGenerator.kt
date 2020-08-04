@@ -71,7 +71,7 @@ class SCCGenerator (
                                 100, 100)
 
                         var sequencer:Sequencer = cmx!!.getSequencer()
-                        if(sequencer is SequencerImpl) sequencer.refreshPlayingTrack()
+                        if (sequencer is SequencerImpl) sequencer.refreshPlayingTrack()
                     }
                 }
             }

@@ -159,6 +159,7 @@ public class JamSketch extends SimplePianoRoll {
         strokeWeight(3);
 
         if (initiated) {
+            println("State = " + ((SequencerImpl)getSequencer()).getState());
             drawCurve();
             drawProgress();
             if (getCurrentMeasure() == Config.NUM_OF_MEASURES - Config.NUM_OF_RESET_AHEAD)
@@ -221,6 +222,7 @@ public class JamSketch extends SimplePianoRoll {
     }
 
     public void stopPlayMusic() {
+        println("stopPlayMusic>>> ");
         if (isNowPlaying()) {
             stopMusic();
 
@@ -242,7 +244,7 @@ public class JamSketch extends SimplePianoRoll {
     private void resetData() {
         getDataModel().setFirstMeasure(Config.INITIAL_BLANK_MEASURES);
         melodyData.getEngine().setFirstMeasure(getDataModel().getFirstMeasure());
-        System.out.println("resetData>>> getCurrentMeasure() = " + getCurrentMeasure() + ", getCurrentBeat() = " + getCurrentBeat());
+        println("resetData>>> getCurrentMeasure() = " + getCurrentMeasure() + ", getCurrentBeat() = " + getCurrentBeat());
     }
 
     private void resetSequencer() {
@@ -250,14 +252,15 @@ public class JamSketch extends SimplePianoRoll {
         Sequencer seqencer = getSequencer();
         seqencer.setLoopStartPoint(0);
         if (seqencer instanceof SequencerImpl) ((SequencerImpl)seqencer).refreshPlayingTrack();
-        System.out.println("resetSequencer>>> MicrosecondPosition:" + seqencer.getMicrosecondPosition() + " MicrosecondLength:" + seqencer.getMicrosecondLength() + " getFirstMeasure():" + getDataModel().getFirstMeasure());
+        println("resetSequencer>>> MicrosecondPosition:" + seqencer.getMicrosecondPosition() + " MicrosecondLength:" + seqencer.getMicrosecondLength() + " getFirstMeasure():" + getDataModel().getFirstMeasure());
     }
 
     @Override
     protected void musicStopped() {
         super.musicStopped();
-        System.out.println("musicStopped>>> StoppedgetMicrosecondPosition() = " + getMicrosecondPosition());
-        System.out.println("musicStopped>>> getSequencer().getMicrosecondLength() = " + getSequencer().getMicrosecondLength());
+        println("musicStopped>>> StoppedgetMicrosecondPosition() = " + getMicrosecondPosition());
+        println("musicStopped>>> getSequencer().getMicrosecondLength() = " + getSequencer().getMicrosecondLength());
+//        Arrays.stream(Thread.currentThread().getStackTrace()).forEach(System.out::println);
         if (getMicrosecondPosition() >= getSequencer().getMicrosecondLength()) {
             resetMusic();
         }
