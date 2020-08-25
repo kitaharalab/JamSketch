@@ -114,10 +114,12 @@ class NoteSeqGenerator(
       if (prev1 == -1) {
         return 0.0
       } else {
-        println("      " + prev1)
-        println("      " + number)
-        println(bigram)
-        println(bigram!![prev1][number])
+        if (BuildConfig.DEBUG) {
+          println("      " + prev1)
+          println("      " + number)
+          println(bigram)
+          println(bigram!![prev1][number])
+        }
         return Math.log(bigram!![prev1][number])
       }
     } else {

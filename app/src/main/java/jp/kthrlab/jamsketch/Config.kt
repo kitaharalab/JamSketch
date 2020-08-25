@@ -49,6 +49,7 @@ public class Config {
         const val RHYTHM_DENSITY = 6.0
         const val SIM_THRESHOLD = 10
 
+        const val COMPOSABLE_TICKS_DIV = 8
 
         // Android
         const val SHOW_ONBOARDING = true

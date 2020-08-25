@@ -8,6 +8,7 @@ import org.xml.sax.SAXException;
 
 import java.io.IOException;
 import java.text.SimpleDateFormat;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Locale;
 import java.util.stream.IntStream;
@@ -159,7 +160,7 @@ public class JamSketch extends SimplePianoRoll {
         strokeWeight(3);
 
         if (initiated) {
-            println("State = " + ((SequencerImpl)getSequencer()).getState());
+//            println("State = " + ((SequencerImpl)getSequencer()).getState());
             drawCurve();
             drawProgress();
             if (getCurrentMeasure() == Config.NUM_OF_MEASURES - Config.NUM_OF_RESET_AHEAD)
@@ -244,7 +245,9 @@ public class JamSketch extends SimplePianoRoll {
     private void resetData() {
         getDataModel().setFirstMeasure(Config.INITIAL_BLANK_MEASURES);
         melodyData.getEngine().setFirstMeasure(getDataModel().getFirstMeasure());
-        println("resetData>>> getCurrentMeasure() = " + getCurrentMeasure() + ", getCurrentBeat() = " + getCurrentBeat());
+        if (BuildConfig.DEBUG) {
+            println("resetData>>> getCurrentMeasure() = " + getCurrentMeasure() + ", getCurrentBeat() = " + getCurrentBeat());
+        }
     }
 
     private void resetSequencer() {
@@ -252,15 +255,19 @@ public class JamSketch extends SimplePianoRoll {
         Sequencer seqencer = getSequencer();
         seqencer.setLoopStartPoint(0);
         if (seqencer instanceof SequencerImpl) ((SequencerImpl)seqencer).refreshPlayingTrack();
-        println("resetSequencer>>> MicrosecondPosition:" + seqencer.getMicrosecondPosition() + " MicrosecondLength:" + seqencer.getMicrosecondLength() + " getFirstMeasure():" + getDataModel().getFirstMeasure());
+        if (BuildConfig.DEBUG) {
+            println("resetSequencer>>> MicrosecondPosition:" + seqencer.getMicrosecondPosition() + " MicrosecondLength:" + seqencer.getMicrosecondLength() + " getFirstMeasure():" + getDataModel().getFirstMeasure());
+        }
     }
 
     @Override
     protected void musicStopped() {
         super.musicStopped();
-        println("musicStopped>>> StoppedgetMicrosecondPosition() = " + getMicrosecondPosition());
-        println("musicStopped>>> getSequencer().getMicrosecondLength() = " + getSequencer().getMicrosecondLength());
-//        Arrays.stream(Thread.currentThread().getStackTrace()).forEach(System.out::println);
+        if (BuildConfig.DEBUG) {
+            println("musicStopped>>> StoppedgetMicrosecondPosition() = " + getMicrosecondPosition());
+            println("musicStopped>>> getSequencer().getMicrosecondLength() = " + getSequencer().getMicrosecondLength());
+            Arrays.stream(Thread.currentThread().getStackTrace()).forEach(System.out::println);
+        }
         if (getMicrosecondPosition() >= getSequencer().getMicrosecondLength()) {
             resetMusic();
         }
@@ -372,7 +379,7 @@ public class JamSketch extends SimplePianoRoll {
         if (initiated && isNowPlaying()) {
 //            println("mouseX = " + mouseX + ", beat2x = " + beat2x(Config.NUM_OF_MEASURES, getCurrentBeat()));
             if(pmouseX < mouseX &&
-                    mouseX > beat2x(getCurrentMeasure(), getCurrentBeat()) + 10) {
+                    mouseX > beat2x(getCurrentMeasure(), getCurrentBeat()) + getTicksPerBeat()/Config.COMPOSABLE_TICKS_DIV) {
                 if ((Config.ON_DRAG_ONLY || nowDrawing) &&
                         isInside(mouseX, mouseY) &&
                         getSequencer().getTickPosition() < getSequencer().getTickLength()) {
