@@ -1,9 +1,6 @@
 package jp.kthrlab.jamsketch
 
-import com.beust.klaxon.JsonArray
-import com.beust.klaxon.JsonObject
 import com.beust.klaxon.Parser
-import groovy.json.JsonSlurper
 import jp.crestmuse.cmx.filewrappers.SCC
 import jp.crestmuse.cmx.filewrappers.SCCDataSet
 import jp.crestmuse.cmx.inference.MusicCalculator
@@ -11,10 +8,7 @@ import jp.crestmuse.cmx.inference.MusicRepresentation
 import jp.crestmuse.cmx.misc.ChordSymbol2
 import jp.crestmuse.cmx.misc.ChordSymbol2.*
 import jp.crestmuse.cmx.processing.CMXController
-import java.io.BufferedReader
-import java.io.File
 import java.io.InputStreamReader
-import java.util.stream.Collectors
 
 abstract class JamSketchEngineAbstract : JamSketchEngine {
   var mr: MusicRepresentation? = null
@@ -87,8 +81,8 @@ abstract class JamSketchEngineAbstract : JamSketchEngine {
     }
   }
 
-  override fun setFirstMeasure(num: Int) {
-    SCCGenerator.firstMeasure = num
+  override fun setFirstMeasure(number: Int) {
+    SCCGenerator.firstMeasure = number
     println("SCCGenerator.firstMeasure = ${SCCGenerator.firstMeasure}")
   }
 

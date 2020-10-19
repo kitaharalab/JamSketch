@@ -13,4 +13,10 @@
     <string name="onboard_eval_app">Evaluate JamSketch</string>
     <string name="onboard_send_melody_title">Notes</string>
     <string name="onboard_send_melody_description">At the last measure, JamSketch sends the generated melody automatically \nto Kitahara laboratory for research purposes. \nNo personal information is included in the transmitted data.</string>
+    <string name="synthesizer_name" translatable="false">FluidSynth MIDI Synthesizer</string>
+    <string name="synthesizer_package" translatable="false">net.volcanomobile.fluidsynthmidi</string>
+    <string name="synthesizer_message" translatable="false">Install %1$s?</string>
+    <string name="playstore_url" translatable="false">https://play.google.com/store/apps/details?id=</string>
+    <string name="ok" translatable="false">OK</string>
+    <string name="cancel" translatable="false">CANCEL</string>
 </resources>

@@ -1,7 +1,5 @@
 package jp.kthrlab.jamsketch;
 
-import android.content.Intent;
-import android.net.Uri;
 import android.util.Log;
 
 import org.xml.sax.SAXException;
@@ -18,6 +16,7 @@ import javax.xml.transform.TransformerException;
 
 import jp.crestmuse.cmx.filewrappers.SCCDataSet;
 import jp.crestmuse.cmx.misc.PianoRoll;
+import jp.crestmuse.cmx.processing.CMXController;
 import jp.crestmuse.cmx.processing.DeviceNotAvailableException;
 import jp.crestmuse.cmx.processing.gui.SimplePianoRoll;
 import jp.crestmuse.cmx.sound.SoundUtils;
@@ -25,6 +24,7 @@ import jp.kshoji.javax.sound.midi.InvalidMidiDataException;
 import jp.kshoji.javax.sound.midi.MidiUnavailableException;
 import jp.kshoji.javax.sound.midi.Sequencer;
 import jp.kshoji.javax.sound.midi.impl.SequencerImpl;
+import kotlin.Unit;
 
 public class JamSketch extends SimplePianoRoll {
     private static final String TAG = "JamSketch";
@@ -109,24 +109,15 @@ public class JamSketch extends SimplePianoRoll {
                 setLabel("Bad↓").setPosition(margin*8 + buttonWidth*7, buttonY).setSize(buttonWidth, buttonHeight);
     }
 
-    void icon(boolean value) {
-        println("got an event for icon", value);
-    }
-
-    void checkMidiOutDeviceInfo() {
-        try {
-            if (SoundUtils.getMidiOutDeviceInfo().size() <= 0) {
-                final String appPackageName = "net.volcanomobile.fluidsynthmidi"; // getPackageName() from Context or Activity object
-                startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://play.google.com/store/apps/details?id=" + appPackageName)));
-            }
-        } catch (MidiUnavailableException e) {
-            e.printStackTrace();
-        }
-    }
+//    void icon(boolean value) {
+//        println("got an event for icon", value);
+//    }
 
     void initData() {
-        Log.d(TAG, "initData()");
+        if (BuildConfig.DEBUG) {
+            Log.d(TAG, "initData()");
 
+        }
         String filename = Config.MIDFILENAME;
 //        println(melodyData.getFullChordProgression());
 //        melodyData = new MelodyData(filename, width,  this, this, jamSketchActivity);
@@ -213,12 +204,12 @@ public class JamSketch extends SimplePianoRoll {
                 initData();
             } catch (DeviceNotAvailableException e) {
                 e.printStackTrace();
-                showMidiOutChooser();
+                showMidiOutChooserAndPlay();
             }
-        }
-
-        if (!isNowPlaying()) {
-            playMusic();
+        } else {
+            if (!isNowPlaying()) {
+                playMusic();
+            }
         }
     }
 
@@ -322,34 +313,64 @@ public class JamSketch extends SimplePianoRoll {
         if( cloudFunctionsHelper == null) cloudFunctionsHelper = new CloudFunctionsHelper();
         if ("audio/midi".equals(mimeType)) {
             cloudFunctionsHelper.uploadScc(fileName, melodyData, mimeType)
-                    .addOnSuccessListener(fileId -> Log.d(TAG, fileId))
-                    .addOnFailureListener(exception ->
-                            Log.e(TAG,"Couldn't create file.", exception));
+                    .addOnSuccessListener(fileId -> { if (BuildConfig.DEBUG) Log.d(TAG, fileId); })
+                    .addOnFailureListener(exception -> {
+                        if (BuildConfig.DEBUG) Log.e(TAG,"Couldn't create file.", exception);
+                        });
         } else if ("text/xml".equals(mimeType)) {
             cloudFunctionsHelper.uploadSccxml(fileName, melodyData, mimeType)
-                    .addOnSuccessListener(fileId -> Log.d(TAG, fileId))
-                    .addOnFailureListener(exception ->
-                            Log.e(TAG,"Couldn't create file.", exception));
+                    .addOnSuccessListener(fileId -> {if (BuildConfig.DEBUG) Log.d(TAG, fileId);})
+                    .addOnFailureListener(exception -> {
+                        if (BuildConfig.DEBUG) Log.e(TAG,"Couldn't create file.", exception);
+                        });
 
         } else if ("application/json".equals(mimeType)) {
             cloudFunctionsHelper.uploadJson(fileName, melodyData, mimeType)
-                    .addOnSuccessListener(fileId -> Log.d(TAG, fileId))
-                    .addOnFailureListener(exception ->
-                            Log.e(TAG,"Couldn't create file.", exception));
+                    .addOnSuccessListener(fileId -> {if (BuildConfig.DEBUG) Log.d(TAG, fileId);})
+                    .addOnFailureListener(exception -> {
+                        if (BuildConfig.DEBUG) Log.e(TAG,"Couldn't create file.", exception);
+                        });
         }
     }
 
     private void uploadFile(String fileName, String text, String mimeType) {
         if( cloudFunctionsHelper == null) cloudFunctionsHelper = new CloudFunctionsHelper();
         cloudFunctionsHelper.uploadText(fileName, text, mimeType)
-                    .addOnSuccessListener(fileId -> Log.d(TAG, fileId))
-                    .addOnFailureListener(exception ->
-                            Log.e(TAG,"Couldn't create file.", exception));
+                    .addOnSuccessListener(fileId -> { if (BuildConfig.DEBUG) Log.d(TAG, fileId);})
+                    .addOnFailureListener(exception -> {
+                        if (BuildConfig.DEBUG) Log.e(TAG,"Couldn't create file.", exception);
+                        });
     }
 
     public void showMidiOutChooser() {
-        checkMidiOutDeviceInfo();
-        showMidiOutChooser(jamSketchActivity.getSupportFragmentManager(), android.R.layout.simple_list_item_1);
+        if (!hasMidiOutDeviceInfo()) openGooglePlay();
+        else showMidiOutChooser(jamSketchActivity.getSupportFragmentManager(), android.R.layout.simple_list_item_1);
+    }
+
+    private void showMidiOutChooserAndPlay() {
+        if (!hasMidiOutDeviceInfo()) openGooglePlay();
+        else new ChooseMidioutNPlayDialogFragment(
+            () -> {
+                initData();
+                return Unit.INSTANCE;
+            })
+            .setCMXController(CMXController.getInstance())
+            .setLayout(android.R.layout.simple_list_item_1)
+            .show(jamSketchActivity.getSupportFragmentManager(), "MidiOutChooser");
+    }
+
+    boolean hasMidiOutDeviceInfo() {
+        try {
+            return SoundUtils.getMidiOutDeviceInfo().size() > 0;
+        } catch (MidiUnavailableException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    void openGooglePlay() {
+        new OpenGooglePlayDialogFragment()
+                .show(jamSketchActivity.getSupportFragmentManager(), "OpenGooglePlay");
     }
 
     public void loadCurve() {
