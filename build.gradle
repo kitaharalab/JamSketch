@@ -3,6 +3,8 @@ plugins {
     id 'application'
 }
 
+mainClassName = "Jamsketch"
+
 repositories {
     google()
     mavenCentral()
@@ -24,6 +26,10 @@ sourceSets {
 //println(projectDir)
 //println(buildDir)
 //println(sourceSets.main.java.srcDirs)
+
+//configurations {
+//    groovyScript
+//}
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'], exclude: [])
@@ -49,13 +55,11 @@ dependencies {
     // https://mvnrepository.com/artifact/com.googlecode.javacv/javacv
     implementation 'com.googlecode.javacv:javacv:0.1'
     // https://mvnrepository.com/artifact/controlp5/controlp5
-    implementation 'controlp5:controlp5:2.2.4'
+//    implementation 'controlp5:controlp5:2.2.4'
     // https://mvnrepository.com/artifact/dk.ange/javaoctave
-    implementation 'dk.ange:javaoctave:0.6.4'
+//    implementation 'dk.ange:javaoctave:0.6.4'
 
-
-
-
+//    groovyScript localGroovy()
 
 }
 
@@ -63,3 +67,27 @@ dependencies {
 
 sourceCompatibility = "1.8"
 targetCompatibility = "1.8"
+
+//compileGroovy.doFirst {
+//    if (true) {throw  new StopExecutionException()}
+//}
+
+task runGroovyScript(type: JavaExec) {
+    description 'Run Groovy script'
+    println(sourceSets.main.compileClasspath.files)
+    // println(project(':cmx_jre').configurations)
+    println(project(':cmx_jre').configurations.getByName('compileClasspath').files)
+
+    classpath(sourceSets.main.compileClasspath)
+    classpath(project(':cmx_jre').configurations.getByName('compileClasspath'))
+    classpath(".")
+    println(classpath.toString())
+    main 'groovy.ui.GroovyMain'
+    args 'jamsketch.groovy'
+}
+
+task printEnv {
+    println(sourceSets.main.compileClasspath.files)
+    println(project(':cmx_jre').configurations)
+    println(project(':cmx_jre').configurations.getByName('compileClasspath').files)
+}
