@@ -47,7 +47,6 @@ class JamSketch extends SimplePianoRoll {
   }
 
   void initData() {
-    if (CFG.SHOW_GUIDE) guideData = new GuideData(CFG.MIDFILENAME, width - 100, this)
     melodyData = new MelodyData2(CFG.MIDFILENAME, width, this, this, CFG)
     smfread(melodyData.scc.getMIDISequence())
     def part =
@@ -57,6 +56,8 @@ class JamSketch extends SimplePianoRoll {
 	    CFG.INITIAL_BLANK_MEASURES,
             CFG.INITIAL_BLANK_MEASURES + CFG.NUM_OF_MEASURES
       ))
+    if (CFG.SHOW_GUIDE)
+      guideData = new GuideData(CFG.MIDFILENAME, width - 100, this)
     fullMeasure = dataModel.getMeasureNum() * CFG.REPEAT_TIMES;
   }
 
@@ -88,7 +89,7 @@ class JamSketch extends SimplePianoRoll {
   void drawGuideCurve() {
     def xFrom = 100
     strokeWeight(3)
-    stroke(224, 224, 224)
+    stroke(100, 200, 200)
     (0..<(guideData.curveGuideView.size()-1)).each { i ->
       if (guideData.curveGuideView[i] != null &&
       guideData.curveGuideView[i+1] != null) {
@@ -174,8 +175,8 @@ class JamSketch extends SimplePianoRoll {
   @Override
   void musicStopped() {
     super.musicStopped()
-    if (microsecondPosition >= sequencer.getMicrosecondLength())
-      resetMusic()
+//    if (microsecondPosition >= sequencer.getMicrosecondLength())
+//      resetMusic()
   }
 
   void makeLog(action) {

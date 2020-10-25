@@ -2,14 +2,15 @@ import jp.crestmuse.cmx.misc.*
 import static jp.crestmuse.cmx.misc.ChordSymbol2.*
 
 class Config {
-  String MIDFILENAME = "blues01.mid"
+  String MIDFILENAME = "chocho.mid"
+//  String MIDFILENAME = "blues01.mid"
   List<ChordSymbol2> chordprog = [C, F, C, C, F, F, C, C, G, F, C, G]
-  int NUM_OF_MEASURES = 12
+  int NUM_OF_MEASURES = 12 //8  // originally 12
   int NUM_OF_RESET_AHEAD = 1
-  int DIVISION = 12
+  int DIVISION = 8 // originally 12
   int BEATS_PER_MEASURE = 4
   int INITIAL_BLANK_MEASURES = 2
-  int REPEAT_TIMES = 4
+  int REPEAT_TIMES = 1  // originally 4
   int CALC_LENGTH = 1
   String MODEL_FILE = "model20180321.json"
   String LOG_DIR = "log/"
@@ -48,9 +49,10 @@ class Config {
     //[onset: [-0.0833, 0.0833], dur: [0.0, 1.25], energy: [0.0, 1.99]]
     //[onset: [-0.0625, 0.0625], dur: [0.0, 1.25], energy: [0.0, 1.99]]
 
-   boolean SHOW_GUIDE = false
+   boolean SHOW_GUIDE = true
    int CHANNEL_GUIDE = 2
    int CHANNEL_ACC = 1
+   int GUIDE_SMOOTHNESS = 10
 }
 
 new Config()
