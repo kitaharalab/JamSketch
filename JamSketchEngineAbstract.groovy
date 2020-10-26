@@ -10,11 +10,13 @@ abstract class JamSketchEngineAbstract implements JamSketchEngine {
   CMXController cmx
   def cfg
   def model
+  def scc
   static String OUTLINE_LAYER = "curve"
   static String MELODY_LAYER = "melody"
   static String CHORD_LAYER = "chord"
   
   void init(SCC scc, SCC.Part target_part, def cfg) {
+    this.scc = scc
     this.cfg = cfg
     def json = new JsonSlurper()
     model = json.parseText((new File(cfg.MODEL_FILE)).text)
@@ -24,7 +26,7 @@ abstract class JamSketchEngineAbstract implements JamSketchEngine {
     mr.addMusicLayerCont(OUTLINE_LAYER)
     mr.addMusicLayer(MELODY_LAYER, (0..11) as int[])
     mr.addMusicLayer(CHORD_LAYER,
-                     [C, F, G] as ChordSymbol2[],
+                     [C, F, G] as ChordSymbol2[],	// temporary
                      cfg.DIVISION)
     cfg.chordprog.eachWithIndex{ c, i ->
       mr.getMusicElement(CHORD_LAYER, i, 0).setEvidence(c)

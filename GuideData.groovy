@@ -25,7 +25,7 @@ class GuideData {
 	def initial = CFG.INITIAL_BLANK_MEASURES
 	part.eachnote { note ->
             try {
-	    def y = pianoroll.notenum2y(note.notenum())
+	    def y = pianoroll.notenum2y(note.notenum() - 0.5)
             def onset = note.onset(480) / 480
 	    def m1 = (onset / beats) as int
 	    def b1 = onset - m1 * beats
