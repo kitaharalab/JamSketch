@@ -16,9 +16,10 @@ class Config {
   boolean EXPRESSION = false
   boolean MELODY_RESETTING = true
   boolean CURSOR_ENHANCED = true
-  boolean ON_DRAG_ONLY = true
+  boolean ON_DRAG_ONLY = false // originally true
+  int HOW_IN_ADVANCE = 1
   int EYE_MOTION_SPEED = 30
-  boolean FORCED_PROGRESS = false
+  boolean FORCED_PROGRESS = true // originally false
   String MOTION_CONTROLLER = null // EyeTrackerFrame, TobiiReceiver, or RfcommServer
 
   def OCTAVE_PROGRAM = [win: "octave-4.0.1.exe"]

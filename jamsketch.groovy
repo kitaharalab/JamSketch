@@ -65,6 +65,16 @@ class JamSketch extends SimplePianoRoll {
     super.draw()    
     if (guideData != null)
       drawGuideCurve()
+    if (CFG.FORCED_PROGRESS) {
+      mouseX = beat2x(getCurrentMeasure() + CFG.HOW_IN_ADVANCE, getCurrentBeat());
+    }
+    if(pmouseX < mouseX &&
+            mouseX > beat2x(getCurrentMeasure(), getCurrentBeat()) + 10) {
+      if (isUpdatable()) {
+        storeCursorPosition()
+        updateCurve()
+      }
+    }
     drawCurve()
     if (getCurrentMeasure() == CFG.NUM_OF_MEASURES - CFG.NUM_OF_RESET_AHEAD)
       processLastMeasure()
@@ -259,13 +269,6 @@ class JamSketch extends SimplePianoRoll {
   }
 
   void mouseDragged() {
-    if(pmouseX < mouseX &&
-            mouseX > beat2x(getCurrentMeasure(), getCurrentBeat()) + 10) {
-      if (isUpdatable()) {
-        storeCursorPosition()
-        updateCurve()
-      }
-    }
   }
 
   void keyReleased() {
@@ -292,7 +295,8 @@ class JamSketch extends SimplePianoRoll {
   }
 
 }
-JamSketch.CFG = evaluate(new File("./config_guided.txt"))
+JamSketch.CFG = evaluate(new File("./config.txt"))
+//JamSketch.CFG = evaluate(new File("./config_guided.txt"))
 JamSketch.start("JamSketch")
 // JamSketch.main("JamSketch", ["--external"] as String[])
   
