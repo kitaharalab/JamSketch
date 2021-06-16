@@ -22,7 +22,7 @@ class Config {
   boolean FORCED_PROGRESS = false
   String MOTION_CONTROLLER = null // EyeTrackerFrame, TobiiReceiver, or RfcommServer
 
-  def OCTAVE_PROGRAM = [win: "octave-4.0.1.exe"]
+  def OCTAVE_PROGRAM = [win: "C:\\Program Files\\GNU Octave\\Octave-6.2.0\\mingw64\\bin\\octave-cli-6.2.0.exe"]
 
   int GA_TIME_R = 100
   int GA_TIME = 500
