@@ -8,14 +8,14 @@ class JamSketchEngineGA1 extends JamSketchEngineAbstract {
   int lastUpdateMeasure = -1
   long lastUpdateTime = -1
 
-  double RHYTHM_THRESHOLD = 0.1
+  double RHYTHM_THRESHOLD = 0.08
 //  double RHYTHM_THRESHOLD = 0.25
   def RHYTHMS = [[1, 0, 0, 0, 0, 0], [1, 0, 0, 1, 0, 0],
 		 [1, 0, 0, 1, 0, 1], [1, 0, 1, 1, 0, 1],
 		 [1, 0, 1, 1, 1, 1], [1, 1, 1, 1, 1, 1]];
 
   Map<String,Double> parameters() {
-    [W1: 1.0, W2: 2.0, ENT_BIAS: cfg.ENT_BIAS]
+    [W1: 1.5, W2: 2.0, W3: 3.0, W4: 20.0, ENT_BIAS: cfg.ENT_BIAS]
   }
 
   Map<String,String> paramDesc() {

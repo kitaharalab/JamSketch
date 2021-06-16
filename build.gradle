@@ -57,7 +57,7 @@ dependencies {
     // https://mvnrepository.com/artifact/controlp5/controlp5
 //    implementation 'controlp5:controlp5:2.2.4'
     // https://mvnrepository.com/artifact/dk.ange/javaoctave
-//    implementation 'dk.ange:javaoctave:0.6.4'
+    // implementation 'dk.ange:javaoctave:0.6.4'
 
 //    groovyScript localGroovy()
 
@@ -75,6 +75,20 @@ targetCompatibility = "1.8"
 //compileGroovy.doFirst {
 //    if (true) {throw  new StopExecutionException()}
 //}
+
+task octaveTest(type: JavaExec) {
+    description 'Run Groovy script'
+    println(sourceSets.main.compileClasspath.files)
+    // println(project(':cmx_jre').configurations)
+    println(project(':cmx_jre').configurations.getByName('compileClasspath').files)
+
+    classpath(sourceSets.main.compileClasspath)
+    classpath(project(':cmx_jre').configurations.getByName('compileClasspath'))
+    classpath(".")
+    println(classpath.toString())
+    main 'groovy.ui.GroovyMain'
+    args 'octavetest.groovy'
+}
 
 task runGroovyScript(type: JavaExec) {
     description 'Run Groovy script'

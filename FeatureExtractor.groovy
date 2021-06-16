@@ -1,4 +1,7 @@
 import dk.ange.octave.OctaveEngineFactory
+import dk.ange.octave.*
+import dk.ange.octave.io.*
+import dk.ange.octave.type.*
 import groovy.transform.CompileStatic
 import jp.crestmuse.cmx.elements.MutableNote
 import jp.crestmuse.cmx.filewrappers.SCCUtils
@@ -27,6 +30,8 @@ class FeatureExtractor {
   def octave
   int beatsPerMeasure
   int TICKS_PER_BEAT = 480
+
+  static def SYNC_OBJ = new Object()
 
   def ATTR_NOMIAL = 
   [keyMode: ["major", "minor"],
@@ -60,23 +65,37 @@ class FeatureExtractor {
     this.part = part
     this.chordprog = chordprog
     this.beatsPerMeasure = beatsPerMeasure
+
+    octave.put("dIn", Octave.scalar(42.0))
+//    octrave.eval("dOut=sin(dIn)")
+//    OctaveDouble od = oe.get(OctaveDouble.class, "dOut")
+//    double jd = od.get(1, 1)
+//    println("OOOOOOOOOO: " + jd);
+    
+
   }
 
   def stop() {
     octave.close()
   }
 
-  def synchronized extractFeatureMapSeq(int from, int thru, int ticksPerBeat) {
+  def extractFeatureMapSeq(int from, int thru, int ticksPerBeat) {
+  try {
     def notelist =
       SCCUtils.getNotesBetween(part, from, thru, ticksPerBeat, true, true)
+    println("Notelist: " + notelist)
     if (notelist.size() < 3)
       return [notelist, null]
     part.calcMilliSec()
     def nmat = SCCUtils.toMatrix(notelist, part.channel())
-    //    println nmat
+    println("send: " + toOctave(nmat))
+//    println("send: " + toOctave(nmat).getDataA())
+//    println("send: " + toOctave(nmat).replace("\n", "\r\n"))
+    synchronized(SYNC_OBJ) {
     octave.eval("clear")
     octave.put("nmat", toOctave(nmat))
     octave.eval(script)
+//    octave.eval("\n")
     def data = [:]
     ["mel_atract", "tessitura", "mobility",
      "complex_trans", "complex_expect", "boundary"].each {
@@ -88,6 +107,8 @@ class FeatureExtractor {
       features.add(extractAllFeatures(i, notelist, data))
     }
     [notelist, features]
+    }
+    }catch (Exception e) { e.printStackTrace();}
   }
 
   @CompileStatic

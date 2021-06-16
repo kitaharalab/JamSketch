@@ -117,6 +117,8 @@ class JamSketchEngineGACalc1 implements GACalculator<Integer,Double> {
     double calcFitness(List<Integer> s, List<Double> o, List<MusicElement> e) {
       double W1 = engine.parameters().W1
       double W2 = engine.parameters().W2
+      double W3 = engine.parameters().W3
+      double W4 = engine.parameters().W4
       double ENT_BIAS = engine.parameters().ENT_BIAS
       double mse = -calcRMSE(s, o)
       double lik = calcLogTrigramLikelihood(s)
@@ -126,7 +128,7 @@ class JamSketchEngineGACalc1 implements GACalculator<Integer,Double> {
       double entrdiff =
 	-(entr-entropy_mean-ENT_BIAS) * (entr-entropy_mean-ENT_BIAS)
       double chord = calcLogChordBeatUnigramLikelihood(s, e)
-      W1 * mse + W2 * (lik + chord) + 5.0 * entrdiff
+      W1 * mse + W2 * lik + W3 * chord + W4 * entrdiff
       //3 * mse + 2 * lik + 0 * delta + 3 * chord + 20 * entrdiff
       //3 * mse + 2 * lik + 1 * delta + 3 * chord + 20 * entrdiff
       //      3 * mse + 2 * lik + delta + 3 * chord + 10 * entrdiff
