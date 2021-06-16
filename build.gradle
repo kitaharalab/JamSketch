@@ -61,6 +61,10 @@ dependencies {
 
 //    groovyScript localGroovy()
 
+// https://mvnrepository.com/artifact/commons-logging/commons-logging
+    implementation 'commons-logging:commons-logging:1.2'
+
+
 }
 
 //compileJava.options.encoding = "UTF-8"

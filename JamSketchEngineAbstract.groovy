@@ -11,6 +11,7 @@ abstract class JamSketchEngineAbstract implements JamSketchEngine {
   def cfg
   def model
   def scc
+  def expgen = null
   static String OUTLINE_LAYER = "curve"
   static String MELODY_LAYER = "melody"
   static String CHORD_LAYER = "chord"
@@ -31,11 +32,20 @@ abstract class JamSketchEngineAbstract implements JamSketchEngine {
     cfg.chordprog.eachWithIndex{ c, i ->
       mr.getMusicElement(CHORD_LAYER, i, 0).setEvidence(c)
     }
+    if (cfg.EXPRESSION) {
+       expgen = new ExpressionGenerator()
+       expgen.start(scc.getFirstPartWithChannel(1),
+	            getFullChordProgression(), cfg.BEATS_PER_MEASURE)
+    }
     def sccgen = new SCCGenerator(target_part, scc.division,
-    OUTLINE_LAYER, cfg)
+    OUTLINE_LAYER, expgen, cfg)
     mr.addMusicCalculator(MELODY_LAYER, sccgen)
     mr.addMusicCalculator(OUTLINE_LAYER,
                           musicCalculatorForOutline())
+  }
+
+  def getFullChordProgression() {
+    [NON_CHORD] * cfg.INITIAL_BLANK_MEASURES + cfg.chordprog * cfg.REPEAT_TIMES
   }
 
   abstract def musicCalculatorForOutline()
