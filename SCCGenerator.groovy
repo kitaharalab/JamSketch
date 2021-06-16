@@ -8,16 +8,18 @@ class SCCGenerator implements MusicCalculator {
   def target_part
   def sccdiv
   def curveLayer
+  def expgen
   static def firstMeasure = 0
   
-  SCCGenerator(target_part, sccdiv, curveLayer, CFG) {
+  SCCGenerator(target_part, sccdiv, curveLayer, expgen, CFG) {
     this.CFG = CFG
     this.target_part = target_part
     this.sccdiv = sccdiv
     this.curveLayer = curveLayer
+    this.expgen = expgen
   }
 
-    void updated(int measure, int tick, String layer,
+  void updated(int measure, int tick, String layer,
 		 MusicRepresentation mr) {
       //      def sccdiv = scc.getDivision()
       //def firstMeasure = pianoroll.getDataModel().getFirstMeasure()
