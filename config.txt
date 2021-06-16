@@ -13,13 +13,13 @@ class Config {
   int CALC_LENGTH = 1
   String MODEL_FILE = "model20180321.json"
   String LOG_DIR = "log/"
-  boolean EXPRESSION = false
+  boolean EXPRESSION = true  // changed from false
   boolean MELODY_RESETTING = true
   boolean CURSOR_ENHANCED = true
-  boolean ON_DRAG_ONLY = false // originally true
+  boolean ON_DRAG_ONLY = true
   int HOW_IN_ADVANCE = 1
   int EYE_MOTION_SPEED = 30
-  boolean FORCED_PROGRESS = true // originally false
+  boolean FORCED_PROGRESS = false
   String MOTION_CONTROLLER = null // EyeTrackerFrame, TobiiReceiver, or RfcommServer
 
   def OCTAVE_PROGRAM = [win: "octave-4.0.1.exe"]
