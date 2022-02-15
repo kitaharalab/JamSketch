@@ -14,6 +14,7 @@ class SCCGenerator (
     private var target_part: SCCDataSet.Part,
     private var sccdiv: Int,
     private var curveLayer: String,
+    private var expgen: ExpressionGenerator,
     private var CFG: Config
 ) : MusicCalculator {
 
@@ -77,12 +78,12 @@ class SCCGenerator (
             }
         }
 
-//        if (Config.EXPRESSION) {
-//            var fromTick = (firstMeasure + measure) * Config.BEATS_PER_MEASURE *
-//                    Config.DIVISION
-//            var thruTick = fromTick + Config.BEATS_PER_MEASURE * Config.DIVISION
-//            expgen.execute(fromTick, thruTick, Config.DIVISION)
-//        }
+        if (Config.EXPRESSION) {
+            var fromTick = (firstMeasure + measure) * Config.BEATS_PER_MEASURE *
+                    Config.DIVISION
+            var thruTick = fromTick + Config.BEATS_PER_MEASURE * Config.DIVISION
+            expgen.execute(fromTick, thruTick, Config.DIVISION)
+        }
     }
 
 //    @CompileStatic

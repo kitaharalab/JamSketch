@@ -22,7 +22,7 @@ class MelodyData2(
         get() = field
 
     init {
-        scc = CMXController.readSMFAsSCC(JamSketchActivity.getMyResources().getAssets().open(filename)).toDataSet()
+        scc = CMXController.readSMFAsSCC(JamSketchActivity.myResources?.getAssets()?.open(filename)).toDataSet()
         scc.repeat(
             (Config.INITIAL_BLANK_MEASURES * Config.BEATS_PER_MEASURE * scc.division).toLong(),
             ((Config.INITIAL_BLANK_MEASURES + Config.NUM_OF_MEASURES) *

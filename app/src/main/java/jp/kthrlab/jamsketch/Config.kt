@@ -29,7 +29,7 @@ public class Config {
         const val CALC_LENGTH = 1
         const val MODEL_FILE = "model20180321.json"
         const val LOG_DIR = "log/"
-        const val EXPRESSION = false // LITE version supports "false" only
+        const val EXPRESSION = true // LITE version supports "false" only
         const val MELODY_RESETING = true
         const val CURSOR_ENHANCED = true
         const val ON_DRAG_ONLY = true
@@ -53,6 +53,12 @@ public class Config {
 
         // Android
         const val SHOW_ONBOARDING = true
-    }
+
+        // TensorFlow Lite
+        const val TFL_MODEL_FILE = "saved_model_20220202.tflite"
+        const val OUTPUT_LENGTH = 1
+
+
+}
 
 }

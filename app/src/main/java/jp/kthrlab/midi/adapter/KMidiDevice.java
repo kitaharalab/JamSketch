@@ -6,7 +6,8 @@ import android.media.midi.MidiManager;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
-import android.support.annotation.NonNull;
+
+import androidx.annotation.NonNull;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -77,15 +78,20 @@ public class KMidiDevice implements jp.kshoji.javax.sound.midi.MidiDevice, Handl
                     null);
 
             // TODO: how to wait deviceOpend?
-            while (!isOpen()) {
-                System.out.println("waiting...");
-                try {
-                    Thread.sleep(500);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
+            synchronized (this) {
+                System.out.println("isOpen() = " + isOpen());
+                while (!isOpen()) {
+                    System.out.println("waiting...");
+                    try {
+                            wait(500);
+                            System.out.println("isOpen() = " + isOpen());
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
                 }
             }
         }
+        System.out.println("return " + aMidiDevice);
         return aMidiDevice;
     }
 

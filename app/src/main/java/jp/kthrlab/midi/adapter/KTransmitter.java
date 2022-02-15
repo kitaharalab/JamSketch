@@ -3,8 +3,11 @@ package jp.kthrlab.midi.adapter;
 import android.media.midi.MidiReceiver;
 import android.media.midi.MidiSender;
 
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
+//import android.support.annotation.NonNull;
+//import android.support.annotation.Nullable;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 import jp.kshoji.javax.sound.midi.MidiDevice;
 import jp.kshoji.javax.sound.midi.MidiDeviceTransmitter;

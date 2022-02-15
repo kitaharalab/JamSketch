@@ -26,7 +26,7 @@ abstract class JamSketchEngineAbstract : JamSketchEngine {
 //    model =  Parser.default().parse((File(Config.MODEL_FILE)).readText()) as JsonArray<JsonObject>
 //    return new BufferedReader(new InputStreamReader(jamSketchActivity.getResources().getAssets().open(path))).lines().collect(Collectors.joining());
     model =  Parser.default().parse(
-            InputStreamReader(JamSketchActivity.getMyResources().getAssets().open(Config.MODEL_FILE))) //as JsonArray<JsonObject>
+            InputStreamReader(JamSketchActivity.myResources?.getAssets()?.open(Config.MODEL_FILE))) //as JsonArray<JsonObject>
     cmx = CMXController.getInstance()
     mr = CMXController.createMusicRepresentation(Config.NUM_OF_MEASURES,
             Config.DIVISION)
@@ -44,7 +44,7 @@ abstract class JamSketchEngineAbstract : JamSketchEngine {
       mr!!.getMusicElement(CHORD_LAYER, index, 0).setEvidence(any)
     }
     var sccgen = SCCGenerator(target_part as SCCDataSet.Part, scc.division,
-    OUTLINE_LAYER, cfg)
+    OUTLINE_LAYER, ExpressionGenerator(), cfg)
     sccgen.cmx = cmx
 
     mr!!.addMusicCalculator(MELODY_LAYER, sccgen)

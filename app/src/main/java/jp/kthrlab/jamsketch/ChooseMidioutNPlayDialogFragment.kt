@@ -1,10 +1,11 @@
 package jp.kthrlab.jamsketch
 
 import android.annotation.SuppressLint
+import android.app.AlertDialog
 import android.app.Dialog
 import android.content.Context
 import android.os.Bundle
-import android.support.v7.app.AlertDialog
+//import android.support.v7.app.AlertDialog
 import android.widget.ArrayAdapter
 import jp.crestmuse.cmx.processing.ChooseMidioutDialogFragment
 import jp.crestmuse.cmx.processing.DeviceNotAvailableException
@@ -20,7 +21,7 @@ class ChooseMidioutNPlayDialogFragment(val callback: () -> Unit) : ChooseMidiout
 //    }
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
-        val builder = AlertDialog.Builder(activity!!)
+        val builder = AlertDialog.Builder(requireActivity())
         try {
             val midiOutDeviceInfo = SoundUtils.getMidiOutDeviceInfo()
             builder.setTitle("Select MIDI OUT Device...")

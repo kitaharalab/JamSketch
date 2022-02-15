@@ -1,15 +1,40 @@
 apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
-apply plugin: 'kotlin-android-extensions'
+//apply plugin: 'kotlin-android-extensions'
 
 repositories {
-    mavenCentral()
     google()
+    mavenCentral()
     maven {
         url "https://maven.scijava.org/content/groups/public/"
     }
 
-    flatDir {dirs 'libs'}
+    maven {
+        name = "GitHubPackages"
+        url = uri("https://maven.pkg.github.com/kitaharalab/cmx")
+        credentials {
+            username = System.getenv("GITHUB_ACTOR")
+            password = System.getenv("GITHUB_TOKEN")
+        }
+    }
+
+    maven {
+        name = "GitHubPackages"
+        url = uri("https://maven.pkg.github.com/kitaharalab/javax.sound.midi-for-Android")
+        credentials {
+            username = System.getenv("GITHUB_ACTOR")
+            password = System.getenv("GITHUB_TOKEN")
+        }
+    }
+
+    maven {
+        name = "GitHubPackages"
+        url = uri("https://maven.pkg.github.com/kitaharalab/USB-MIDI-Driver")
+        credentials {
+            username = System.getenv("GITHUB_ACTOR")
+            password = System.getenv("GITHUB_TOKEN")
+        }
+    }
 }
 
 def jamsketchPropertiesFile = rootProject.file("jamsketch.properties")
@@ -17,17 +42,17 @@ def jamsketchProperties = new Properties()
 jamsketchProperties.load(new FileInputStream(jamsketchPropertiesFile))
 
 android {
-    compileSdkVersion 30
+    compileSdkVersion 31
     defaultConfig {
         applicationId "jp.kthrlab.jamsketch"
         minSdkVersion 27
-        targetSdkVersion 30
+        targetSdkVersion 31
         versionCode 5
         versionName "1.0.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
 
-    println(jamsketchProperties)
+//    println(jamsketchProperties)
 
     buildTypes {
         release {
@@ -44,47 +69,39 @@ android {
         sourceCompatibility = '1.8'
         targetCompatibility = '1.8'
     }
-
     packagingOptions {
-        exclude 'assets/shaders/*.glsl'
-        exclude 'META-INF/groovy-release-info.properties'
-        exclude 'META-INF/INDEX.LIST'
-        exclude 'META-INF/DEPENDENCIES'
-//        exclude 'META-INF/LICENSE'
-//        exclude 'META-INF/LICENSE.txt'
-//        exclude 'META-INF/license.txt'
-//        exclude 'META-INF/NOTICE'
-//        exclude 'META-INF/NOTICE.txt'
-//        exclude 'META-INF/notice.txt'
-//        exclude 'META-INF/ASL2.0'
+        resources {
+            excludes += ['assets/shaders/*.glsl', 'META-INF/groovy-release-info.properties', 'META-INF/INDEX.LIST', 'META-INF/DEPENDENCIES']
+        }
     }
 
-   lintOptions {
-       abortOnError false
-   }
+
+    kotlinOptions{
+        jvmTarget = '1.8'
+    }
+    lint {
+        abortOnError false
+    }
 }
 
 dependencies {
-    implementation fileTree(dir: 'libs', include: ['*.jar'])
-     implementation(name: 'javax.sound.midi-release', ext: 'aar')
-//    implementation project(path: ':javax.sound.midi')
-     implementation(name: 'MIDIDriver-release', ext: 'aar')
-
-    //noinspection GradleCompatible
-    implementation 'com.android.support:appcompat-v7:28.0.0'
-    implementation 'com.android.support:support-annotations:28.0.0'
-
+    implementation fileTree(dir: 'libs', include: ['*.jar', '*.aar'])
+    implementation 'androidx.appcompat:appcompat:1.4.1'
     // Onboarding
-    // https://mvnrepository.com/artifact/com.android.support/leanback-v17
-    //noinspection GradleCompatible
-    implementation 'com.android.support:leanback-v17:28.0.0'
+    implementation 'androidx.leanback:leanback:1.0.0'
+//     implementation(name: 'javax.sound.midi-release', ext: 'aar')
+//    implementation project(path: ':javax.sound.midi')
+//     implementation(name: 'MIDIDriver-release', ext: 'aar')
+//     implementation(name: 'cmx_android-release', ext: 'aar')
 
+    testImplementation 'junit:junit:4.13.2'
 
-    testImplementation 'junit:junit:4.12'
-    //noinspection GradleCompatible
-    androidTestImplementation 'com.android.support.test:runner:1.0.2'
-    androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
-    implementation project(path: ':cmx_android')
+    // implementation project(path: ':cmx_android')
+    // cmx on GitHub Packages
+    implementation 'javax.sound.midi-for-Android:javax.sound.midi-release:0.2.0-kitaharalab'
+    implementation 'USB-MIDI-Driver:mididriver-release:0.2.0-kitaharalab'
+    implementation 'cmx:cmx_android-release:1.1.0'
+
 
     // cmx_common
     // https://mvnrepository.com/artifact/org.apache.commons/commons-math3
@@ -92,8 +109,8 @@ dependencies {
     // https://mvnrepository.com/artifact/be.ac.ulg.montefiore.run.jahmm/jahmm
     implementation 'be.ac.ulg.montefiore.run.jahmm:jahmm:0.6.2'
 
-    implementation 'com.google.android.gms:play-services-auth:16.0.1'
-    implementation 'com.google.http-client:google-http-client-gson:1.32.1'
+    implementation 'com.google.android.gms:play-services-auth:20.1.0'
+    implementation 'com.google.http-client:google-http-client-gson:1.41.2'
 
     // Kotlin
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
@@ -101,7 +118,18 @@ dependencies {
 
     // JSON
     // https://mvnrepository.com/artifact/com.beust/klaxon
-    implementation 'com.beust:klaxon:5.2'
+    implementation 'com.beust:klaxon:5.5'
+
+    // TensorFlow Lite
+    // https://mvnrepository.com/artifact/org.tensorflow/tensorflow-lite
+    implementation 'org.tensorflow:tensorflow-lite:2.7.0'
 
 
 }
+
+task comps {
+    afterEvaluate {
+        println("Components: " + components.names)
+    }
+}
+
