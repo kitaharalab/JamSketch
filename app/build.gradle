@@ -102,12 +102,11 @@ dependencies {
     implementation 'USB-MIDI-Driver:mididriver-release:0.2.0-kitaharalab'
     implementation 'cmx:cmx_android-release:1.1.0'
 
-
-    // cmx_common
-    // https://mvnrepository.com/artifact/org.apache.commons/commons-math3
-    implementation 'org.apache.commons:commons-math3:3.6.1'
-    // https://mvnrepository.com/artifact/be.ac.ulg.montefiore.run.jahmm/jahmm
-    implementation 'be.ac.ulg.montefiore.run.jahmm:jahmm:0.6.2'
+//    // cmx_common
+//    // https://mvnrepository.com/artifact/org.apache.commons/commons-math3
+//    implementation 'org.apache.commons:commons-math3:3.6.1'
+//    // https://mvnrepository.com/artifact/be.ac.ulg.montefiore.run.jahmm/jahmm
+//    implementation 'be.ac.ulg.montefiore.run.jahmm:jahmm:0.6.2'
 
     implementation 'com.google.android.gms:play-services-auth:20.1.0'
     implementation 'com.google.http-client:google-http-client-gson:1.41.2'
