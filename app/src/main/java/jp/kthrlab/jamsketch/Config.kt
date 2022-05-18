@@ -29,7 +29,7 @@ public class Config {
         const val CALC_LENGTH = 1
         const val MODEL_FILE = "model20180321.json"
         const val LOG_DIR = "log/"
-        const val EXPRESSION = true // LITE version supports "false" only
+        const val EXPRESSION = false // LITE version supports "false" only
         const val MELODY_RESETING = true
         const val CURSOR_ENHANCED = true
         const val ON_DRAG_ONLY = true
