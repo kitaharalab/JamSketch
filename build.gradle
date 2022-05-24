@@ -3,20 +3,33 @@ plugins {
     id 'application'
 }
 
-mainClassName = "Jamsketch"
+mainClassName = "JamSketch"
 
 repositories {
     google()
     mavenCentral()
-    jcenter()
-    maven {url "http://maven.imagej.net/content/groups/public/" }
     maven {url "https://artifacts.alfresco.com/nexus/content/repositories/public/"}
-    maven {url "https://dl.bintray.com/groovy/maven/"}
+    // maven {url "https://dl.bintray.com/groovy/maven/"}
+
+    // jahmm
+    maven {
+        url "https://maven.scijava.org/content/groups/public/"
+    }
+
+    // cmx
+    // maven {
+    //     name = "GitHubPackages"
+    //     url = uri("https://maven.pkg.github.com/kitaharalab/cmx")
+    //     credentials {
+    //         username = System.getenv("GITHUB_ACTOR")
+    //         password = System.getenv("GITHUB_TOKEN")
+    //     }
+    // }
 }
 
 sourceSets {
     main {
-        java.srcDirs = []
+        java.srcDirs = [projectDir]
         groovy.srcDirs = [projectDir]
     }
 }
@@ -31,9 +44,14 @@ sourceSets {
 //    groovyScript
 //}
 
-dependencies {
+dependencbes {
     implementation fileTree(dir: 'libs', include: ['*.jar'], exclude: [])
-    implementation project(path: ':cmx_jre')
+    
+    // cmx
+    //// project
+    // implementation project(path: ':cmx_jre')
+    //// GitHubPackages
+    // implementation 'cmx:cmx_jre:1.0.0'
 
     // https://mvnrepository.com/artifact/org.apache.commons/commons-math3
     implementation 'org.apache.commons:commons-math3:3.6.1'
@@ -42,7 +60,7 @@ dependencies {
 
 //    implementation fileTree(exclude: ['processing-core-android.jar'], dir: '../cmx_platforms/libs')
     // https://mvnrepository.com/artifact/org.codehaus.groovy/groovy
-    implementation 'org.codehaus.groovy:groovy:3.0.1'
+    implementation 'org.codehaus.groovy:groovy:3.0.9'
 // https://mvnrepository.com/artifact/org.apache.ivy/ivy
     implementation 'org.apache.ivy:ivy:2.4.0'
 
@@ -58,46 +76,32 @@ dependencies {
 //    implementation 'controlp5:controlp5:2.2.4'
     // https://mvnrepository.com/artifact/dk.ange/javaoctave
     // implementation 'dk.ange:javaoctave:0.6.4'
+    // https://mvnrepository.com/artifact/it.unimi.dsi/fastutil
+    implementation 'it.unimi.dsi:fastutil:8.5.6'
+ // https://mvnrepository.com/artifact/javazoom/jlayer
+    implementation 'javazoom:jlayer:1.0.1'
 
-//    groovyScript localGroovy()
 
 // https://mvnrepository.com/artifact/commons-logging/commons-logging
     implementation 'commons-logging:commons-logging:1.2'
 
-
 }
 
-//compileJava.options.encoding = "UTF-8"
+compileJava.options.encoding = "UTF-8"
 
 sourceCompatibility = "1.8"
 targetCompatibility = "1.8"
 
-//compileGroovy.doFirst {
-//    if (true) {throw  new StopExecutionException()}
-//}
-
-task octaveTest(type: JavaExec) {
-    description 'Run Groovy script'
-    println(sourceSets.main.compileClasspath.files)
-    // println(project(':cmx_jre').configurations)
-    println(project(':cmx_jre').configurations.getByName('compileClasspath').files)
-
-    classpath(sourceSets.main.compileClasspath)
-    classpath(project(':cmx_jre').configurations.getByName('compileClasspath'))
-    classpath(".")
-    println(classpath.toString())
-    main 'groovy.ui.GroovyMain'
-    args 'octavetest.groovy'
+application {
+    // Define the main class for the application.
+    mainClass = 'JamSketch'
 }
 
-task runGroovyScript(type: JavaExec) {
+task runScript(type: JavaExec) {
     description 'Run Groovy script'
     println(sourceSets.main.compileClasspath.files)
-    // println(project(':cmx_jre').configurations)
-    println(project(':cmx_jre').configurations.getByName('compileClasspath').files)
 
     classpath(sourceSets.main.compileClasspath)
-    classpath(project(':cmx_jre').configurations.getByName('compileClasspath'))
     classpath(".")
     println(classpath.toString())
     main 'groovy.ui.GroovyMain'
@@ -106,6 +110,4 @@ task runGroovyScript(type: JavaExec) {
 
 task printEnv {
     println(sourceSets.main.compileClasspath.files)
-    println(project(':cmx_jre').configurations)
-    println(project(':cmx_jre').configurations.getByName('compileClasspath').files)
 }

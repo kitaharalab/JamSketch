@@ -13,7 +13,7 @@ class Config {
   int CALC_LENGTH = 1
   String MODEL_FILE = "model20180321.json"
   String LOG_DIR = "log/"
-  boolean EXPRESSION = true  // changed from false
+  boolean EXPRESSION = false
   boolean MELODY_RESETTING = true
   boolean CURSOR_ENHANCED = true
   boolean ON_DRAG_ONLY = true
@@ -22,9 +22,9 @@ class Config {
   boolean FORCED_PROGRESS = false
   String MOTION_CONTROLLER = null // EyeTrackerFrame, TobiiReceiver, or RfcommServer
 
-  def OCTAVE_PROGRAM = [win: "C:\\Octave\\Octave-4.0.3\\bin\\octave-4.0.3.exe"]
+//  def OCTAVE_PROGRAM = [win: "C:\\Octave\\Octave-4.0.3\\bin\\octave-4.0.3.exe"]
 //  def OCTAVE_PROGRAM = [win: "C:\\Octave\\Octave-4.4.1\\bin\\octave-cli-4.4.1.exe"]
-//  def OCTAVE_PROGRAM = [win: "C:\\Program Files\\GNU Octave\\Octave-6.2.0\\mingw64\\bin\\octave-cli-6.2.0.exe"]
+  def OCTAVE_PROGRAM = [win: "C:\\Program Files\\GNU Octave\\Octave-6.2.0\\mingw64\\bin\\octave-cli-6.2.0.exe"]
 
   int GA_TIME_R = 100
   int GA_TIME = 500

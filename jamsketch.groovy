@@ -1,16 +1,8 @@
 import controlP5.ControlP5
 import groovy.json.JsonOutput
 import groovy.json.JsonSlurper
-import jdk.nashorn.internal.runtime.regexp.joni.Config
-import jp.crestmuse.cmx.filewrappers.CMXFileWrapper
-import jp.crestmuse.cmx.filewrappers.MIDIXMLWrapper
 import jp.crestmuse.cmx.filewrappers.SCCDataSet
-import jp.crestmuse.cmx.processing.CMXController
 import jp.crestmuse.cmx.processing.gui.SimplePianoRoll
-import jp.crestmuse.cmx.sound.MusicPlaySynchronizer
-
-import javax.swing.*
-import javax.swing.filechooser.FileNameExtensionFilter
 
 class JamSketch extends SimplePianoRoll {
 
@@ -292,6 +284,11 @@ class JamSketch extends SimplePianoRoll {
     println("exit() called.")
     super.exit()
     if (CFG.MOTION_CONTROLLER.any{mCtrl == "RfcommServer"}) RfcommServer.close()
+  }
+
+  static void main(String[] args) {
+    JamSketch.CFG = evaluate(new File("./config.txt"))
+    JamSketch.start("JamSketch")
   }
 
 }

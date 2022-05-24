@@ -4,16 +4,19 @@ JamSketch is a jam session system that enables the user to enjoy improvisation j
 
 ## Installation
 
-Unzip jamsketch_lite.zip anywhere.
+```
+git clone https://github.com/kitaharalab/JamSketch.git
+```
 
 ## Usage
 
-Execute jamsketch_lite.exe on Windows.  
-Execute jamsketch_lite.jar on all platforms.
+```
+gradlew runScript
+```
 
 ## Requirements
 
-* Java Runtime Environment(JRE) Version 8
+* Java Runtime Environment(JRE)
 
 ## References
 
