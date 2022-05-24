@@ -47,21 +47,23 @@ sourceSets {
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'], exclude: [])
     
+    // JamSketch dependencies
+
     // cmx
     //// project
     // implementation project(path: ':cmx_jre')
     //// GitHubPackages
     // implementation 'cmx:cmx_jre:1.0.0'
 
+    // cmx dependencies
     // https://mvnrepository.com/artifact/org.apache.commons/commons-math3
     implementation 'org.apache.commons:commons-math3:3.6.1'
     // https://mvnrepository.com/artifact/be.ac.ulg.montefiore.run.jahmm/jahmm
     implementation 'be.ac.ulg.montefiore.run.jahmm:jahmm:0.6.2'
 
-//    implementation fileTree(exclude: ['processing-core-android.jar'], dir: '../cmx_platforms/libs')
     // https://mvnrepository.com/artifact/org.codehaus.groovy/groovy
     implementation 'org.codehaus.groovy:groovy:3.0.9'
-// https://mvnrepository.com/artifact/org.apache.ivy/ivy
+    // https://mvnrepository.com/artifact/org.apache.ivy/ivy
     implementation 'org.apache.ivy:ivy:2.4.0'
 
     // https://mvnrepository.com/artifact/nz.ac.waikato.cms.weka/weka-stable
@@ -73,7 +75,7 @@ dependencies {
     // https://mvnrepository.com/artifact/com.googlecode.javacv/javacv
     implementation 'com.googlecode.javacv:javacv:0.1'
     // https://mvnrepository.com/artifact/controlp5/controlp5
-//    implementation 'controlp5:controlp5:2.2.4'
+    // implementation 'controlp5:controlp5:2.2.4'
     // https://mvnrepository.com/artifact/dk.ange/javaoctave
     // implementation 'dk.ange:javaoctave:0.6.4'
     // https://mvnrepository.com/artifact/it.unimi.dsi/fastutil
