@@ -12,6 +12,10 @@ import jp.crestmuse.cmx.inference.*
 import jp.crestmuse.cmx.inference.models.*
 import static java.lang.Double.*
 import org.tensorflow.SavedModelBundle
+import org.tensorflow.ndarray.Shape
+import org.tensorflow.ndarray.NdArray
+import org.tensorflow.ndarray.NdArrays
+import org.tensorflow.ndarray.IntNdArray;
 
 class JamSketchEngineGA3 extends JamSketchEngineAbstract {
   int lastUpdateMeasure = -1
@@ -33,13 +37,24 @@ class JamSketchEngineGA3 extends JamSketchEngineAbstract {
  }
 
 //preprocessing input data
- def preprocessing() {
-  // def inputData = mr.getMusicElement(OUTLINE_LAYER0,0)/
-  def rawData =mr.getMusicElementList(OUTLINE_LAYER)
-  rawData.each {
-    if (it.getMostLikely()!=NaN)
-    println it.getMostLikely()
-  }
+ def preprocessing(int measure) {
+  def nn_from=36
+  def tf_row=16
+  def tf_column=133
+
+  IntNdArray tf_input =  NdArrays.ofInts(Shape.of(16, 133))
+  for(i in 0..<tf_row){
+    for(j in 0..<tf_column){
+      tf_input.setInt(0, i, j)
+    }}
+
+
+  def mes = mr.getMusicElementList("curve")
+  def mes_start = (mes.size()/12)*measure
+  def mes_end   = mes_start + 16
+  // println mes[1]
+  def me_per_measure = mes[mes_start ..<mes_end]
+
 
  }
 
@@ -83,7 +98,7 @@ class JamSketchEngineGA3 extends JamSketchEngineAbstract {
       lastUpdateMeasure = measure
       lastUpdateTime = currentTime
       //get OUTLINE_LAYER Elements and Model the data for it to be inserted into model.
-      preprocessing()
+      preprocessing(measure)
       //get the output from model.
       // def outputDatra = prediction(inputData)
 
