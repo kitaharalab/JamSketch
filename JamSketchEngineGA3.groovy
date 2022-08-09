@@ -21,10 +21,8 @@ class JamSketchEngineGA3 extends JamSketchEngineAbstract {
   double RHYTHM_THRESHOLD = 0.08
 //  double RHYTHM_THRESHOLD = 0.25S
   
+  //set Model to TFmodel Variable.
   def setTFModel() {
-
-    println "loadModel"
-
     try {
         def TFmodel_file = new File("./onebar_model")
         def TFmodel_path = TFmodel_file.getPath()
@@ -34,7 +32,16 @@ class JamSketchEngineGA3 extends JamSketchEngineAbstract {
     }
  }
 
+//preprocessing input data
+ def preprocessing() {
+  // def inputData = mr.getMusicElement(OUTLINE_LAYER0,0)/
+  def rawData =mr.getMusicElementList(OUTLINE_LAYER)
+  rawData.each {
+    if (it.getMostLikely()!=NaN)
+    println it.getMostLikely()
+  }
 
+ }
 
 
   def RHYTHMS = [[1, 0, 0, 0, 0, 0], [1, 0, 0, 1, 0, 0],
@@ -66,7 +73,6 @@ class JamSketchEngineGA3 extends JamSketchEngineAbstract {
   }
 
   def outlineUpdated(measure, tick) {
-    println "outlineUpdated"
     long currentTime = System.nanoTime()
     if (tick == cfg.DIVISION - 1 &&
         lastUpdateMeasure != measure &&
@@ -76,6 +82,13 @@ class JamSketchEngineGA3 extends JamSketchEngineAbstract {
       mr.getMusicElement(OUTLINE_LAYER, measure, tick).resumeUpdate()
       lastUpdateMeasure = measure
       lastUpdateTime = currentTime
+      //get OUTLINE_LAYER Elements and Model the data for it to be inserted into model.
+      preprocessing()
+      //get the output from model.
+      // def outputDatra = prediction(inputData)
+
+      // mr.addMusicLayer(MELODY_LAYER outputData)
+
     }
   }
 
