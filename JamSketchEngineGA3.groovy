@@ -16,6 +16,8 @@ import org.tensorflow.ndarray.Shape
 import org.tensorflow.ndarray.NdArray
 import org.tensorflow.ndarray.NdArrays
 import org.tensorflow.ndarray.IntNdArray;
+import org.tensorflow.types.TInt32;
+
 
 class JamSketchEngineGA3 extends JamSketchEngineAbstract {
   int lastUpdateMeasure = -1
@@ -38,11 +40,15 @@ class JamSketchEngineGA3 extends JamSketchEngineAbstract {
 
 //preprocessing input data
  def preprocessing(int measure) {
-  def nn_from=36
-  def tf_row=16
-  def tf_column=133
 
-  IntNdArray tf_input =  NdArrays.ofInts(Shape.of(16, 133))
+  def nn_from = 36
+  def tf_row= 16
+  def measures_num = 16
+  def tf_column = 133
+  
+
+  IntNdArray tf_input =  NdArrays.ofInts(Shape.of(tf_row, tf_column))
+  // initialize tf_input to set 0;
   for(i in 0..<tf_row){
     for(j in 0..<tf_column){
       tf_input.setInt(0, i, j)
@@ -50,12 +56,45 @@ class JamSketchEngineGA3 extends JamSketchEngineAbstract {
 
 
   def mes = mr.getMusicElementList("curve")
-  def mes_start = (mes.size()/12)*measure
-  def mes_end   = mes_start + 16
-  // println mes[1]
-  def me_per_measure = mes[mes_start ..<mes_end]
+  def me_start = (mes.size()/12)*measure
+  def me_end   = me_start + 16
+  def me_per_measure = mes[me_start ..<me_end]
 
 
+
+
+  for (i in 0..<measures_num) {
+    def note_num_f=me_per_measure[i].getMostLikely()
+    if(note_num_f !=NaN){
+      def note_number = Math.floor(note_num_f)-nn_from
+      tf_input.setInt(1, i, (int)note_number)
+   
+    }else{
+      tf_input.setInt(1, i, 121)
+    }
+
+  }
+
+  return tf_input
+    // for (i in 0..<16){
+    //   print me_per_measure[i].getMostLikely()+", "
+    // }
+    // for(i in 0..<tf_row){
+    //  for(j in 0..<tf_column){
+    //    println i+"line "+j+"columns: "+tf_input.getInt(i, j)
+    //   }
+    // }
+ }
+
+ def prediction(IntNdArray tf_input) {
+  TInt32 ten_input = TInt32.tensorOf(tf_input)
+  TInt32 ten_output = (TInt32)TFmodel.session()
+                        .runner()
+                        .feed("serving_default_conv2d_13_input", ten_input)
+                        .fetch("StatefulPartitionedCall")
+                        .run()
+                        .get(0)
+  return output_ten
  }
 
 
@@ -89,6 +128,8 @@ class JamSketchEngineGA3 extends JamSketchEngineAbstract {
 
   def outlineUpdated(measure, tick) {
     long currentTime = System.nanoTime()
+    IntNdArray tf_input
+    IntNdArray tf_output
     if (tick == cfg.DIVISION - 1 &&
         lastUpdateMeasure != measure &&
 	currentTime - lastUpdateTime >= 100000) {
@@ -98,11 +139,9 @@ class JamSketchEngineGA3 extends JamSketchEngineAbstract {
       lastUpdateMeasure = measure
       lastUpdateTime = currentTime
       //get OUTLINE_LAYER Elements and Model the data for it to be inserted into model.
-      preprocessing(measure)
-      //get the output from model.
-      // def outputDatra = prediction(inputData)
-
-      // mr.addMusicLayer(MELODY_LAYER outputData)
+      tf_input = preprocessing(measure)
+      tf_output = prediction(tf_input)
+      println tf_output
 
     }
   }
