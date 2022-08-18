@@ -15,8 +15,8 @@ import org.tensorflow.SavedModelBundle
 import org.tensorflow.ndarray.Shape
 import org.tensorflow.ndarray.NdArray
 import org.tensorflow.ndarray.NdArrays
-import org.tensorflow.ndarray.IntNdArray;
-import org.tensorflow.types.TInt32;
+import org.tensorflow.ndarray.FloatNdArray;
+import org.tensorflow.types.TFloat32;
 
 
 class JamSketchEngineGA3 extends JamSketchEngineAbstract {
@@ -32,7 +32,7 @@ class JamSketchEngineGA3 extends JamSketchEngineAbstract {
     try {
         def TFmodel_file = new File("./onebar_model")
         def TFmodel_path = TFmodel_file.getPath()
-        TFmodel= SavedModelBundle.load(TFmodel_path,"serve")
+        TFmodel= SavedModelBundle.load(TFmodel_path)
     }catch(IOException e){
         System.err.println "Model not founded"
     }
@@ -45,15 +45,13 @@ class JamSketchEngineGA3 extends JamSketchEngineAbstract {
   def tf_row= 16
   def measures_num = 16
   def tf_column = 133
-  
 
-  IntNdArray tf_input =  NdArrays.ofInts(Shape.of(tf_row, tf_column))
+  FloatNdArray tf_input =  NdArrays.ofFloats(Shape.of(1 , tf_row, tf_column, 1))
   // initialize tf_input to set 0;
   for(i in 0..<tf_row){
     for(j in 0..<tf_column){
-      tf_input.setInt(0, i, j)
+      tf_input.setFloat(0.0f, 0, i, j, 0)
     }}
-
 
   def mes = mr.getMusicElementList("curve")
   def me_start = (mes.size()/12)*measure
@@ -67,34 +65,88 @@ class JamSketchEngineGA3 extends JamSketchEngineAbstract {
     def note_num_f=me_per_measure[i].getMostLikely()
     if(note_num_f !=NaN){
       def note_number = Math.floor(note_num_f)-nn_from
-      tf_input.setInt(1, i, (int)note_number)
+      tf_input.setFloat(1.0f, 0,i, (int)note_number,0)
    
     }else{
-      tf_input.setInt(1, i, 121)
+      tf_input.setFloat(1.0f, 0, i, 121, 0)
     }
+
+    //set chrod for test
+    for(i2 in 0..<tf_row){
+      def chord_column=121
+      for(_ in 0..<12){
+        chord_column+=1
+        switch(chord_column) {
+          case 123:
+            tf_input.setFloat(1.0f, 0, i2, chord_column, 0)
+            break
+          case 127:
+            tf_input.setFloat(1.0f, 0, i2, chord_column, 0)
+            break
+          case 130:
+            tf_input.setFloat(1.0f, 0, i2, chord_column, 0)
+            break
+          case 132:
+            tf_input.setFloat(1.0f, 0, i2, chord_column, 0)
+            break
+        }
+    }
+  }
 
   }
 
   return tf_input
-    // for (i in 0..<16){
-    //   print me_per_measure[i].getMostLikely()+", "
-    // }
-    // for(i in 0..<tf_row){
-    //  for(j in 0..<tf_column){
-    //    println i+"line "+j+"columns: "+tf_input.getInt(i, j)
-    //   }
-    // }
+
  }
 
- def prediction(IntNdArray tf_input) {
-  TInt32 ten_input = TInt32.tensorOf(tf_input)
-  TInt32 ten_output = (TInt32)TFmodel.session()
+ def predict(FloatNdArray tf_input) {
+  TFloat32 ten_input = TFloat32.tensorOf(tf_input)
+  TFloat32 ten_output = (TFloat32)TFmodel.session()
                         .runner()
                         .feed("serving_default_conv2d_13_input", ten_input)
                         .fetch("StatefulPartitionedCall")
                         .run()
                         .get(0)
-  return output_ten
+  // return ten_output
+  return ten_output
+ }
+
+ def normalize(TFloat32 tf_output) {
+  def tf_row=16
+  def tf_column=121
+  def value=0
+
+  for(i in 0..<tf_row) {
+    for(j in 0..<tf_column) {
+      value = tf_output.getFloat(0,i,j,0)
+      if(value >= 0.5f){
+        tf_output.setFloat(1.0f,0,i,j,0)
+      }else{
+        tf_output.setFloat(0.0f,0,i,j,0)
+      }
+      value = tf_output.getFloat(0,i,j,0)
+
+    }
+  }
+   return tf_output
+
+ }
+
+ def getLabelList(TFloat32 tf_output) {
+  def tf_row=16
+  def tf_column=121
+  def note_num_list=[]
+
+  for(i in 0..<tf_row){
+    for(j in 0..<tf_column) {
+      if(tf_output.getFloat(0,i,j,0)==1.0f){
+        note_num_list.add(j%12)
+      }
+    }
+  }
+
+  return note_num_list
+
  }
 
 
@@ -128,11 +180,13 @@ class JamSketchEngineGA3 extends JamSketchEngineAbstract {
 
   def outlineUpdated(measure, tick) {
     long currentTime = System.nanoTime()
-    IntNdArray tf_input
-    IntNdArray tf_output
+    FloatNdArray tf_input
+    FloatNdArray tf_output
+    FloatNdArray normalized_data
+    def label_List=[]
     if (tick == cfg.DIVISION - 1 &&
         lastUpdateMeasure != measure &&
-	currentTime - lastUpdateTime >= 100000) {
+	      currentTime - lastUpdateTime >= 100000) {
 
       applyRhythm(measure, decideRhythm(measure, RHYTHM_THRESHOLD))
       mr.getMusicElement(OUTLINE_LAYER, measure, tick).resumeUpdate()
@@ -140,8 +194,16 @@ class JamSketchEngineGA3 extends JamSketchEngineAbstract {
       lastUpdateTime = currentTime
       //get OUTLINE_LAYER Elements and Model the data for it to be inserted into model.
       tf_input = preprocessing(measure)
-      tf_output = prediction(tf_input)
-      println tf_output
+      tf_output = predict(tf_input)
+      normalized_data= normalize(tf_output)
+      label_List = getLabelList(normalized_data)
+      print(tick)
+
+      // def melody_layer_elements=mr.getM
+     
+      // print(mr.getMusicElementList("melody").size())
+      // println melody_layer_elements.size()
+
 
     }
   }
