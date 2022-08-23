@@ -118,7 +118,7 @@ def CHORD_VECTORS = [
   TFloat32 ten_input = TFloat32.tensorOf(tf_input)
   TFloat32 ten_output = (TFloat32)TFmodel.session()
                         .runner()
-                        .feed("serving_default_conv2d_13_input", ten_input)
+                        .feed("serving_default_conv2d_2_input", ten_input)
                         .fetch("StatefulPartitionedCall")
                         .run()
                         .get(0)
