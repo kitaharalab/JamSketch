@@ -92,6 +92,10 @@ dependencies {
     // tensorflow java
         implementation 'org.tensorflow:tensorflow-core-platform:0.4.1'
 
+// https://mvnrepository.com/artifact/org.tensorflow/proto
+implementation group: 'org.tensorflow', name: 'proto', version: '1.15.0'
+
+
 }
 
 compileJava.options.encoding = "UTF-8"
