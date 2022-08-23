@@ -14,7 +14,7 @@ import static java.lang.Double.*
 import org.tensorflow.SavedModelBundle
 import org.tensorflow.ndarray.Shape
 import org.tensorflow.ndarray.NdArray
-import org.tensorflow.ndarray.NdArrays
+;simport org.tensorflow.ndarray.NdArrays
 import org.tensorflow.ndarray.FloatNdArray;
 import org.tensorflow.types.TFloat32;
 import jp.crestmuse.cmx.misc.*

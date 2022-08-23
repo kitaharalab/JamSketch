@@ -89,6 +89,9 @@ dependencies {
 // https://mvnrepository.com/artifact/commons-logging/commons-logging
     implementation 'commons-logging:commons-logging:1.2'
 
+    // tensorflow java
+        implementation 'org.tensorflow:tensorflow-core-platform:0.4.1'
+
 }
 
 compileJava.options.encoding = "UTF-8"
