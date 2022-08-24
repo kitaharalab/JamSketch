@@ -38,7 +38,7 @@ def CHORD_VECTORS = [
   //Set Model to TFmodel Variable.
   def setTFModel() {
     try {
-          def TFmodel_file = new File("./onebar_model")
+          def TFmodel_file = new File("./onebar_model_div3")
         def TFmodel_path = TFmodel_file.getPath()
         TFmodel= SavedModelBundle.load(TFmodel_path)
     }catch(IOException e){
@@ -50,8 +50,7 @@ def CHORD_VECTORS = [
  def preprocessing(int measure) {
 
   def nn_from = 36
-  def tf_row= 16
-  def measures_num = 16
+  def tf_row= cfg.DIVISION
   def tf_column = 133
 
   FloatNdArray tf_input =  NdArrays.ofFloats(Shape.of(1 , tf_row, tf_column, 1))
@@ -64,10 +63,10 @@ def CHORD_VECTORS = [
 
   def mes = mr.getMusicElementList("curve")
   def me_start = (mes.size()/12)*measure
-  def me_end   = me_start + 16
+  def me_end   = me_start + cfg.DIVISION
   def me_per_measure = mes[me_start ..<me_end]
 
-  for (i in 0..<measures_num) {
+  for (i in 0..<tf_row) {
     def note_num_f=me_per_measure[i].getMostLikely()
     if(note_num_f !=NaN){
       def note_number = Math.floor(note_num_f)-nn_from
@@ -85,28 +84,6 @@ def CHORD_VECTORS = [
       float chord_value = chord_vec[j] 
       tf_input.setFloat(chord_value, 0, i, chord_column_from + j, 0)
     }
-/*
-    for(i2 in 0..<12tf_row){
-      def chord_column=121
-      for(_ in 0..<12){
-        chord_column+=1
-        switch(chord_column) {
-          case 123:
-            tf_input.setFloat(1.0f, 0, i2, chord_column, 0)
-            break
-          case 127:
-            tf_input.setFloat(1.0f, 0, i2, chord_column, 0)
-            break
-          case 130:
-            tf_input.setFloat(1.0f, 0, i2, chord_column, 0)
-            break
-          case 132:
-            tf_input.setFloat(1.0f, 0, i2, chord_column, 0)
-            break
-        }
-    }
-  }
-*/
   }
 
   return tf_input
@@ -118,7 +95,7 @@ def CHORD_VECTORS = [
   TFloat32 ten_input = TFloat32.tensorOf(tf_input)
   TFloat32 ten_output = (TFloat32)TFmodel.session()
                         .runner()
-                        .feed("serving_default_conv2d_2_input", ten_input)
+                        .feed("serving_default_first_layer_input", ten_input)
                         .fetch("StatefulPartitionedCall")
                         .run()
                         .get(0)
@@ -129,7 +106,7 @@ def CHORD_VECTORS = [
 
 //Normalize the prediction data which if it is under 0.5, be 0, if it is over 0.5, be 1.
  def normalize(TFloat32 tf_output) {
-  def tf_row=16
+  def tf_row=cfg.DIVISION
   def tf_column=121
   def value=0
 
@@ -150,7 +127,7 @@ def CHORD_VECTORS = [
  }
  //Get the labels from the predicton data as Integer 1 to 11.
  def getLabelList(TFloat32 tf_output) {
-  def tf_row=16
+  def tf_row=cfg.DIVISION
   def tf_column=120
   def note_num_list=[]
 

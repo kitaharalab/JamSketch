@@ -96,6 +96,13 @@ dependencies {
 implementation group: 'org.tensorflow', name: 'proto', version: '1.15.0'
 
 
+// https://mvnrepository.com/artifact/xerces/xercesImpl
+implementation group: 'xerces', name: 'xercesImpl', version: '2.12.2'
+
+// https://mvnrepository.com/artifact/xalan/xalan
+implementation group: 'xalan', name: 'xalan', version: '2.7.2'
+
+
 }
 
 compileJava.options.encoding = "UTF-8"

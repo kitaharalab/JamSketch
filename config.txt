@@ -6,7 +6,8 @@ class Config {
   List<ChordSymbol2> chordprog = [C, F, C, C, F, F, C, C, G, F, C, G]
   int NUM_OF_MEASURES = 12
   int NUM_OF_RESET_AHEAD = 1
-  int DIVISION = 16
+  int DIVISION = 12
+//  int DIVISION = 16
   int BEATS_PER_MEASURE = 4
   int INITIAL_BLANK_MEASURES = 2
   int REPEAT_TIMES = 4
