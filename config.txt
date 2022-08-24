@@ -12,6 +12,21 @@ class Config {
   int INITIAL_BLANK_MEASURES = 2
   int REPEAT_TIMES = 4
   int CALC_LENGTH = 1
+
+//Add　Varialbles 20220824
+  String MODEL_ENGINE="./onebar_model_div3"
+  String MODEL_ENGINE_LAYER = "serving_default_first_layer_input"
+  int MODEL_INPUT_COL=133
+  int MODEL_OUTPUT_COL=121
+  int CHORD_COL_START=121
+  int NUM_OF_MELODY_ELEMENT=12
+  int NOTE_NUM_START=36
+  int REST_COL=121
+  int NOTE_CON_COL_START=60
+
+//Add　Varialbles 20220824 
+
+
   String MODEL_FILE = "model20180321.json"
   String LOG_DIR = "log/"
   boolean EXPRESSION = false
