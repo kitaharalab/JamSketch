@@ -176,13 +176,10 @@ def CHORD_VECTORS = [
  }
 
   Map<String,Double> parameters() {
-    // [W1: 1.5, W2: 2.0, W3:3 .0, W4: 20.0, ENT_BIAS: cfg.ENT_BIAS]
     return [:]
   }
 
   Map<String,String> paramDesc() {
-    // [W1: "fitness to drawing", W2: "fitness to style",
-    //  ENT_BIAS: "melodic complexity"]
     return [:]
   }
   
