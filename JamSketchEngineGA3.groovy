@@ -34,14 +34,10 @@ def CHORD_VECTORS = [
 
   
   //Set Model to TFmodel Variable.
-  def setTFModel() {
-    try {
+  def init_local() {
         def TFmodel_file = new File(cfg.MODEL_ENGINE)
         def TFmodel_path = TFmodel_file.getPath()
         TFmodel= SavedModelBundle.load(TFmodel_path)
-    }catch(IOException e){
-        System.err.println "Model not founded"
-    }
  }
 
 //preprocessing input data
@@ -184,17 +180,12 @@ def CHORD_VECTORS = [
   }
   
   def musicCalculatorForOutline() {
-    setTFModel()
     return null
   }
 
   def outlineUpdated(measure, tick) {
     println("outlineUpdated: " + measure + " " + tick)
     long currentTime = System.nanoTime()
-    FloatNdArray tf_input
-    FloatNdArray tf_output
-    FloatNdArray normalized_data
-    def label_List=[]
     if (//tick == cfg.DIVISION - 1 &&
         //lastUpdateMeasure != measure &&
 	      currentTime - lastUpdateTime >= 1000 * 1000 * 150) {
@@ -202,10 +193,10 @@ def CHORD_VECTORS = [
       lastUpdateMeasure = measure
       lastUpdateTime = currentTime
       //get OUTLINE_LAYER Elements and Model the data for it to be inserted into model.
-      tf_input = preprocessing(measure)
-      tf_output = predict(tf_input)
-      normalized_data= normalize(tf_output)
-      label_List = getLabelList(normalized_data)
+      FloatNdArray tf_input = preprocessing(measure)
+      FloatNdArray tf_output = predict(tf_input)
+      FloatNdArray normalized_data= normalize(tf_output)
+      def label_List = getLabelList(normalized_data)
       // println label_List
       setEvidences(measure, tick, label_List)
     }
