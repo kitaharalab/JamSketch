@@ -20,7 +20,7 @@ import org.tensorflow.types.TFloat32;
 import jp.crestmuse.cmx.misc.*
 
 
-class JamSketchEngineGA3 extends JamSketchEngineAbstract {
+class JamSketchEngineTF1 extends JamSketchEngineAbstract {
 
 def CHORD_VECTORS = [
   "C": [1, 0, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0], 
@@ -35,7 +35,7 @@ def CHORD_VECTORS = [
   
   //Set Model to TFmodel Variable.
   def init_local() {
-        def TFmodel_file = new File(cfg.MODEL_ENGINE)
+        def TFmodel_file = new File(cfg.TF_MODEL_ENGINE)
         def TFmodel_path = TFmodel_file.getPath()
         TFmodel= SavedModelBundle.load(TFmodel_path)
  }
@@ -43,9 +43,9 @@ def CHORD_VECTORS = [
 //preprocessing input data
  def preprocessing(int measure) {
 
-  def nn_from = cfg.NOTE_NUM_START
+  def nn_from = cfg.TF_NOTE_NUM_START
   def tf_row= cfg.DIVISION
-  def tf_column = cfg.MODEL_INPUT_COL
+  def tf_column = cfg.TF_MODEL_INPUT_COL
 
   FloatNdArray tf_input =  NdArrays.ofFloats(Shape.of(1 , tf_row, tf_column, 1))
   // initialize tf_input;
@@ -67,15 +67,15 @@ def CHORD_VECTORS = [
       tf_input.setFloat(1.0f, 0,i, note_number as int,0)
    
     }else{
-      tf_input.setFloat(1.0f, 0, i, cfg.REST_COL, 0)
+      tf_input.setFloat(1.0f, 0, i, cfg.TF_REST_COL, 0)
     }
 
     //set chrod
-    def chord_column_from = cfg.CHORD_COL_START
+    def chord_column_from = cfg.TF_CHORD_COL_START
     def chord = getChord(measure, i)
     def chord_vec = CHORD_VECTORS[chord.toString()]
 
-    for (j in 0..<cfg.NUM_OF_MELODY_ELEMENT) {
+    for (j in 0..<cfg.TF_NUM_OF_MELODY_ELEMENT) {
       float chord_value = chord_vec[j] 
       tf_input.setFloat(chord_value, 0, i, chord_column_from + j, 0)
     }
@@ -90,7 +90,7 @@ def CHORD_VECTORS = [
   TFloat32 ten_input = TFloat32.tensorOf(tf_input)
   TFloat32 ten_output = (TFloat32)TFmodel.session()
                         .runner()
-                        .feed(cfg.MODEL_ENGINE_LAYER, ten_input)
+                        .feed(cfg.TF_MODEL_ENGINE_LAYER, ten_input)
                         .fetch("StatefulPartitionedCall")
                         .run()
                         .get(0)
@@ -102,12 +102,11 @@ def CHORD_VECTORS = [
 //Normalize the prediction data which if it is under 0.5, be 0, if it is over 0.5, be 1.
  def normalize(TFloat32 tf_output) {
   def tf_row=cfg.DIVISION
-  def tf_column=cfg.MODEL_OUTPUT_COL
-  def value=0.0f
+  def tf_column=cfg.TF_MODEL_OUTPUT_COL
 
   for(i in 0..<tf_row) {
     for(j in 0..<tf_column) {
-      value = tf_output.getFloat(0,i,j,0)
+      def value = tf_output.getFloat(0,i,j,0)
       if(value >= 0.5f){
         tf_output.setFloat(1.0f,0,i,j,0)
       }else{
@@ -124,7 +123,7 @@ def CHORD_VECTORS = [
  def getLabelList(TFloat32 tf_output) {
 
   def tf_row=cfg.DIVISION
-  def tf_column=cfg.MODEL_OUTPUT_COL
+  def tf_column=cfg.TF_MODEL_OUTPUT_COL
   def note_num_list=[]
 
   for(i in 0..<tf_row){
@@ -155,7 +154,7 @@ def CHORD_VECTORS = [
       e.setRest(true)
     } else {
       e.setRest(false)
-      if (note_num >= cfg.NOTE_CON_COL_START && (i>=1 && note_num instanceof Integer && note_num_list[i-1] instanceof Integer && (note_num % cfg.NUM_OF_MELODY_ELEMENT) == (note_num_list[i-1] % cfg.NUM_OF_MELODY_ELEMENT))) {
+      if (note_num >= cfg.TF_NOTE_CON_COL_START && (i>=1 && note_num instanceof Integer && note_num_list[i-1] instanceof Integer && (note_num % cfg.TF_NUM_OF_MELODY_ELEMENT) == (note_num_list[i-1] % cfg.TF_NUM_OF_MELODY_ELEMENT))) {
         e.setTiedFromPrevious(true)
         println("Tied: ${i}")
       }
@@ -165,7 +164,7 @@ def CHORD_VECTORS = [
     def note_num = note_num_list[i]
     def e = mr.getMusicElement("melody", measure, i)
     if (note_num instanceof Integer && !e.tiedFromPrevious()) {
-      e.setEvidence(note_num % cfg.NUM_OF_MELODY_ELEMENT)
+      e.setEvidence(note_num % cfg.TF_NUM_OF_MELODY_ELEMENT)
     }
   }
 
