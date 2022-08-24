@@ -42,8 +42,13 @@ abstract class JamSketchEngineAbstract implements JamSketchEngine {
     mr.addMusicCalculator(MELODY_LAYER, sccgen)
     def calc = musicCalculatorForOutline()
     if (calc != null) {
-        mr.addMusicCalculator(OUTLINE_LAYER, calc)
-	}
+      mr.addMusicCalculator(OUTLINE_LAYER, calc)
+    }
+    init_local()
+  }
+
+  def init_local() {
+    // do nothing
   }
 
   def getFullChordProgression() {

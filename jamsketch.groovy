@@ -261,6 +261,7 @@ class JamSketch extends SimplePianoRoll {
   }
 
   void mouseDragged() {
+
   }
 
   void keyReleased() {

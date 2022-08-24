@@ -221,14 +221,15 @@ def CHORD_VECTORS = [
   }
 
   def outlineUpdated(measure, tick) {
+    println("outlineUpdated: " + measure + " " + tick)
     long currentTime = System.nanoTime()
     FloatNdArray tf_input
     FloatNdArray tf_output
     FloatNdArray normalized_data
     def label_List=[]
-    if (tick == cfg.DIVISION - 1 &&
-        lastUpdateMeasure != measure &&
-	      currentTime - lastUpdateTime >= 100000) {
+    if (//tick == cfg.DIVISION - 1 &&
+        //lastUpdateMeasure != measure &&
+	      currentTime - lastUpdateTime >= 1000 * 1000 * 150) {
 
 //      applyRhythm(measure, decideRhythm(measure, RHYTHM_THRESHOLD))
       mr.getMusicElement(OUTLINE_LAYER, measure, tick).resumeUpdate()
