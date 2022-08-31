@@ -56,6 +56,7 @@ def CHORD_VECTORS = [
   }
 
   def mes = mr.getMusicElementList("curve")
+
   def me_start = (mes.size()/cfg.NUM_OF_MEASURES)*measure
   def me_end   = me_start + cfg.DIVISION
   def me_per_measure = mes[me_start ..<me_end]
@@ -135,7 +136,7 @@ def CHORD_VECTORS = [
         isSet=true
       }
     }
-    //If all columns is 0, add  "rest" in  note_num_list.
+    //If all value in a column is 0, add  "rest" in  note_num_list.
     if(!isSet){
       note_num_list.add("rest")
     }
@@ -183,26 +184,30 @@ def CHORD_VECTORS = [
   }
 
   def outlineUpdated(measure, tick) {
-    println("outlineUpdated: " + measure + " " + tick)
+    // println("outlineUpdated: " + measure + " " + tick)
     long currentTime = System.nanoTime()
     if (//tick == cfg.DIVISION - 1 &&
-        //lastUpdateMeasure != measure &&
+    //     lastUpdateMeasure != measure &&
 	      currentTime - lastUpdateTime >= 1000 * 1000 * 150) {
+          // currentTime - lastUpdateTime >= 100000) {
       mr.getMusicElement(OUTLINE_LAYER, measure, tick).resumeUpdate()
-      lastUpdateMeasure = measure
+      // lastUpdateMeasure = measure
       lastUpdateTime = currentTime
       //get OUTLINE_LAYER Elements and Model the data for it to be inserted into model.
-      FloatNdArray tf_input = preprocessing(measure)
-      FloatNdArray tf_output = predict(tf_input)
-      FloatNdArray normalized_data= normalize(tf_output)
-      def label_List = getLabelList(normalized_data)
-      // println label_List
-      setEvidences(measure, tick, label_List)
+
+        FloatNdArray tf_input = preprocessing(measure)
+        FloatNdArray tf_output = predict(tf_input)
+        FloatNdArray normalized_data= normalize(tf_output)
+        def label_List = getLabelList(normalized_data)
+        setEvidences(measure, tick, label_List)
+  
     }
   }
 
   def automaticUpdate() {
     false
   }
+
+    
   
 }

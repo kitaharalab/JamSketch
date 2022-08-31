@@ -28,6 +28,7 @@ class SCCGenerator implements MusicCalculator {
 	//def curvevalue = curve2[measure * CFG.DIVISION + tick]
 		def curvevalue =
 		  mr.getMusicElement(curveLayer, measure, tick).getMostLikely()
+		//   println(curveLayer)
 		if (curvevalue != null) {
 		  int notenum = getNoteNum(e.getMostLikely(), curvevalue)
 		int duration = e.duration() * sccdiv /
@@ -44,6 +45,7 @@ class SCCGenerator implements MusicCalculator {
 					//	      target_part.remove(oldnotes)
 					// edit 2020.03.04
 					target_part.eachnote { note ->
+					// println(note)
 						if (note.onset() < onset && onset <= note.offset()) {
 							target_part.remove(note)
 //							println("cond1 remove ${note}")
@@ -53,18 +55,46 @@ class SCCGenerator implements MusicCalculator {
 									note.offVelocity())
 //							println("cond1 add ${note.onset}, ${onset-1}, ${note.notenum()}")
 						}
-						if (onset <= note.onset() && note.offset() <= onset+duration) {
+// 						if (onset <= note.onset() && note.offset() <= onset+duration) {
+// 							target_part.remove(note)
+// //							println("cond2 remove ${note}")
+// 						}
+						// if (note.onset() < onset+duration &&
+						// 		onset+duration < note.offset()) {
+						// 	//		
+						//    note.setOnset(onset+duration)
+						// }
+
+						//1 結果: 過去の音符がすべて削除されてしまう。
+						// if (note.onset() < onset && note.offset() <= onset) {
+						// 	target_part.remove(note)
+						// }
+
+						// 2 結果: 音の重なりは消えるが、一度か描画しなおすと後続の音が全てきえてしまう。
+					    // if (onset <= note.onset() && note.offset() >= onset+duration) {
+						// 	println(onset <= note.onset() && note.offset() >= onset+duration)
+						// 	target_part.remove(note)
+						// }
+
+                        //3 結果: 2と殆ど同じ結果だが、音符の追加のされ方が微妙。
+						// if (note.onset() >= onset+duration) {
+						// 	target_part.remove(note)
+						// }
+
+						
+                        //4 結果: 音の重なりが無くなり、後続の音符は残る。カーソルのある小節のみ書き換わる。
+						if (note.onset() >= onset && note.onset() <= onset+duration) {
+							println(note.onset() >= onset && note.onset() <= onset+duration)
 							target_part.remove(note)
-//							println("cond2 remove ${note}")
 						}
-						if (note.onset() < onset+duration &&
-								onset+duration < note.offset()) {
-							//		  note.setOnset(onset+duration)
-						}
+
+						
+						
 					}
 					target_part.addNoteElement(onset, onset+duration, notenum,
 							100, 100)
-//					println("all add ${onset}, ${onset+duration}, ${notenum}")
+					// println("all add ${onset}, ${onset+duration}, ${notenum}")
+					// println(target_part)
 					//	  }
 				}
 			}
