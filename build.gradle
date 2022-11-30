@@ -1,6 +1,10 @@
 plugins {
     id 'groovy'
     id 'application'
+    //added 20221130 by yonamine, plugin for making fat JAR easliy
+    id 'com.github.johnrengelman.shadow' version '7.+'
+    id 'java'
+
 }
 
 mainClassName = "JamSketch"
@@ -85,6 +89,18 @@ dependencies {
  // https://mvnrepository.com/artifact/javazoom/jlayer
     implementation 'javazoom:jlayer:1.0.1'
 
+    // added 20221130 yonamine yonamine blow 4 implementation
+    implementation 'xml-resolver:xml-resolver:1.2'
+    // https://mvnrepository.com/artifact/xalan/xalan
+    implementation 'xalan:xalan:2.7.2'
+    // https://mvnrepository.com/artifact/xalan/serializer
+    implementation 'xalan:serializer:2.7.2'
+    // https://mvnrepository.com/artifact/xerces/xercesImpl
+    implementation 'xerces:xercesImpl:2.12.2'
+
+
+
+
 
 // https://mvnrepository.com/artifact/commons-logging/commons-logging
     implementation 'commons-logging:commons-logging:1.2'
@@ -114,4 +130,10 @@ task runScript(type: JavaExec) {
 
 task printEnv {
     println(sourceSets.main.compileClasspath.files)
+}
+//added 20221130 by yonamine, plugin for making fat JAR easliy
+jar {
+    manifest {
+        attributes "Main-Class" : "JamSketch"
+    }
 }
