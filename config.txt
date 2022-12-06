@@ -2,19 +2,21 @@ import jp.crestmuse.cmx.misc.*
 import static jp.crestmuse.cmx.misc.ChordSymbol2.*
 
 class Config {
-  String MIDFILENAME = "blues01.mid"
+  String MIDFILENAME = "blues02.mid"
+//  String MIDFILENAME = "blues01.mid"
   List<ChordSymbol2> chordprog = [C, F, C, C, F, F, C, C, G, F, C, G]
   int NUM_OF_MEASURES = 12
   int NUM_OF_RESET_AHEAD = 1
-  int DIVISION = 12
-//  int DIVISION = 16
+//  int DIVISION = 12
+  int DIVISION = 16
   int BEATS_PER_MEASURE = 4
   int INITIAL_BLANK_MEASURES = 2
   int REPEAT_TIMES = 4
   int CALC_LENGTH = 1
 
 //Add　Varialbles 20220824
-  String MODEL_ENGINE="./onebar_model_div3"
+  String MODEL_ENGINE="./onebar_model_div4"
+//  String MODEL_ENGINE="./onebar_model_div3"
   String MODEL_ENGINE_LAYER = "serving_default_first_layer_input"
   int MODEL_INPUT_COL=133
   int MODEL_OUTPUT_COL=121
