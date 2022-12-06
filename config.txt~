@@ -2,19 +2,22 @@ import jp.crestmuse.cmx.misc.*
 import static jp.crestmuse.cmx.misc.ChordSymbol2.*
 
 class Config {
-  String MIDFILENAME = "blues01.mid"
+  String MIDFILENAME = "blues02.mid"
+//  String MIDFILENAME = "blues01.mid"
   List<ChordSymbol2> chordprog = [C, F, C, C, F, F, C, C, G, F, C, G]
   int NUM_OF_MEASURES = 12
   int NUM_OF_RESET_AHEAD = 1
-  int DIVISION = 12
-//  int DIVISION = 16
+//  int DIVISION = 12
+  int DIVISION = 16
   int BEATS_PER_MEASURE = 4
   int INITIAL_BLANK_MEASURES = 2
   int REPEAT_TIMES = 4
   int CALC_LENGTH = 1
 
 //Add　Varialbles 20220824
-  String MODEL_ENGINE="./onebar_model_div3"
+<<<<<<< HEAD
+  String MODEL_ENGINE="./onebar_model_div4"
+//  String MODEL_ENGINE="./onebar_model_div3"
   String MODEL_ENGINE_LAYER = "serving_default_first_layer_input"
   int MODEL_INPUT_COL=133
   int MODEL_OUTPUT_COL=121
@@ -23,6 +26,17 @@ class Config {
   int NOTE_NUM_START=36
   int REST_COL=121
   int NOTE_CON_COL_START=60
+=======
+  String TF_MODEL_ENGINE="./onebar_model_div3" 
+  String TF_MODEL_ENGINE_LAYER = "serving_default_first_layer_input"
+  int TF_MODEL_INPUT_COL=133
+  int TF_MODEL_OUTPUT_COL=121
+  int TF_CHORD_COL_START=121
+  int TF_NUM_OF_MELODY_ELEMENT=12
+  int TF_NOTE_NUM_START=36
+  int TF_REST_COL=121
+  int TF_NOTE_CON_COL_START=60
+>>>>>>> origin/CreateJamSketchEngineGA3
 
 //Add　Varialbles 20220824 
 
@@ -47,7 +61,7 @@ class Config {
   int GA_POPUL_SIZE = 200
   String GA_INIT = "tree"  // "random" or "tree"
 
-  def JAMSKETCH_ENGINE = "JamSketchEngineGA3" //"JamSketchEngineSimple"
+  def JAMSKETCH_ENGINE = "JamSketchEngineTF1" //"JamSketchEngineSimple"
 
   def ENT_BIAS = 0.0
   def RHYTHM_DENSITY = 6.0
