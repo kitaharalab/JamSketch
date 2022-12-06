@@ -49,7 +49,7 @@ class Config {
   int GA_POPUL_SIZE = 200
   String GA_INIT = "tree"  // "random" or "tree"
 
-  def JAMSKETCH_ENGINE = "JamSketchEngineGA3" //"JamSketchEngineSimple"
+  def JAMSKETCH_ENGINE = "JamSketchEngineTF1" //"JamSketchEngineSimple"
 
   def ENT_BIAS = 0.0
   def RHYTHM_DENSITY = 6.0
