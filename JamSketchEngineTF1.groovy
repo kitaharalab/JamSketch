@@ -19,6 +19,12 @@ import org.tensorflow.ndarray.FloatNdArray;
 import org.tensorflow.types.TFloat32;
 import jp.crestmuse.cmx.misc.*
 
+import java.io.FileWriter;
+import java.io.BufferedWriter;
+import java.io.PrintWriter;
+import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 class JamSketchEngineTF1 extends JamSketchEngineAbstract {
 
@@ -97,6 +103,34 @@ def CHORD_VECTORS = [
   // return ten_output
   return ten_output
  }
+
+ def exportCVS(FloatNdArray data, String logfile) {
+
+  def tf_column = (int)data.shape().size(2)
+  def tf_row= (int)data.shape().size(1)
+
+
+ 
+  try {
+
+    FileWriter fw = new FileWriter(logfile, false)
+    PrintWriter pw = new PrintWriter(new BufferedWriter(fw))
+    
+    for (i in 0..<tf_row) {
+      for (j in 0..<tf_column) {
+        pw.print(data.getFloat(0,i,j,0))
+        pw.print(",")
+      }
+      pw.println()
+    }
+    pw.close();
+    System.out.println("Save as " + logfile);
+ 
+  } catch (IOException ex) {
+    ex.printStackTrace();
+  }
+ }
+
 
 
 //Normalize the prediction data which if it is under 0.5, be 0, if it is over 0.5, be 1.
@@ -183,23 +217,43 @@ def CHORD_VECTORS = [
   }
 
   def outlineUpdated(measure, tick) {
-    println("outlineUpdated: " + measure + " " + tick)
+
+
+    // println("outlineUpdated: " + measure + " " + tick)
     long currentTime = System.nanoTime()
     if (//tick == cfg.DIVISION - 1 &&
         //lastUpdateMeasure != measure &&
 	      currentTime - lastUpdateTime >= 1000 * 1000 * 150) {
+      String logname=""
+      String date=""
       mr.getMusicElement(OUTLINE_LAYER, measure, tick).resumeUpdate()
       lastUpdateMeasure = measure
       lastUpdateTime = currentTime
+      
       //get OUTLINE_LAYER Elements and Model the data for it to be inserted into model.
       FloatNdArray tf_input = preprocessing(measure)
+
+      if (cfg.DEBUG) {
+        date=(new Date()).toString().replace(" ", "_").replace(":", "-")+".csv"
+        logname="./log/" + "tf_input" + date
+        exportCVS(tf_input, logname)
+      }
       FloatNdArray tf_output = predict(tf_input)
+    
+
+      if (cfg.DEBUG) {
+        logname="./log/" + "tf_output" + date
+        exportCVS(tf_output, logname)
+      }
+
       FloatNdArray normalized_data= normalize(tf_output)
       def label_List = getLabelList(normalized_data)
       // println label_List
       setEvidences(measure, tick, label_List)
+
     }
   }
+
 
   def automaticUpdate() {
     false
