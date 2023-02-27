@@ -1,6 +1,37 @@
+
+// added by yonamine 20230208
+@Grapes([
+    @Grab(group='org.tensorflow', module='tensorflow-core-api', version='0.4.1'),
+    @Grab(group='org.tensorflow', module='tensorflow-core-platform', version='0.4.1'),
+    @Grab(group='org.bytedeco', module='javacpp', version='1.5.7'),
+    @Grab(group='org.tensorflow', module='ndarray', version='0.3.3'),
+    @Grab(group='com.google.truth', module='truth', version='1.0.1', scope='test')
+
+])
+
 import controlP5.ControlP5
 import groovy.json.JsonOutput
 import groovy.json.JsonSlurper
+
+// added by yonamine 20230208
+import java.io.File
+import java.io.FileReader
+import java.io.BufferedReader
+import java.io.FileNotFoundException
+import java.io.IOException
+import org.tensorflow.ndarray.Shape
+import org.tensorflow.ndarray.NdArray
+import org.tensorflow.ndarray.NdArrays
+import org.tensorflow.ndarray.FloatNdArray
+
+import java.io.FileWriter;
+import java.io.BufferedWriter;
+import java.io.PrintWriter;
+import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+
+
 import jp.crestmuse.cmx.filewrappers.SCCDataSet
 import jp.crestmuse.cmx.processing.gui.SimplePianoRoll
 
@@ -27,6 +58,10 @@ class JamSketch extends SimplePianoRoll {
     setLabel("Reset").setPosition(160, 645).setSize(120, 40)
     p5ctrl.addButton("loadCurve").
     setLabel("Load").setPosition(300, 645).setSize(120, 40)
+
+    //added by yonamine
+    p5ctrl.addButton("LoadInputFile").
+    setLabel("LoadInput").setPosition(500, 645).setSize(120, 40)
 
     if (CFG.MOTION_CONTROLLER != null) {
       CFG.MOTION_CONTROLLER.each { mCtrl ->
@@ -181,6 +216,8 @@ class JamSketch extends SimplePianoRoll {
 //      resetMusic()
   }
 
+
+
   void makeLog(action) {
     def logname = "output_" + (new Date()).toString().replace(" ", "_").replace(":", "-")
     if (action == "melody") {
@@ -196,7 +233,6 @@ class JamSketch extends SimplePianoRoll {
       def pngname = "${CFG.LOG_DIR}/${logname}_screenshot.png"
       save(pngname)
       println("saved as ${pngname}")
-
       // for debug
       new File("${CFG.LOG_DIR}/${logname}_noteList.txt").text = (melodyData.scc as SCCDataSet).getFirstPartWithChannel(1).getNoteList().toString()
 //      new File("${CFG.LOG_DIR}/${logname}_noteOnlyList.txt").text = (melodyData.scc as SCCDataSet).getFirstPartWithChannel(1).getNoteOnlyList().toString()
@@ -280,6 +316,73 @@ class JamSketch extends SimplePianoRoll {
 //      melodyData.updateCurve('all')
     }
   }
+
+  //added by yonamie 20220210
+  void LoadInputFile() {
+    
+    //include melody outlined data for 12 measures.
+    // FloatNdArray tf_input_per_12measure =  NdArrays.ofFloats(Shape.of(12, 1, CFG.DIVISION, CFG.TF_MODEL_INPUT_COL, 1))
+    def date = (new Date()).toString().replace(" ", "_").replace(":", "-") + ".csv"
+    FloatNdArray tf_input =  NdArrays.ofFloats(Shape.of(12, 1, CFG.DIVISION, CFG.TF_MODEL_INPUT_COL, 1))
+    // FloatNdArray tf_output =  NdArrays.ofFloats(Shape.of(1, CFG.DIVISION, CFG.TF_MODEL_OUTPUT_COL, 1))
+
+
+    def filename = CFG.INPUT_FILE_PATH.replaceAll("./inputs/", "")
+
+    def output_file = "./log/tf_output"+"_"+date
+    def csv_row
+    def tf_row
+    def line
+
+
+    try (BufferedReader br = new BufferedReader(new FileReader(CFG.INPUT_FILE_PATH))){
+      csv_row = 0
+      tf_row = 0
+      
+      while((line = br.readLine()) != null && csv_row <= (CFG.NUM_OF_MEASURES * CFG.DIVISION-1)) {
+        def values_str = line.split(",")
+        println(tf_row)
+        values_str.eachWithIndex { value, column ->
+          tf_input.setFloat(value.toFloat(), (csv_row/16).toInteger(), 0, tf_row, column, 0)
+        }
+  
+        csv_row += 1
+        tf_row += 1
+
+        if (tf_row == 16) {
+          tf_row = 0
+        }
+      }
+
+    } catch (IOException e) {
+      e.printStackTrace()
+    }
+
+    tf_input.elements(0).forEach(v -> {
+      FloatNdArray df_output = melodyData.engine.predict(v)
+
+       try {
+
+         FileWriter fw = new FileWriter(output_file, true)
+         PrintWriter pw = new PrintWriter(new BufferedWriter(fw))
+    
+         for (i in 0..<df_output.shape().size(1)) {
+            for (j in 0..<df_output.shape().size(2)) {
+              pw.print(df_output.getFloat(0,i,j,0))
+              pw.print(",")
+             }
+            pw.println()
+        }
+        pw.close();
+    System.out.println("Save as " + output_file);
+ 
+  } catch (IOException ex) {
+    ex.printStackTrace();
+  }
+
+})
+
+}
 
   public void exit() {
     println("exit() called.")

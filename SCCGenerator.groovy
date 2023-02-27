@@ -29,7 +29,10 @@ class SCCGenerator implements MusicCalculator {
 		def curvevalue =
 		  mr.getMusicElement(curveLayer, measure, tick).getMostLikely()
 		if (curvevalue != null) {
-		  int notenum = getNoteNum(e.getMostLikely(), curvevalue)
+		// int notenum = getNoteNum(e.getMostLikely(), curvevalue)
+		int notenum = e.getMostLikely()
+		// println("notenum:")
+		// println(notenum)
 		int duration = e.duration() * sccdiv /
 		(CFG.DIVISION / CFG.BEATS_PER_MEASURE)
 		int onset = ((firstMeasure + measure) * CFG.DIVISION + tick) * sccdiv /
@@ -44,6 +47,7 @@ class SCCGenerator implements MusicCalculator {
 					//	      target_part.remove(oldnotes)
 					// edit 2020.03.04
 					target_part.eachnote { note ->
+
 						if (note.onset() < onset && onset <= note.offset()) {
 							target_part.remove(note)
 //							println("cond1 remove ${note}")
@@ -79,14 +83,15 @@ class SCCGenerator implements MusicCalculator {
       }
     }
 
-  @CompileStatic
-  int getNoteNum(int notename, double neighbor) {
-    int best = 0
-    for (int i in 0..11) {
-      def notenum = i * 12 + notename
-      if (Math.abs(notenum - neighbor) < Math.abs(best - neighbor))
-	best = notenum
-    }
-    best
-  }
+//   @CompileStatic
+//   int getNoteNum(int notename, double neighbor) {
+//     int best = 0
+//     for (int i in 0..11) {
+//       def notenum = i * 12 + notename
+//       if (Math.abs(notenum - neighbor) < Math.abs(best - neighbor)) 
+// 	best = notenum
+//     }
+//     best
+//   }
+
 }

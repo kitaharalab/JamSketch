@@ -30,9 +30,10 @@ class Config {
 
 
   String MODEL_FILE = "model20180321.json"
-  String LOG_DIR = "log/"
+  String LOG_DIR = "./log/"
   //added by yonamine
   boolean DEBUG=true
+  String  INPUT_FILE_PATH = "./inputs/input.csv"
   boolean EXPRESSION = false
   boolean MELODY_RESETTING = true
   boolean CURSOR_ENHANCED = true

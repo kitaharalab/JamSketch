@@ -17,6 +17,7 @@ import org.tensorflow.ndarray.NdArray
 import org.tensorflow.ndarray.NdArrays
 import org.tensorflow.ndarray.FloatNdArray;
 import org.tensorflow.types.TFloat32;
+import org.tensorflow.internal.types.TFloat32Mapper
 import jp.crestmuse.cmx.misc.*
 
 import java.io.FileWriter;
@@ -106,11 +107,10 @@ def CHORD_VECTORS = [
 
  def exportCVS(FloatNdArray data, String logfile) {
 
+
   def tf_column = (int)data.shape().size(2)
   def tf_row= (int)data.shape().size(1)
 
-
- 
   try {
 
     FileWriter fw = new FileWriter(logfile, false)
@@ -124,84 +124,183 @@ def CHORD_VECTORS = [
       pw.println()
     }
     pw.close();
-    System.out.println("Save as " + logfile);
+    System.out.println("Save as ${logfile}");
  
   } catch (IOException ex) {
     ex.printStackTrace();
   }
  }
 
+//  def inputCSV(String filepath) {
+//   FloatNdArray tf_input =  NdArrays.ofFloats(Shape.of(1, cfg.DIVISION, cfg.TF_MODEL_INPUT_COL, 1))
 
+//     try (BufferedReader br = new BufferedReader(new FileReader(filepath))){
+//       def csv_row = 0
+//       def tf_row = 0
+//       def line
+      
+//       while((line = br.readLine()) != null && csv_row <= (cfg.DIVISION-1)) {
+//         def values_str = line.split(",")
+
+//         values_str.eachWithIndex { value, column ->
+//           tf_input.setFloat(value.toFloat(), 0, tf_row, column, 0)
+//         }
+  
+//         tf_row += 1
+//         csv_row += 1
+//       }
+        
+//       } catch (IOException e) {
+//       e.printStackTrace()
+//     }
+
+//     return tf_input
+//  }
 
 //Normalize the prediction data which if it is under 0.5, be 0, if it is over 0.5, be 1.
  def normalize(TFloat32 tf_output) {
+  
+  """
+
+  入力: 
+      tf_output: 16x121の行列(predict後の行列)
+  
+  内部で使用している変数:
+      tmp_output: tf_outputの60~120列目までのデータを格納。
+    
+  出力:
+      tf_output: 0.5以上を1、0.5より小さい値のものを0に置き換えた行列。
+  
+  """
+
+  // 小節の個数を取得。(16)
   def tf_row=cfg.DIVISION
+  // 行列(16×121)の列数を取得。(121)
   def tf_column=cfg.TF_MODEL_OUTPUT_COL
 
+  // 16×60の行列を作成。 
+  FloatNdArray tmp_output =  NdArrays.ofFloats(Shape.of(1 , tf_row, (tf_column-1)/2 as int, 1)) 
+  // tf_ouputの全ての行の60~120列目(結合部分)をtmp_outputに代入。
   for(i in 0..<tf_row) {
-    for(j in 0..<tf_column) {
-      def value = tf_output.getFloat(0,i,j,0)
-      if(value >= 0.5f){
-        tf_output.setFloat(1.0f,0,i,j,0)
-      }else{
-
-        tf_output.setFloat(0.0f,0,i,j,0)
-      }
-
+    for(j in 60..<tf_column-1) {
+      tmp_output.setFloat(tf_output.getFloat(0, i, j, 0), 0, i, j-60, 0)
     }
   }
+
+  // 24measure_MelodyGenerationDemo.ipynbの関数(make_note_msgs)の処理に対応。
+  for(i in 0..<tf_row) {
+    for(j in 0..<(tf_column-1)/2) {
+      if ((tf_output.getFloat(0,i,j,0) <= 0.5) && (tmp_output.getFloat(0,i,j,0) > 0.5)) {
+        if (i >= 1 && tmp_output.getFloat(0, i-1, j, 0) < 0.5 && tf_output.getFloat(0, i-1, j ,0 ) < 0.5){
+          //値が0.5以上になるように加算。
+          tf_output.setFloat((tmp_output.getFloat(0, i, j, 0)+tf_output.getFloat(0, i, j, 0)) as float, 0, i, j, 0)
+          tf_output.setFloat(0.0, 0, i, j+60, 0)
+        }
+      }
+    }
+  }
+ // tf_outputの各値に対して,0.5以上であれば1.0、0.5以下であれば0に置き換える。
+  for(i in 0..<tf_row) {
+    for(j in 0..<tf_column){
+      
+      if(tf_output.getFloat(0, i, j, 0) >= 0.5) {
+
+        tf_output.setFloat(1.0, 0, i, j, 0)
+
+      } else {
+
+        tf_output.setFloat(0.0, 0, i, j, 0)
+      }
+    }
+  }
+
+
    return tf_output
+}
 
- }
- //Get the labels from the predicton data as Integer 1 to 11.
- def getLabelList(TFloat32 tf_output) {
 
+ def setEvidences(Integer measure, Integer lastTick, TFloat32 tf_normalized) {
+  """
+  入力: 
+      tf_normalized: 16x121の0または1を値として持つ行列。
+      measure: 小節。
+      lasttick: 音符。
+  
+  内部で使用している変数:
+      tf_normalized2: tf_normalizedの60~120列目までのデータを格納。
+    
+  出力:
+      tf_output: 0.5以上を1、0.5より小さい値のものを0に置き換えた行列。
+
+  """
+
+
+  // 小節の個数を取得。(16)
   def tf_row=cfg.DIVISION
+  // 行列(16×121)の列数を取得。(121)
   def tf_column=cfg.TF_MODEL_OUTPUT_COL
-  def note_num_list=[]
-
-  for(i in 0..<tf_row){
-    def isSet=false
-
-    for(j in 0..<tf_column) {
-      if(tf_output.getFloat(0,i,j,0)==1.0f){
-        note_num_list.add(j)
-        isSet=true
-      }
-    }
-    //If all columns is 0, add  "rest" in  note_num_list.
-    if(!isSet){
-      note_num_list.add("rest")
+  // 16×60の行列を作成。 
+  FloatNdArray tf_normalized2 =  NdArrays.ofFloats(Shape.of(1 , tf_row, (tf_column-1)/2 as int, 1))
+  // tf_ouputの全ての行の60~120列目(結合部分)をtmp_outputに代入。
+  for(i in 0..<tf_row) {
+    for(j in 60..<tf_column-1) {
+      tf_normalized2.setFloat(tf_normalized.getFloat(0, i, j, 0), 0, i, j-60, 0)
     }
   }
 
 
-  return note_num_list
-
- }
-
- def setEvidences(Integer measure, Integer lastTick, List note_num_list) {
-  for (i in 0..lastTick) {    
-    def note_num = note_num_list[i]
+  for (i in 0..lastTick) 
+    //MusicElement要素を取得。
     def e = mr.getMusicElement("melody", measure, i)
-    if (note_num == "rest") {
+
+    //121列目の値が1.0だったら休符を設定。
+    if (tf_normalized.getFloat(0, i, 120, 0) == 1.0) {
       e.setRest(true)
     } else {
-      e.setRest(false)
-      if (note_num >= cfg.TF_NOTE_CON_COL_START && (i>=1 && note_num instanceof Integer && note_num_list[i-1] instanceof Integer && (note_num % cfg.TF_NUM_OF_MELODY_ELEMENT) == (note_num_list[i-1] % cfg.TF_NUM_OF_MELODY_ELEMENT))) {
-        e.setTiedFromPrevious(true)
-        println("Tied: ${i}")
-      }
-    }
-  }
-  for (i in 0..lastTick) {
-    def note_num = note_num_list[i]
-    def e = mr.getMusicElement("melody", measure, i)
-    if (note_num instanceof Integer && !e.tiedFromPrevious()) {
-      e.setEvidence(note_num % cfg.TF_NUM_OF_MELODY_ELEMENT)
-    }
-  }
 
+      e.setRest(false)
+
+      if (i >= 1) {
+        for (j in 0..<(tf_column-1)/2) {
+          if((tf_normalized2.getFloat(0,i-1,j,0) == 1.0 || tf_normalized.getFloat(0,i-1,j,0) == 1.0) && tf_normalized2.getFloat(0,i,j,0) == 1.0) {
+            //条件を満たせばi行j列とi-1行j列のノートナンバーを結合のする処理。
+            e.setTiedFromPrevious(true)
+
+          } else {
+            // 結合しなればj番目のノートナンバーをsetEvidence。
+            e.setEvidence(j)
+          }
+          break
+        }
+      }
+
+    }
+  //   if (note_num == "rest") {
+  //     e.setRest(true)
+  //   } else {
+  //     e.setRest(false)
+  //     // println("previous: ${note_num_list[i-1]}")
+  //     // println("next: ${note_num}")
+
+  //     if (note_num >= cfg.TF_NOTE_CON_COL_START && (i>=1 && note_num instanceof Integer && note_num_list[i-1] instanceof Integer && note_num == note_num_list[i-1])) {
+  //       e.setTiedFromPrevious(true)
+  //       println("Tied: ${i}")
+  //     }
+
+  //   }
+  // }
+  // for (i in 0..lastTick) {
+  //   def note_num = note_num_list[i]
+  //   def e = mr.getMusicElement("melody", measure, i)
+  //   // println("note_num: ${note_num}")
+  //   // println("e befor set Evidence: ${e.getMostLikely()}")
+  //   if (note_num instanceof Integer && !e.tiedFromPrevious()) {
+  //     // e.setEvidence(note_num % cfg.TF_NUM_OF_MELODY_ELEMENT)
+  //     e.setEvidence(note_num)
+  //     println("note_num: ${note_num}")
+  //   }
+  //   // println("e after set Evidence: ${e.getMostLikely()}")
+   }
  }
 
   Map<String,Double> parameters() {
@@ -218,38 +317,40 @@ def CHORD_VECTORS = [
 
   def outlineUpdated(measure, tick) {
 
-
-    // println("outlineUpdated: " + measure + " " + tick)
     long currentTime = System.nanoTime()
     if (//tick == cfg.DIVISION - 1 &&
         //lastUpdateMeasure != measure &&
 	      currentTime - lastUpdateTime >= 1000 * 1000 * 150) {
       String logname=""
-      String date=""
+
       mr.getMusicElement(OUTLINE_LAYER, measure, tick).resumeUpdate()
       lastUpdateMeasure = measure
       lastUpdateTime = currentTime
       
       //get OUTLINE_LAYER Elements and Model the data for it to be inserted into model.
       FloatNdArray tf_input = preprocessing(measure)
+      // FloatNdArray tf_input = inputCSV(cfg.INPUT_FILE_PATH)
 
       if (cfg.DEBUG) {
-        date=(new Date()).toString().replace(" ", "_").replace(":", "-")+".csv"
-        logname="./log/" + "tf_input" + date
+        logname="./log/" + "tf_input" + "measure${measure}" + ".csv"
         exportCVS(tf_input, logname)
       }
       FloatNdArray tf_output = predict(tf_input)
-    
 
       if (cfg.DEBUG) {
-        logname="./log/" + "tf_output" + date
+        logname="./log/" + "tf_output" + "measure${measure}" + ".csv"
         exportCVS(tf_output, logname)
       }
 
       FloatNdArray normalized_data= normalize(tf_output)
-      def label_List = getLabelList(normalized_data)
-      // println label_List
-      setEvidences(measure, tick, label_List)
+
+      if (cfg.DEBUG) {
+        logname="./log/" + "tf_normalized" + "measure${measure}" + ".csv"
+        exportCVS(normalized_data, logname)
+      }
+
+
+      setEvidences(measure, tick, normalized_data)
 
     }
   }
