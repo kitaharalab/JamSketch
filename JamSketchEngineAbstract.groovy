@@ -57,14 +57,18 @@ abstract class JamSketchEngineAbstract implements JamSketchEngine {
   }
 
   abstract def musicCalculatorForOutline()
+  
 
   void setMelodicOutline(int measure, int tick, double value) {
+
+    println("measure:${measure} , tick:${tick}")
     def e = mr.getMusicElement(OUTLINE_LAYER, measure, tick)
     if (!automaticUpdate()) {
       e.suspendUpdate()
     }
     e.setEvidence(value)
     outlineUpdated(measure, tick)
+    
   }
 
   double getMelodicOutline(int measure, int tick) {

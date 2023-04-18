@@ -60,8 +60,8 @@ class JamSketch extends SimplePianoRoll {
     setLabel("Load").setPosition(300, 645).setSize(120, 40)
 
     //added by yonamine
-    p5ctrl.addButton("LoadInputFile").
-    setLabel("LoadInput").setPosition(500, 645).setSize(120, 40)
+    p5ctrl.addButton("LoadOutlineLayerData").
+    setLabel("LoadOutlineLayerData").setPosition(500, 645).setSize(120, 40)
 
     if (CFG.MOTION_CONTROLLER != null) {
       CFG.MOTION_CONTROLLER.each { mCtrl ->
@@ -74,7 +74,7 @@ class JamSketch extends SimplePianoRoll {
   }
 
   void initData() {
-    melodyData = new MelodyData2(CFG.MIDFILENAME, width, this, this, CFG)
+    melodyData = new MelodyData2(CFG.MIDFILENAME, (width - getKeyboardWidth()) as int, this, this, CFG)
     smfread(melodyData.scc.getMIDISequence())
     def part =
       melodyData.scc.getFirstPartWithChannel(CFG.CHANNEL_ACC)
@@ -84,7 +84,7 @@ class JamSketch extends SimplePianoRoll {
             CFG.INITIAL_BLANK_MEASURES + CFG.NUM_OF_MEASURES
       ))
     if (CFG.SHOW_GUIDE)
-      guideData = new GuideData(CFG.MIDFILENAME, width - 100, this)
+      guideData = new GuideData(CFG.MIDFILENAME, (width - getKeyboardWidth()) as int, this)
     fullMeasure = dataModel.getMeasureNum() * CFG.REPEAT_TIMES;
   }
 
@@ -257,11 +257,11 @@ class JamSketch extends SimplePianoRoll {
       if (absolutePath.endsWith(".json")) {
         def json = new JsonSlurper()
         melodyData.curve1 = json.parseText(selection.text)
-        melodyData.updateCurve(0, width)
+        melodyData.updateCurve(0, (width - getKeyboardWidth()) as int)
       } else if (selection.getCanonicalPath().endsWith(".txt")) {
         println("Reading ${absolutePath}")
         def table = loadTable(absolutePath, "csv")
-        melodyData.curve1 = [null] * width
+        melodyData.curve1 = [null] * (width - getKeyboardWidth()) as int
         int n = table.getRowCount()
         int m = melodyData.curve1.size() - 100
         for (int i in 100..<(melodyData.curve1.size() - 1)) {
@@ -271,7 +271,7 @@ class JamSketch extends SimplePianoRoll {
                   (from..thru).collect { notenum2y(table.getFloat(it, 0)) }.sum() /
                           (from..thru).size()
         }
-        melodyData.updateCurve(0, width)
+        melodyData.updateCurve(0, (width - getKeyboardWidth()) as int)
       }else {
         println("File is not supported")
         return
@@ -312,77 +312,92 @@ class JamSketch extends SimplePianoRoll {
     } else if (key == 'b') {
       setNoteVisible(!isNoteVisible());
       println("Visible=${isVisible()}")
-//    } else if (key == 'u') {
-//      melodyData.updateCurve('all')
+   } else if (key == 'u') {
+     melodyData.updateCurve('all')
     }
-  }
+  
 
   //added by yonamie 20220210
-  void LoadInputFile() {
+//   void LoadInputFile() {
     
-    //include melody outlined data for 12 measures.
-    // FloatNdArray tf_input_per_12measure =  NdArrays.ofFloats(Shape.of(12, 1, CFG.DIVISION, CFG.TF_MODEL_INPUT_COL, 1))
-    def date = (new Date()).toString().replace(" ", "_").replace(":", "-") + ".csv"
-    FloatNdArray tf_input =  NdArrays.ofFloats(Shape.of(12, 1, CFG.DIVISION, CFG.TF_MODEL_INPUT_COL, 1))
-    // FloatNdArray tf_output =  NdArrays.ofFloats(Shape.of(1, CFG.DIVISION, CFG.TF_MODEL_OUTPUT_COL, 1))
+//     //include melody outlined data for 12 measures.
+//     // FloatNdArray tf_input_per_12measure =  NdArrays.ofFloats(Shape.of(12, 1, CFG.DIVISION, CFG.TF_MODEL_INPUT_COL, 1))
+//     def date = (new Date()).toString().replace(" ", "_").replace(":", "-") + ".csv"
+//     FloatNdArray tf_input =  NdArrays.ofFloats(Shape.of(12, 1, CFG.DIVISION, CFG.TF_MODEL_INPUT_COL, 1))
+//     // FloatNdArray tf_output =  NdArrays.ofFloats(Shape.of(1, CFG.DIVISION, CFG.TF_MODEL_OUTPUT_COL, 1))
 
 
-    def filename = CFG.INPUT_FILE_PATH.replaceAll("./inputs/", "")
+//     def filename = CFG.INPUT_FILE_PATH.replaceAll("./inputs/", "")
 
-    def output_file = "./log/tf_output"+"_"+date
-    def csv_row
-    def tf_row
-    def line
+//     def output_file = "./log/tf_output"+"_"+date
+//     def csv_row
+//     def tf_row
+//     def line
 
 
-    try (BufferedReader br = new BufferedReader(new FileReader(CFG.INPUT_FILE_PATH))){
-      csv_row = 0
-      tf_row = 0
+//     try (BufferedReader br = new BufferedReader(new FileReader(CFG.INPUT_FILE_PATH))){
+//       csv_row = 0
+//       tf_row = 0
       
-      while((line = br.readLine()) != null && csv_row <= (CFG.NUM_OF_MEASURES * CFG.DIVISION-1)) {
-        def values_str = line.split(",")
-        println(tf_row)
-        values_str.eachWithIndex { value, column ->
-          tf_input.setFloat(value.toFloat(), (csv_row/16).toInteger(), 0, tf_row, column, 0)
-        }
+//       while((line = br.readLine()) != null && csv_row <= (CFG.NUM_OF_MEASURES * CFG.DIVISION-1)) {
+//         def values_str = line.split(",")
+//         println(tf_row)
+//         values_str.eachWithIndex { value, column ->
+//           tf_input.setFloat(value.toFloat(), (csv_row/16).toInteger(), 0, tf_row, column, 0)
+//         }
   
-        csv_row += 1
-        tf_row += 1
+//         csv_row += 1
+//         tf_row += 1
 
-        if (tf_row == 16) {
-          tf_row = 0
-        }
-      }
+//         if (tf_row == 16) {
+//           tf_row = 0
+//         }
+//       }
 
-    } catch (IOException e) {
-      e.printStackTrace()
-    }
+//     } catch (IOException e) {
+//       e.printStackTrace()
+//     }
 
-    tf_input.elements(0).forEach(v -> {
-      FloatNdArray df_output = melodyData.engine.predict(v)
+//     tf_input.elements(0).forEach(v -> {
+//       FloatNdArray df_output = melodyData.engine.predict(v)
+//       println(df_output)
 
-       try {
+//        try {
 
-         FileWriter fw = new FileWriter(output_file, true)
-         PrintWriter pw = new PrintWriter(new BufferedWriter(fw))
+//          FileWriter fw = new FileWriter(output_file, true)
+//          PrintWriter pw = new PrintWriter(new BufferedWriter(fw))
     
-         for (i in 0..<df_output.shape().size(1)) {
-            for (j in 0..<df_output.shape().size(2)) {
-              pw.print(df_output.getFloat(0,i,j,0))
-              pw.print(",")
-             }
-            pw.println()
-        }
-        pw.close();
-    System.out.println("Save as " + output_file);
+//          for (i in 0..<df_output.shape().size(1)) {
+//             for (j in 0..<df_output.shape().size(2)) {
+//               pw.print(df_output.getFloat(0,i,j,0))
+//               pw.print(",")
+//              }
+//             pw.println()
+//         }
+//         pw.close();
+//     System.out.println("Save as " + output_file);
  
-  } catch (IOException ex) {
-    ex.printStackTrace();
-  }
+//   } catch (IOException ex) {
+//     ex.printStackTrace();
+//   }
 
-})
+// })
 
 }
+  void LoadOutlineLayerData() {
+
+    def jsonFile = new File(CFG.INPUT_FILE_PATH)
+    def jsonSlurper = new JsonSlurper()
+    def jsonData  = jsonSlurper.parse(jsonFile)
+    jsonData.eachWithIndex{v, i-> 
+
+      melodyData.curve1[i] = v
+
+    }
+
+    melodyData.updateCurve(0, (width - getKeyboardWidth()) as int)
+    // processLastMeasure()
+  }
 
   public void exit() {
     println("exit() called.")

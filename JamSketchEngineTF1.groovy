@@ -131,31 +131,31 @@ def CHORD_VECTORS = [
   }
  }
 
-//  def inputCSV(String filepath) {
-//   FloatNdArray tf_input =  NdArrays.ofFloats(Shape.of(1, cfg.DIVISION, cfg.TF_MODEL_INPUT_COL, 1))
+ def inputCSV(String filepath) {
+  FloatNdArray tf_input =  NdArrays.ofFloats(Shape.of(1, cfg.DIVISION, cfg.TF_MODEL_INPUT_COL, 1))
 
-//     try (BufferedReader br = new BufferedReader(new FileReader(filepath))){
-//       def csv_row = 0
-//       def tf_row = 0
-//       def line
+    try (BufferedReader br = new BufferedReader(new FileReader(filepath))){
+      def csv_row = 0
+      def tf_row = 0
+      def line
       
-//       while((line = br.readLine()) != null && csv_row <= (cfg.DIVISION-1)) {
-//         def values_str = line.split(",")
+      while((line = br.readLine()) != null && csv_row <= (cfg.DIVISION-1)) {
+        def values_str = line.split(",")
 
-//         values_str.eachWithIndex { value, column ->
-//           tf_input.setFloat(value.toFloat(), 0, tf_row, column, 0)
-//         }
+        values_str.eachWithIndex { value, column ->
+          tf_input.setFloat(value.toFloat(), 0, tf_row, column, 0)
+        }
   
-//         tf_row += 1
-//         csv_row += 1
-//       }
+        tf_row += 1
+        csv_row += 1
+      }
         
-//       } catch (IOException e) {
-//       e.printStackTrace()
-//     }
+      } catch (IOException e) {
+      e.printStackTrace()
+    }
 
-//     return tf_input
-//  }
+    return tf_input
+ }
 
 //Normalize the prediction data which if it is under 0.5, be 0, if it is over 0.5, be 1.
  def normalize(TFloat32 tf_output) {
@@ -249,13 +249,14 @@ def CHORD_VECTORS = [
   }
 
 
-  for (i in 0..lastTick) 
+  for (i in 0..lastTick) {
     //MusicElement要素を取得。
     def e = mr.getMusicElement("melody", measure, i)
 
     //121列目の値が1.0だったら休符を設定。
     if (tf_normalized.getFloat(0, i, 120, 0) == 1.0) {
       e.setRest(true)
+      // println(tf_normalized.getFloat(0, i, 120, 0))
     } else {
 
       e.setRest(false)
@@ -265,12 +266,13 @@ def CHORD_VECTORS = [
           if((tf_normalized2.getFloat(0,i-1,j,0) == 1.0 || tf_normalized.getFloat(0,i-1,j,0) == 1.0) && tf_normalized2.getFloat(0,i,j,0) == 1.0) {
             //条件を満たせばi行j列とi-1行j列のノートナンバーを結合のする処理。
             e.setTiedFromPrevious(true)
+         
 
-          } else {
-            // 結合しなればj番目のノートナンバーをsetEvidence。
+          } else if (tf_normalized.getFloat(0, i, j, 0) == 1.0 ){
+            // 結合しなければj番目のノートナンバーをsetEvidence。
             e.setEvidence(j)
+            // println(j)
           }
-          break
         }
       }
 
@@ -318,9 +320,9 @@ def CHORD_VECTORS = [
   def outlineUpdated(measure, tick) {
 
     long currentTime = System.nanoTime()
-    if (//tick == cfg.DIVISION - 1 &&
-        //lastUpdateMeasure != measure &&
-	      currentTime - lastUpdateTime >= 1000 * 1000 * 150) {
+     if (//tick == cfg.DIVISION - 1 &&
+    //     //lastUpdateMeasure != measure &&
+	      currentTime - lastUpdateTime >= 1000 * 1000 * cfg.MELODY_EXECUTION_SPAN) {
       String logname=""
 
       mr.getMusicElement(OUTLINE_LAYER, measure, tick).resumeUpdate()
@@ -349,7 +351,7 @@ def CHORD_VECTORS = [
         exportCVS(normalized_data, logname)
       }
 
-
+      println("outlineupdated is callled")
       setEvidences(measure, tick, normalized_data)
 
     }
