@@ -277,31 +277,6 @@ def CHORD_VECTORS = [
       }
 
     }
-  //   if (note_num == "rest") {
-  //     e.setRest(true)
-  //   } else {
-  //     e.setRest(false)
-  //     // println("previous: ${note_num_list[i-1]}")
-  //     // println("next: ${note_num}")
-
-  //     if (note_num >= cfg.TF_NOTE_CON_COL_START && (i>=1 && note_num instanceof Integer && note_num_list[i-1] instanceof Integer && note_num == note_num_list[i-1])) {
-  //       e.setTiedFromPrevious(true)
-  //       println("Tied: ${i}")
-  //     }
-
-  //   }
-  // }
-  // for (i in 0..lastTick) {
-  //   def note_num = note_num_list[i]
-  //   def e = mr.getMusicElement("melody", measure, i)
-  //   // println("note_num: ${note_num}")
-  //   // println("e befor set Evidence: ${e.getMostLikely()}")
-  //   if (note_num instanceof Integer && !e.tiedFromPrevious()) {
-  //     // e.setEvidence(note_num % cfg.TF_NUM_OF_MELODY_ELEMENT)
-  //     e.setEvidence(note_num)
-  //     println("note_num: ${note_num}")
-  //   }
-  //   // println("e after set Evidence: ${e.getMostLikely()}")
    }
  }
 
@@ -331,7 +306,6 @@ def CHORD_VECTORS = [
       
       //get OUTLINE_LAYER Elements and Model the data for it to be inserted into model.
       FloatNdArray tf_input = preprocessing(measure)
-      // FloatNdArray tf_input = inputCSV(cfg.INPUT_FILE_PATH)
 
       if (cfg.DEBUG) {
         logname="./log/" + "tf_input" + "measure${measure}" + ".csv"
@@ -351,7 +325,6 @@ def CHORD_VECTORS = [
         exportCVS(normalized_data, logname)
       }
 
-      println("outlineupdated is callled")
       setEvidences(measure, tick, normalized_data)
 
     }

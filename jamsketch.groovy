@@ -43,6 +43,8 @@ class JamSketch extends SimplePianoRoll {
   String username = ""
   int fullMeasure
   int mCurrentMeasure
+
+  // int dx, y
   
   static def CFG
 
@@ -95,6 +97,7 @@ class JamSketch extends SimplePianoRoll {
     if (CFG.FORCED_PROGRESS) {
       mouseX = beat2x(getCurrentMeasure() + CFG.HOW_IN_ADVANCE, getCurrentBeat());
     }
+
     if(pmouseX < mouseX &&
             mouseX > beat2x(getCurrentMeasure(), getCurrentBeat()) + 10) {
       if (isUpdatable()) {
@@ -256,14 +259,22 @@ class JamSketch extends SimplePianoRoll {
       println("User selected " + absolutePath)
       if (absolutePath.endsWith(".json")) {
         def json = new JsonSlurper()
+
         melodyData.curve1 = json.parseText(selection.text)
-        melodyData.updateCurve(0, (width - getKeyboardWidth()) as int)
+        int count = melodyData.curve1.count(null)
+        for(int i in count..100) {
+          melodyData.curve1.add(0, null)
+        }
+
+        Thread.sleep(5000)
+        melodyData.updateCurve(0, width)
       } else if (selection.getCanonicalPath().endsWith(".txt")) {
         println("Reading ${absolutePath}")
         def table = loadTable(absolutePath, "csv")
         melodyData.curve1 = [null] * (width - getKeyboardWidth()) as int
         int n = table.getRowCount()
-        int m = melodyData.curve1.size() - 100
+        // int m = melodyData.curve1.size() - 100
+        int m = melodyData.curve1.size()
         for (int i in 100..<(melodyData.curve1.size() - 1)) {
           int from = (i - 100) * n / m
           int thru = ((i + 1) - 100) * n / m - 1
@@ -286,8 +297,6 @@ class JamSketch extends SimplePianoRoll {
   void mouseReleased() {
     nowDrawing = false
     if (isInside(mouseX, mouseY)) {
-      println(x2measure(mouseX))
-      println(CFG.NUM_OF_MEASURES)
       if (!melodyData.engine.automaticUpdate()) {
         melodyData.engine.outlineUpdated(
 	   x2measure(mouseX) % CFG.NUM_OF_MEASURES,

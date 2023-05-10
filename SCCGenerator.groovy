@@ -31,7 +31,7 @@ class SCCGenerator implements MusicCalculator {
 		if (curvevalue != null) {
 		// int notenum = getNoteNum(e.getMostLikely(), curvevalue)
 		int notenum = e.getMostLikely()
-		println(notenum)
+		// println(notenum)
 		// println(layer)
 		int duration = e.duration() * sccdiv /
 		(CFG.DIVISION / CFG.BEATS_PER_MEASURE)
