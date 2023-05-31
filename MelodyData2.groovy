@@ -38,7 +38,7 @@ class MelodyData2 {
         // int ii = i
         int ii = i - 100
         // int position = (int)(ii * size2 / (curve1.size() - 100))
-        int position = (int)(ii * size2 / (curve1.size()))
+        int position = (int)(i * size2 / (curve1.size()))
         if (position >= 0) {
           engine.setMelodicOutline((int)(position / div), position % div, nn)
         }

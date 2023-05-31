@@ -69,6 +69,8 @@ def CHORD_VECTORS = [
 
   for (i in 0..<tf_row) {
     def note_num_f=me_per_measure[i].getMostLikely()
+    print(note_num_f)
+    print(", ")
     if(note_num_f !=NaN){
       def note_number = Math.floor(note_num_f)-nn_from
       tf_input.setFloat(1.0f, 0,i, note_number as int,0)
@@ -293,6 +295,11 @@ def CHORD_VECTORS = [
   }
 
   def outlineUpdated(measure, tick) {
+    
+    //デバッグ用
+    if (cfg.DEBUG)
+      cfg.MELODY_EXECUTION_SPAN = 0
+    }
 
     long currentTime = System.nanoTime()
      if (//tick == cfg.DIVISION - 1 &&

@@ -14,7 +14,7 @@ class Config {
   int REPEAT_TIMES = 4
   int CALC_LENGTH = 1
 
-  int MELODY_EXECUTION_SPAN=0
+  int MELODY_EXECUTION_SPAN=150
 
 //Add　Varialbles 20220824
   String TF_MODEL_ENGINE="./onebar_model_div4"
@@ -34,7 +34,7 @@ class Config {
   String MODEL_FILE = "model20180321.json"
   String LOG_DIR = "./log/"
   //added by yonamine
-  boolean DEBUG=true
+  boolean DEBUG=false
   String  INPUT_FILE_PATH = "./inputs/data.json"
   boolean EXPRESSION = false
   boolean MELODY_RESETTING = true
