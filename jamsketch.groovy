@@ -43,7 +43,9 @@ class JamSketch extends SimplePianoRoll {
   String username = ""
   int fullMeasure
   int mCurrentMeasure
-  
+  double DebugModeDraw
+
+
   static def CFG
 
   void setup() {
@@ -61,8 +63,11 @@ class JamSketch extends SimplePianoRoll {
       
       p5ctrl.addButton("loadCurve").
       setLabel("Load").setPosition(300, 645).setSize(120, 40)
+      DebugModeDraw = getKeyboardWidth()
+      
+    } else {
+      DebugModeDraw = 0.0
     }
-
 
     if (CFG.MOTION_CONTROLLER != null) {
       CFG.MOTION_CONTROLLER.each { mCtrl ->
@@ -88,6 +93,7 @@ class JamSketch extends SimplePianoRoll {
       guideData = new GuideData(CFG.MIDFILENAME, (width - getKeyboardWidth()) as int, this)
     fullMeasure = dataModel.getMeasureNum() * CFG.REPEAT_TIMES;
   }
+
 
   void draw() {
     super.draw()    
@@ -119,11 +125,13 @@ class JamSketch extends SimplePianoRoll {
     (0..<(melodyData.curve1.size()-1)).each { i ->
       if (melodyData.curve1[i] != null &&
           melodyData.curve1[i+1] != null) {
-        line(i+getKeyboardWidth(), melodyData.curve1[i] as int, i+(getKeyboardWidth()+1),
+        line(i+DebugModeDraw, melodyData.curve1[i] as int, i+DebugModeDraw+1,
              melodyData.curve1[i+1] as int)
       }
     }    
   }
+
+  
 
   void drawGuideCurve() {
     def xFrom = 100
@@ -132,8 +140,8 @@ class JamSketch extends SimplePianoRoll {
     (0..<(guideData.curveGuideView.size()-1)).each { i ->
       if (guideData.curveGuideView[i] != null &&
       guideData.curveGuideView[i+1] != null) {
-        line(i+getKeyboardWidth()+xFrom, guideData.curveGuideView[i] as int,
-             i+(getKeyboardWidth()+1)+xFrom, guideData.curveGuideView[i+1] as int)
+        line(i+DebugModeDraw+xFrom, guideData.curveGuideView[i] as int,
+             i+DebugModeDraw+1+xFrom, guideData.curveGuideView[i+1] as int)
       }
     }
   }
@@ -143,6 +151,7 @@ class JamSketch extends SimplePianoRoll {
   }
 
   void storeCursorPosition() {
+    // println("pmouse: ${pmouseX}")
     (pmouseX..mouseX).each { i ->
       melodyData.curve1[i] = mouseY
     }
@@ -260,24 +269,23 @@ class JamSketch extends SimplePianoRoll {
         def json = new JsonSlurper()
 
         melodyData.curve1 = json.parseText(selection.text)
-        println(melodyData.curve1.size())
         int count = melodyData.curve1.count(null)
 
-        melodyData.updateCurve(0, width)
+        melodyData.updateCurve(0, width - (DebugModeDraw as int))
       } else if (selection.getCanonicalPath().endsWith(".txt")) {
         println("Reading ${absolutePath}")
         def table = loadTable(absolutePath, "csv")
-        melodyData.curve1 = [null] * (width - getKeyboardWidth()) as int
+        melodyData.curve1 = [null] * (width - (DebugModeDraw as int))
         int n = table.getRowCount()
         int m = melodyData.curve1.size()
-        for (int i in 100..<(melodyData.curve1.size() - 1)) {
-          int from = (i - 100) * n / m
-          int thru = ((i + 1) - 100) * n / m - 1
+        for (int i in (getKeyboardWidth() as int)..<(melodyData.curve1.size() - 1)) {
+          int from = (i - (getKeyboardWidth() as int)) * n / m
+          int thru = ((i + 1) - (getKeyboardWidth() as int)) * n / m - 1
           melodyData.curve1[i] =
                   (from..thru).collect { notenum2y(table.getFloat(it, 0)) }.sum() /
                           (from..thru).size()
         }
-        melodyData.updateCurve(0, width)
+        melodyData.updateCurve(0,  width - (DebugModeDraw as int))
       }else {
         println("File is not supported")
         return

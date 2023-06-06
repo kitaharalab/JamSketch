@@ -297,12 +297,12 @@ def CHORD_VECTORS = [
   def outlineUpdated(measure, tick) {
     
     //デバッグ用
-    if (cfg.DEBUG)
+    if (cfg.DEBUG){
       cfg.MELODY_EXECUTION_SPAN = 0
     }
 
     long currentTime = System.nanoTime()
-     if (//tick == cfg.DIVISION - 1 &&
+    if (//tick == cfg.DIVISION - 1 &&
     //     //lastUpdateMeasure != measure &&
 	      currentTime - lastUpdateTime >= 1000 * 1000 * cfg.MELODY_EXECUTION_SPAN) {
       String logname=""

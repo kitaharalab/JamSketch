@@ -33,12 +33,12 @@ class MelodyData2 {
     int size2 = nMeas * div
   
     for (int i in from..thru) {
+  
       if (curve1[i] != null) {
         double nn = (curve1[i] == null ? null : pianoroll.y2notenum(curve1[i]))
-        // int ii = i
         int ii = i - 100
-        // int position = (int)(ii * size2 / (curve1.size() - 100))
-        int position = (int)(i * size2 / (curve1.size()))
+        int position = (int)(ii * size2 / (curve1.size() - 100))
+
         if (position >= 0) {
           engine.setMelodicOutline((int)(position / div), position % div, nn)
         }
