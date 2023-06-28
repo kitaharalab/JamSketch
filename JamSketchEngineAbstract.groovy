@@ -61,7 +61,6 @@ abstract class JamSketchEngineAbstract implements JamSketchEngine {
 
   void setMelodicOutline(int measure, int tick, double value) {
 
-    println("measure:${measure} , tick:${tick}")
     def e = mr.getMusicElement(OUTLINE_LAYER, measure, tick)
     if (!automaticUpdate()) {
       e.suspendUpdate()

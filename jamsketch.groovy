@@ -59,15 +59,10 @@ class JamSketch extends SimplePianoRoll {
     p5ctrl.addButton("resetMusic").
     setLabel("Reset").setPosition(160, 645).setSize(120, 40)
     
-    if (CFG.DEBUG) {
-      
+
       p5ctrl.addButton("loadCurve").
       setLabel("Load").setPosition(300, 645).setSize(120, 40)
-      DebugModeDraw = getKeyboardWidth()
-      
-    } else {
-      DebugModeDraw = 0.0
-    }
+
 
     if (CFG.MOTION_CONTROLLER != null) {
       CFG.MOTION_CONTROLLER.each { mCtrl ->
@@ -80,7 +75,7 @@ class JamSketch extends SimplePianoRoll {
   }
 
   void initData() {
-    melodyData = new MelodyData2(CFG.MIDFILENAME, (width - getKeyboardWidth()) as int, this, this, CFG)
+    melodyData = new MelodyData2(CFG.MIDFILENAME, (width - CFG.getKeyboardWidth) as int, this, this, CFG)
     smfread(melodyData.scc.getMIDISequence())
     def part =
       melodyData.scc.getFirstPartWithChannel(CFG.CHANNEL_ACC)
@@ -90,7 +85,7 @@ class JamSketch extends SimplePianoRoll {
             CFG.INITIAL_BLANK_MEASURES + CFG.NUM_OF_MEASURES
       ))
     if (CFG.SHOW_GUIDE)
-      guideData = new GuideData(CFG.MIDFILENAME, (width - getKeyboardWidth()) as int, this)
+      guideData = new GuideData(CFG.MIDFILENAME, (width - CFG.getKeyboardWidth) as int, this)
     fullMeasure = dataModel.getMeasureNum() * CFG.REPEAT_TIMES;
   }
 
@@ -122,10 +117,11 @@ class JamSketch extends SimplePianoRoll {
   void drawCurve() {
     strokeWeight(3)
     stroke(0, 0, 255)
+
     (0..<(melodyData.curve1.size()-1)).each { i ->
       if (melodyData.curve1[i] != null &&
           melodyData.curve1[i+1] != null) {
-        line(i+DebugModeDraw, melodyData.curve1[i] as int, i+DebugModeDraw+1,
+        line(i+CFG.getKeyboardWidth, melodyData.curve1[i] as int, i+CFG.getKeyboardWidth+1,
              melodyData.curve1[i+1] as int)
       }
     }    
@@ -140,8 +136,8 @@ class JamSketch extends SimplePianoRoll {
     (0..<(guideData.curveGuideView.size()-1)).each { i ->
       if (guideData.curveGuideView[i] != null &&
       guideData.curveGuideView[i+1] != null) {
-        line(i+DebugModeDraw+xFrom, guideData.curveGuideView[i] as int,
-             i+DebugModeDraw+1+xFrom, guideData.curveGuideView[i+1] as int)
+        line(i+xFrom, guideData.curveGuideView[i] as int,
+             i+1+xFrom, guideData.curveGuideView[i+1] as int)
       }
     }
   }
@@ -151,9 +147,10 @@ class JamSketch extends SimplePianoRoll {
   }
 
   void storeCursorPosition() {
-    // println("pmouse: ${pmouseX}")
     (pmouseX..mouseX).each { i ->
-      melodyData.curve1[i] = mouseY
+
+      melodyData.curve1[i-CFG.getKeyboardWidth] = mouseY
+
     }
   }
 

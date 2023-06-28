@@ -63,6 +63,7 @@ def CHORD_VECTORS = [
   }
 
   def mes = mr.getMusicElementList("curve")
+  // print(mes)
   def me_start = (mes.size()/cfg.NUM_OF_MEASURES)*measure
   def me_end   = me_start + cfg.DIVISION
   def me_per_measure = mes[me_start ..<me_end]

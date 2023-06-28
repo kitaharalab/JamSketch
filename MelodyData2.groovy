@@ -27,17 +27,19 @@ class MelodyData2 {
     engine.resetMelodicOutline()
   }
 
+
   def updateCurve(int from, int thru) {
+
     int nMeas = cfg.NUM_OF_MEASURES
     int div = cfg.DIVISION
     int size2 = nMeas * div
   
     for (int i in from..thru) {
   
-      if (curve1[i] != null) {
-        double nn = (curve1[i] == null ? null : pianoroll.y2notenum(curve1[i]))
-        int ii = i - 100
-        int position = (int)(ii * size2 / (curve1.size() - 100))
+      if (curve1[i-cfg.getKeyboardWidth] != null) {
+        double nn = (curve1[i-cfg.getKeyboardWidth] == null ? null : pianoroll.y2notenum(curve1[i-cfg.getKeyboardWidth]))
+        int ii = i - cfg.getKeyboardWidth
+        int position = (int)(ii * size2 / (curve1.size()))
 
         if (position >= 0) {
           engine.setMelodicOutline((int)(position / div), position % div, nn)

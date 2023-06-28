@@ -35,6 +35,8 @@ sourceSets {
     }
 }
 
+
+println("project dir ${projectDir}")
 // buildDir = projectDir
 
 //println(projectDir)
@@ -47,9 +49,6 @@ sourceSets {
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'], exclude: [])
-    
-    // JamSketch dependencies
-
     // cmx
     //// project
     // implementation project(path: ':cmx_jre')
@@ -108,9 +107,6 @@ dependencies {
     // https://mvnrepository.com/artifact/xalan/serializer
     implementation 'xalan:serializer:2.7.2'
 
-    
-
-
 }
 
 compileJava.options.encoding = "UTF-8"
@@ -153,8 +149,7 @@ jar {
         configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) }
     }
 
-    
-    //include some file from projectDir to Jar file.
+     //include some file from projectDir to Jar file.
     from(projectDir) {
         //Specifying the files excluded from Jar file. 
         exclude "*.java"
@@ -166,7 +161,7 @@ jar {
         exclude "*.txt"
         exclude "*.mid"
         exclude "bk"
-
+        exclude "bin*"
     }
 }
 

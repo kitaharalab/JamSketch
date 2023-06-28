@@ -35,6 +35,7 @@ class Config {
   String LOG_DIR = "./log/"
   //added by yonamine
   boolean DEBUG=false
+  int getKeyboardWidth = 100
   String  INPUT_FILE_PATH = "./inputs/data.json"
   boolean EXPRESSION = false
   boolean MELODY_RESETTING = true
