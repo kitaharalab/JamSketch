@@ -10,7 +10,8 @@ class JamSketchEngineGA1 extends JamSketchEngineAbstract {
 
   double RHYTHM_THRESHOLD = 0.08
 //  double RHYTHM_THRESHOLD = 0.25
-  def RHYTHMS = [[1, 0, 0, 0, 0, 0], [1, 0, 0, 1, 0, 0],
+//  def RHYTHMS = [[1, 0, 0, 0, 0, 0], [1, 0, 0, 1, 0, 0],
+  def RHYTHMS = [[1, 0, 0, 1, 0, 0], [1, 0, 0, 1, 0, 0],
 		 [1, 0, 0, 1, 0, 1], [1, 0, 1, 1, 0, 1],
 		 [1, 0, 1, 1, 1, 1], [1, 1, 1, 1, 1, 1]];
 

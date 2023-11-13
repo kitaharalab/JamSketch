@@ -9,6 +9,6 @@ interface JamSketchEngine {
   ChordSymbol2 getChord(int measure, int tick)
   void setFirstMeasure(int number)
   void resetMelodicOutline()
-  Map<String,Double> parameters()
-  Map<String,String> paramDesc()
+  // Map<String,Double> parameters()
+  // Map<String,String> kamnn()
 }

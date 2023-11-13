@@ -25,7 +25,8 @@ abstract class JamSketchEngineAbstract implements JamSketchEngine {
     mr = cmx.createMusicRepresentation(cfg.NUM_OF_MEASURES,
                                        cfg.DIVISION)
     mr.addMusicLayerCont(OUTLINE_LAYER)
-    mr.addMusicLayer(MELODY_LAYER, (0..11) as int[])
+    // mr.addMusicLayer(MELODY_LAYER, (0..11) as int[])
+    mr.addMusicLayer(MELODY_LAYER, (0..(cfg.TF_NOTE_CON_COL_START-1)) as int[])
     mr.addMusicLayer(CHORD_LAYER,
                      [C, F, G] as ChordSymbol2[],	// temporary
                      cfg.DIVISION)
@@ -40,8 +41,15 @@ abstract class JamSketchEngineAbstract implements JamSketchEngine {
     def sccgen = new SCCGenerator(target_part, scc.division,
     OUTLINE_LAYER, expgen, cfg)
     mr.addMusicCalculator(MELODY_LAYER, sccgen)
-    mr.addMusicCalculator(OUTLINE_LAYER,
-                          musicCalculatorForOutline())
+    def calc = musicCalculatorForOutline()
+    if (calc != null) {
+      mr.addMusicCalculator(OUTLINE_LAYER, calc)
+    }
+    init_local()
+  }
+
+  def init_local() {
+    // do nothing
   }
 
   def getFullChordProgression() {
@@ -49,14 +57,17 @@ abstract class JamSketchEngineAbstract implements JamSketchEngine {
   }
 
   abstract def musicCalculatorForOutline()
+  
 
   void setMelodicOutline(int measure, int tick, double value) {
+
     def e = mr.getMusicElement(OUTLINE_LAYER, measure, tick)
     if (!automaticUpdate()) {
       e.suspendUpdate()
     }
     e.setEvidence(value)
     outlineUpdated(measure, tick)
+    
   }
 
   double getMelodicOutline(int measure, int tick) {
