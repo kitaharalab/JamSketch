@@ -1,6 +1,5 @@
 apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
-//apply plugin: 'kotlin-android-extensions'
 
 repositories {
     google()
@@ -8,6 +7,10 @@ repositories {
     maven {
         url "https://maven.scijava.org/content/groups/public/"
     }
+
+//    maven {
+//        url "https://raw.github.com/processing/processing-android/repository/"
+//    }
 
     maven {
         name = "GitHubPackages"
@@ -42,17 +45,21 @@ def jamsketchProperties = new Properties()
 jamsketchProperties.load(new FileInputStream(jamsketchPropertiesFile))
 
 android {
-    compileSdkVersion 31
+    namespace "jp.kthrlab.jamsketch"
+    compileSdk 34
     defaultConfig {
         applicationId "jp.kthrlab.jamsketch"
         minSdkVersion 27
-        targetSdkVersion 31
-        versionCode 5
-        versionName "1.0.0"
+        targetSdk 34
+        versionCode 6
+        versionName "1.1.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
 
 //    println(jamsketchProperties)
+    buildFeatures {
+        buildConfig true
+    }
 
     buildTypes {
         release {
@@ -66,18 +73,18 @@ android {
     }
 
     compileOptions {
-        sourceCompatibility = '1.8'
-        targetCompatibility = '1.8'
+        sourceCompatibility = "11"
+        targetCompatibility = "11"
     }
+
     packagingOptions {
         resources {
             excludes += ['assets/shaders/*.glsl', 'META-INF/groovy-release-info.properties', 'META-INF/INDEX.LIST', 'META-INF/DEPENDENCIES']
         }
     }
 
-
     kotlinOptions{
-        jvmTarget = '1.8'
+        jvmTarget = '11'
     }
     lint {
         abortOnError false
@@ -86,10 +93,10 @@ android {
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar', '*.aar'])
-    implementation 'androidx.appcompat:appcompat:1.4.1'
+    implementation 'androidx.appcompat:appcompat:1.7.0'
     // Onboarding
     implementation 'androidx.leanback:leanback:1.0.0'
-//     implementation(name: 'javax.sound.midi-release', ext: 'aar')
+    //     implementation(name: 'javax.sound.midi-release', ext: 'aar')
 //    implementation project(path: ':javax.sound.midi')
 //     implementation(name: 'MIDIDriver-release', ext: 'aar')
 //     implementation(name: 'cmx_android-release', ext: 'aar')
@@ -100,7 +107,7 @@ dependencies {
     // cmx on GitHub Packages
     implementation 'javax.sound.midi-for-Android:javax.sound.midi-release:0.2.0-kitaharalab'
     implementation 'USB-MIDI-Driver:mididriver-release:0.2.0-kitaharalab'
-    implementation 'cmx:cmx_android-release:1.1.0'
+    implementation 'cmx:cmx_android-release:1.1.2'
 
 //    // cmx_common
 //    // https://mvnrepository.com/artifact/org.apache.commons/commons-math3
@@ -108,8 +115,8 @@ dependencies {
 //    // https://mvnrepository.com/artifact/be.ac.ulg.montefiore.run.jahmm/jahmm
 //    implementation 'be.ac.ulg.montefiore.run.jahmm:jahmm:0.6.2'
 
-    implementation 'com.google.android.gms:play-services-auth:20.1.0'
-    implementation 'com.google.http-client:google-http-client-gson:1.41.2'
+    implementation 'com.google.android.gms:play-services-auth:21.2.0'
+    implementation 'com.google.http-client:google-http-client-gson:1.44.2'
 
     // Kotlin
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
@@ -117,16 +124,16 @@ dependencies {
 
     // JSON
     // https://mvnrepository.com/artifact/com.beust/klaxon
-    implementation 'com.beust:klaxon:5.5'
+    implementation 'com.beust:klaxon:5.6'
 
     // TensorFlow Lite
     // https://mvnrepository.com/artifact/org.tensorflow/tensorflow-lite
-    implementation 'org.tensorflow:tensorflow-lite:2.7.0'
+    implementation 'org.tensorflow:tensorflow-lite:2.15.0'
 
 
 }
 
-task comps {
+tasks.register('comps') {
     afterEvaluate {
         println("Components: " + components.names)
     }

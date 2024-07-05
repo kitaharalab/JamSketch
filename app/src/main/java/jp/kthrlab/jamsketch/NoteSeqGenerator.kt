@@ -40,7 +40,7 @@ class NoteSeqGenerator(
       entropy_mean = model.lookup<Double>("entropy.mean")[0]
     }
     handlerThread.start()
-    handler = Handler((handlerThread.getLooper()))
+    handler = Handler((handlerThread.looper))
   }
 
 //  @CompileStatic

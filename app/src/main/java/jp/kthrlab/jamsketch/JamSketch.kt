@@ -1,7 +1,7 @@
 package jp.kthrlab.jamsketch
 
-import android.R
 import android.util.Log
+import androidx.fragment.app.FragmentActivity
 import jp.crestmuse.cmx.processing.CMXController
 import jp.crestmuse.cmx.processing.DeviceNotAvailableException
 import jp.crestmuse.cmx.processing.gui.SimplePianoRoll
@@ -12,7 +12,9 @@ import jp.kshoji.javax.sound.midi.impl.SequencerImpl
 import org.xml.sax.SAXException
 import java.io.IOException
 import java.text.SimpleDateFormat
-import java.util.*
+import java.util.Arrays
+import java.util.Calendar
+import java.util.Locale
 import java.util.stream.IntStream
 import javax.xml.parsers.ParserConfigurationException
 import javax.xml.transform.TransformerException
@@ -98,10 +100,8 @@ class JamSketch     //    private Checkbox sendGranted;
         if (BuildConfig.DEBUG) {
             Log.d(TAG, "initData()")
         }
-        val filename = Config.MIDFILENAME
-        //        println(melodyData.getFullChordProgression());
-//        melodyData = new MelodyData(filename, width,  this, this, jamSketchActivity);
-        melodyData = MelodyData2(Config.MIDFILENAME, width, this, this, Config())
+        val filename = Config.getMidiFileName()
+        melodyData = MelodyData2(Config.getMidiFileName(), width, this, this, Config())
         try {
             smfread(melodyData!!.scc.midiSequence)
         } catch (e: IOException) {
@@ -131,7 +131,8 @@ class JamSketch     //    private Checkbox sendGranted;
 //            println("State = " + ((SequencerImpl)getSequencer()).getState());
             drawCurve()
             drawProgress()
-            if (getCurrentMeasure() == Config.NUM_OF_MEASURES - Config.NUM_OF_RESET_AHEAD) processLastMeasure()
+            if (getCurrentMeasure() == Config.NUM_OF_MEASURES - Config.NUM_OF_RESET_AHEAD)
+                processLastMeasure()
             enhanceCursor()
         }
     }
@@ -369,8 +370,8 @@ class JamSketch     //    private Checkbox sendGranted;
 
     fun showMidiOutChooser() {
         if (!hasMidiOutDeviceInfo()) openGooglePlay() else showMidiOutChooser(
-            jamSketchActivity.supportFragmentManager,
-            R.layout.simple_list_item_1
+            (activity as FragmentActivity).supportFragmentManager,
+            android.R.layout.simple_list_item_1
         )
     }
 
@@ -380,8 +381,11 @@ class JamSketch     //    private Checkbox sendGranted;
             Unit
         }
             .setCMXController(CMXController.getInstance())
-            .setLayout(R.layout.simple_list_item_1)
-            .show(jamSketchActivity.supportFragmentManager, "MidiOutChooser")
+            .setLayout(android.R.layout.simple_list_item_1)
+            .show(
+                (activity as FragmentActivity).supportFragmentManager,
+                "MidiOutChooser"
+            )
     }
 
     private fun hasMidiOutDeviceInfo(): Boolean {
@@ -395,7 +399,10 @@ class JamSketch     //    private Checkbox sendGranted;
 
     private fun openGooglePlay() {
         OpenGooglePlayDialogFragment()
-            .show(jamSketchActivity.supportFragmentManager, "OpenGooglePlay")
+            .show(
+                (activity as FragmentActivity).supportFragmentManager,
+                "OpenGooglePlay"
+            )
     }
 
     fun loadCurve() {}
@@ -407,20 +414,19 @@ class JamSketch     //    private Checkbox sendGranted;
     override fun mouseReleased() {
         nowDrawing = false
         if (isInside(mouseX, mouseY)) {
-//            println(x2measure(mouseX));
-//            println(Config.NUM_OF_MEASURES);
             if (melodyData != null && !melodyData!!.engine.automaticUpdate()) {
+                if (BuildConfig.DEBUG) println("mouseReleased() before outlineUpdated")
                 melodyData!!.engine.outlineUpdated(
                     x2measure(mouseX.toDouble()) % Config.NUM_OF_MEASURES,
-                    Config.DIVISION - 1
+                    Config.getDivision() - 1
                 )
+                if (BuildConfig.DEBUG) println("mouseReleased() after outlineUpdated")
             }
         }
     }
 
     override fun mouseDragged() {
         if (initiated && isNowPlaying) {
-//            println("mouseX = " + mouseX + ", beat2x = " + beat2x(Config.NUM_OF_MEASURES, getCurrentBeat()));
             if (pmouseX < mouseX &&
                 mouseX > beat2x(
                     currentMeasure,
@@ -437,7 +443,9 @@ class JamSketch     //    private Checkbox sendGranted;
                             // store cursor position
                             melodyData!!.curve1!![i] = mouseY
                         }
+                        if (BuildConfig.DEBUG) println("--------- beginning of mouseDragged()::outlineUpdated")
                         melodyData!!.updateCurve(pmouseX, mouseX)
+                        if (BuildConfig.DEBUG) println("--------- end of mouseDragged()::outlineUpdated")
                     }
                 }
             }
@@ -460,6 +468,12 @@ class JamSketch     //    private Checkbox sendGranted;
     //            melodyData.updateCurve("all");
     //        }
     //    }
+
+    override fun exit() {
+        super.exit()
+
+    }
+
     companion object {
         private const val TAG = "JamSketch"
     }

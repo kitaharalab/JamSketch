@@ -8,19 +8,19 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
-import androidx.fragment.app.FragmentActivity
 import androidx.leanback.app.OnboardingSupportFragment
 
 class JamSketchOnboardingFragment : OnboardingSupportFragment() {
-    private var myActivity: FragmentActivity? = null
+//    private var myActivity: FragmentActivity? = null
     override fun getPageCount(): Int {
         return 6
     }
 
     override fun getPageTitle(i: Int): CharSequence? {
-        val textViewTitle = requireView().findViewById<TextView>(R.id.title)
+        val textViewTitle = requireView().findViewById<TextView>(androidx.leanback.R.id.title)
         return when (i) {
             0 -> {
+
                 textViewTitle.setBackgroundColor(Color.TRANSPARENT)
                 resources.getText(R.string.onboard_welcom)
             }
@@ -45,7 +45,7 @@ class JamSketchOnboardingFragment : OnboardingSupportFragment() {
     override fun onPageChanged(newPage: Int, previousPage: Int) {
         super.onPageChanged(newPage, previousPage)
         val imageView = ImageView(context)
-        val viewGroup = requireView().findViewById<ViewGroup>(R.id.background_container)
+        val viewGroup = requireView().findViewById<ViewGroup>(androidx.leanback.R.id.background_container)
         when (newPage) {
             0, 5 -> imageView.setImageResource(R.drawable.onboarding_jamsketch_plane)
             1 -> imageView.setImageResource(R.drawable.onboarding_select_midi_out_device)
@@ -56,18 +56,26 @@ class JamSketchOnboardingFragment : OnboardingSupportFragment() {
         viewGroup.getChildAt(viewGroup.childCount - 1).foreground = imageView.drawable
     }
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
         titleViewTextColor = Color.BLACK
         descriptionViewTextColor = Color.BLACK
-        return super.onCreateView(inflater, container, savedInstanceState)
     }
 
+//    override fun onCreateView(
+//        inflater: LayoutInflater,
+//        container: ViewGroup?,
+//        savedInstanceState: Bundle?
+//    ): View? {
+//        val view = super.onCreateView(inflater, container, savedInstanceState)
+//
+//        titleViewTextColor = Color.BLACK
+//        descriptionViewTextColor = Color.BLACK
+//        return view
+//    }
+
     override fun getPageDescription(i: Int): CharSequence? {
-        val textViewDescription = requireView().findViewById<TextView>(R.id.description)
+        val textViewDescription = requireView().findViewById<TextView>(androidx.leanback.R.id.description)
         return when (i) {
             0, 2, 4 -> {
                 textViewDescription.setBackgroundColor(Color.TRANSPARENT)
@@ -114,27 +122,27 @@ class JamSketchOnboardingFragment : OnboardingSupportFragment() {
     }
 
     override fun onProvideTheme(): Int {
-        return R.style.Theme_Leanback_Onboarding
+        return androidx.leanback.R.style.Theme_Leanback_Onboarding
     }
 
     override fun onFinishFragment() {
-        (myActivity as JamSketchActivity?)!!.putSharedPreferencesBoolean(
+        (requireActivity() as JamSketchActivity?)!!.putSharedPreferencesBoolean(
             SHOW_ONBOARDING_PREF_NAME,
             false
         )
-        requireActivity().supportFragmentManager
-            .beginTransaction()
-            .commit()
-        (myActivity as JamSketchActivity?)!!.startJamSketch()
+//        requireActivity().supportFragmentManager
+//            .beginTransaction()
+//            .commit()
+        (requireActivity() as JamSketchActivity?)!!.startJamSketch()
     }
 
-    fun setView(view: View, activity: FragmentActivity) {
-        this.myActivity = activity
-        activity.supportFragmentManager
-            .beginTransaction()
-            .add(view.id, this)
-            .commit()
-    }
+//    fun setView(view: View, activity: FragmentActivity) {
+//        this.myActivity = activity
+//        activity.supportFragmentManager
+//            .beginTransaction()
+//            .add(view.id, this)
+//            .commit()
+//    }
 
     companion object {
         private const val TAG = "JamSketchOnboardingFragment"

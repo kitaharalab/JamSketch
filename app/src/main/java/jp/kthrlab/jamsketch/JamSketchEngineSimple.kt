@@ -3,8 +3,15 @@ package jp.kthrlab.jamsketch
 import jp.crestmuse.cmx.inference.MusicCalculator
 
 class JamSketchEngineSimple : JamSketchEngineAbstract() {
+  override fun addMusicLayerLocal() {
+    mr!!.addMusicLayer(MELODY_LAYER, Array(12){it})
+  }
 
-  override fun musicCalculatorForOutline(): MusicCalculator {
+  override fun initLocal() {
+    // Do nothing
+  }
+
+  override fun musicCalculatorForOutline(): MusicCalculator? {
     var noteSeqGenerator = NoteSeqGenerator(MELODY_LAYER, CHORD_LAYER, Config.BEATS_PER_MEASURE,
             Config.ENT_BIAS, model!!)
     return noteSeqGenerator

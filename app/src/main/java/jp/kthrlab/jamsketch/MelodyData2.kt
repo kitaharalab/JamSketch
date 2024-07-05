@@ -22,14 +22,13 @@ class MelodyData2(
         get() = field
 
     init {
-        scc = CMXController.readSMFAsSCC(JamSketchActivity.myResources?.getAssets()?.open(filename)).toDataSet()
+        scc = CMXController.readSMFAsSCC(JamSketchActivity.jamSketchResources?.getAssets()?.open(filename)).toDataSet()
         scc.repeat(
             (Config.INITIAL_BLANK_MEASURES * Config.BEATS_PER_MEASURE * scc.division).toLong(),
             ((Config.INITIAL_BLANK_MEASURES + Config.NUM_OF_MEASURES) *
                     Config.BEATS_PER_MEASURE * scc.division).toLong(),
             Config.REPEAT_TIMES - 1)
         var target_part = scc.getFirstPartWithChannel(1)
-    //    engine = new JamSketchEngineSimple()
         engine = Class.forName(Config.JAMSKETCH_ENGINE).newInstance() as JamSketchEngineAbstract
         engine.init(scc, target_part, cfg)
         engine.model
@@ -37,24 +36,28 @@ class MelodyData2(
     }
 
   fun resetCurve() {
-//    curve1 =  [null] * width
     curve1 = arrayOfNulls<Int>(width).toMutableList() //[null] * width
     engine.resetMelodicOutline()
   }
 
   fun updateCurve(from: Int, thru: Int) {
-    var nMeas: Int = Config.NUM_OF_MEASURES
-    var div: Int = Config.DIVISION
-    var size2: Int = nMeas * div
-    for (i in from..thru) {
-      var nn: Double? = if(curve1!![i] == null) null else pianoroll.y2notenum(curve1!![i]!!.toDouble())
-        println("var nn: ${nn} curve1!![i] == ${curve1!![i]}")
-      var ii: Int = i - pianoroll.keyboardWidth.roundToInt()
-      var position: Int = (ii * size2 / (curve1!!.size - pianoroll.keyboardWidth.roundToInt()))
-      if (position >= 0) {
-          println("engine.setMelodicOutline((${position} / ${div}), ${position} % ${div}, ${nn}})")
-        engine.setMelodicOutline((position / div), position % div, nn)
+    val nMeas: Int = Config.NUM_OF_MEASURES
+    val div: Int = Config.getDivision()
+    val size2: Int = nMeas * div
+
+      for (i in from..thru) {
+          val ii: Int = i - pianoroll.keyboardWidth.roundToInt()
+          if(curve1!![ii] != null
+              && curve1!![i] != null
+          ) {
+              val nn: Double = pianoroll.y2notenum(curve1!![i]!!.toDouble())
+              println("var nn: ${nn} curve1!![i] == ${curve1!![i]}")
+              val position: Int = (ii * size2 / (curve1!!.size))
+              if (position >= 0) {
+                  if (BuildConfig.DEBUG) println("engine.setMelodicOutline((${position} / ${div}), ${position} % ${div}, ${nn}})")
+                  engine.setMelodicOutline((position / div), position % div, nn)
+              }
+          }
       }
-    }
   }
 }	    

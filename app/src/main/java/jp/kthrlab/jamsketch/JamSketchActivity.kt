@@ -3,6 +3,7 @@ package jp.kthrlab.jamsketch
 import android.content.Intent
 import android.content.SharedPreferences
 import android.content.pm.ActivityInfo
+import android.content.res.AssetManager
 import android.content.res.Resources
 import android.os.Bundle
 import android.preference.PreferenceManager
@@ -13,14 +14,16 @@ import jp.kshoji.javax.sound.midi.UsbMidiSystem
 import jp.kthrlab.midi.adapter.MidiSystemAdapter
 import processing.android.CompatUtils
 import processing.android.PFragment
-import processing.core.PApplet
 
 class JamSketchActivity : AppCompatActivity() {
-    private var frame: FrameLayout? = null
-    private var sketch: PApplet? = null
-    var ums: UsbMidiSystem? = null
-    var sharedPreferences: SharedPreferences? = null
+    private var sketch: JamSketch//PApplet
+    private lateinit var frameLayout: FrameLayout
+    private lateinit var ums: UsbMidiSystem
+    private lateinit var sharedPreferences: SharedPreferences
 
+    init {
+        sketch = JamSketch(this)
+    }
     //    public String getSharedPreferencesString(String key, String defValue) {
     //        return sharedPreferences.getString(key, defValue);
     //    }
@@ -32,11 +35,11 @@ class JamSketchActivity : AppCompatActivity() {
     //    }
     //
     fun getSharedPreferencesBoolean(key: String?, defValue: Boolean): Boolean {
-        return sharedPreferences!!.getBoolean(key, defValue)
+        return sharedPreferences .getBoolean(key, defValue)
     }
 
     fun putSharedPreferencesBoolean(key: String?, value: Boolean) {
-        sharedPreferences!!.edit()
+        sharedPreferences.edit()
             .putBoolean(key, value)
             .apply()
     }
@@ -53,19 +56,22 @@ class JamSketchActivity : AppCompatActivity() {
     //    }
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        myResources = resources
+        jamSketchResources = resources
+        jamSketchAssets = assets
         sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this)
-        frame = FrameLayout(this)
-        frame!!.id = CompatUtils.getUniqueViewId()
+        frameLayout = FrameLayout(this)
+        frameLayout.id = CompatUtils.getUniqueViewId()
         setContentView(
-            frame, ViewGroup.LayoutParams(
+            frameLayout,
+            ViewGroup.LayoutParams(
                 ViewGroup.LayoutParams.MATCH_PARENT,
                 ViewGroup.LayoutParams.MATCH_PARENT
             )
         )
+
         requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
         ums = UsbMidiSystem(this)
-        ums!!.initialize()
+        ums.initialize()
         MidiSystemAdapter(this).adaptAndroidMidiDeviceToKshoji()
         if (getSharedPreferencesBoolean(
                 JamSketchOnboardingFragment.SHOW_ONBOARDING_PREF_NAME,
@@ -79,13 +85,14 @@ class JamSketchActivity : AppCompatActivity() {
     }
 
     fun startOnboarding() {
-        JamSketchOnboardingFragment().setView(frame!!, this)
+        supportFragmentManager.beginTransaction()
+            .add(frameLayout.id, JamSketchOnboardingFragment())
+            .commit()
     }
 
     fun startJamSketch() {
-        sketch = JamSketch(this)
         val fragment = PFragment(sketch)
-        fragment.setView(frame, this)
+        fragment.setView(frameLayout, this)
     }
 
     override fun onRequestPermissionsResult(
@@ -94,26 +101,30 @@ class JamSketchActivity : AppCompatActivity() {
         grantResults: IntArray
     ) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-        if (sketch != null) {
-            sketch!!.onRequestPermissionsResult(requestCode, permissions, grantResults)
-        }
+        sketch.onRequestPermissionsResult(requestCode, permissions, grantResults)
     }
 
     override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
-        if (sketch != null) {
-            sketch!!.onNewIntent(intent)
-        }
+        sketch.onNewIntent(intent)
+    }
+
+    override fun onStop() {
+        super.onStop()
+        sketch.exit()
+        ums.terminate()
+        if (BuildConfig.DEBUG) println("onStop()")
     }
 
     override fun onDestroy() {
         super.onDestroy()
-        ums!!.terminate()
+        if (BuildConfig.DEBUG) println("onDestroy()")
     }
 
     companion object {
         private const val TAG = "JamSketchActivity"
-        var myResources: Resources? = null
-            private set
+        lateinit var jamSketchResources: Resources
+        lateinit var jamSketchAssets: AssetManager
     }
+
 }

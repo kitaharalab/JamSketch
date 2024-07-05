@@ -3,9 +3,7 @@ package jp.kthrlab.jamsketch
 import jp.crestmuse.cmx.filewrappers.SCCDataSet
 import jp.crestmuse.cmx.inference.MusicCalculator
 import jp.crestmuse.cmx.inference.MusicRepresentation
-import jp.crestmuse.cmx.misc.PianoRoll
 import jp.crestmuse.cmx.processing.CMXController
-import jp.crestmuse.cmx.processing.gui.SimplePianoRoll
 import jp.kshoji.javax.sound.midi.Sequencer
 import jp.kshoji.javax.sound.midi.impl.SequencerImpl
 
@@ -29,29 +27,25 @@ class SCCGenerator (
     }
 
     override fun updated(measure: Int, tick: Int, layer: String, mr: MusicRepresentation) {
-        //      def sccdiv = scc.getDivision()
-        //def firstMeasure = pianoroll.getDataModel().getFirstMeasure()
-        synchronized(this) {
-        var e = mr.getMusicElement(layer, measure, tick)
-        if (!e.rest() && !e.tiedFromPrevious()) {
-            //def curvevalue = curve2[measure * CFG.DIVISION + tick]
-            var curvevalue =
-            mr.getMusicElement(curveLayer, measure, tick).getMostLikely()
-            if (curvevalue != null) {
-                var notenum = getNoteNum(e.getMostLikely() as Int, curvevalue as Double)
-                var duration = e.duration() * sccdiv /
-                        (Config.DIVISION / Config.BEATS_PER_MEASURE)
-                var onset = ((firstMeasure + measure) * Config.DIVISION + tick) * sccdiv /
-                        (Config.DIVISION / Config.BEATS_PER_MEASURE)
 
-//                println("onset = ((${firstMeasure} + ${measure}) * ${Config.DIVISION} + ${tick}) * ${sccdiv} / (${Config.DIVISION} / ${Config.BEATS_PER_MEASURE}) = ${onset}")
-                if (onset > CMXController.getInstance().getTickPosition()) {
-                        //	    def oldnotes =
-                        //	      SCCUtils.getNotesBetween(target_part, onset,
-                        //				       onset+duration, sccdiv, true, true)
-                        //data.target_part.getNotesBetween2(onset, onset+duration)
-                        //	      target_part.remove(oldnotes)
-                        // edit 2020.03.04
+        synchronized(this) {
+            if (BuildConfig.DEBUG) println("--------- beginning of SCCGenerator::updated(${measure}, ${tick}, ${layer}, ${mr})")
+
+            val e = mr.getMusicElement(layer, measure, tick)
+            if (!e.rest() && !e.tiedFromPrevious()) {
+                //def curvevalue = curve2[measure * CFG.DIVISION + tick]
+                val curvevalue = mr.getMusicElement(curveLayer, measure, tick).getMostLikely()
+                if (curvevalue != null) {
+                    val notenum =  if (Config.JAMSKETCH_ENGINE == "jp.kthrlab.jamsketch.JamSketchEngineTF1"){
+                        e.mostLikely as Int + Config.TF_NOTE_NUM_START
+                    } else e.mostLikely as Int
+
+                    val duration = e.duration() * sccdiv /
+                            (Config.getDivision() / Config.BEATS_PER_MEASURE)
+                    val onset = ((firstMeasure + measure) * Config.getDivision() + tick) * sccdiv /
+                            (Config.getDivision() / Config.BEATS_PER_MEASURE)
+
+                    if (onset > CMXController.getInstance().getTickPosition()) {
                         target_part.noteList.forEach { note ->
                             if (note.onset() < onset && onset <= note.offset()) {
                                 target_part.remove(note)
@@ -63,15 +57,20 @@ class SCCGenerator (
                             if (onset <= note.onset() && note.offset() <= onset+duration) {
                                 target_part.remove(note)
                             }
-                            if (note.onset() < onset+duration &&
-                                    onset+duration < note.offset()) {
-                                //		  note.setOnset(onset+duration)
-                            }
+//                            if (note.onset() < onset+duration &&
+//                                    onset+duration < note.offset()) {
+//                                //		  note.setOnset(onset+duration)
+//                            }
                         }
-                        target_part.addNoteElement(onset.toLong(), (onset+duration).toLong(), notenum,
-                                100, 100)
+                        target_part.addNoteElement(
+                            onset.toLong(),
+                            (onset+duration).toLong(),
+                            notenum,
+                            100,
+                            100
+                        )
 
-                        var sequencer:Sequencer = cmx!!.getSequencer()
+                        var sequencer:Sequencer = cmx!!.sequencer
                         if (sequencer is SequencerImpl) sequencer.refreshPlayingTrack()
                     }
                 }
@@ -79,21 +78,10 @@ class SCCGenerator (
         }
 
         if (Config.EXPRESSION) {
-            var fromTick = (firstMeasure + measure) * Config.BEATS_PER_MEASURE *
-                    Config.DIVISION
-            var thruTick = fromTick + Config.BEATS_PER_MEASURE * Config.DIVISION
-            expgen.execute(fromTick, thruTick, Config.DIVISION)
+            val fromTick = (firstMeasure + measure) * Config.BEATS_PER_MEASURE *
+                    Config.getDivision()
+            val thruTick = fromTick + Config.BEATS_PER_MEASURE * Config.getDivision()
+            expgen.execute(fromTick, thruTick, Config.getDivision())
         }
-    }
-
-//    @CompileStatic
-    fun getNoteNum(notename: Int, neighbor: Double): Int {
-        var best = 0
-        for (i in 0..11) {
-            var notenum = i * 12 + notename
-            if (Math.abs(notenum - neighbor) < Math.abs(best - neighbor))
-                best = notenum
-        }
-        return best
     }
 }
