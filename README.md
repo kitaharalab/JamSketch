@@ -11,11 +11,7 @@ git clone https://github.com/kitaharalab/JamSketch.git
 ## Usage
 
 ```
-gradlew runApp
-```
-or
-```
-gradlew run --args="jp.kthrlab.jamsketch.view.JamSketch" 
+gradlew runScript
 ```
 
 ## Requirements
