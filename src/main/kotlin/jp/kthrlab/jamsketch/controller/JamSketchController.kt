@@ -3,7 +3,6 @@ package jp.kthrlab.jamsketch.controller
 import jp.crestmuse.cmx.processing.CMXController
 import jp.kthrlab.jamsketch.engine.JamSketchEngine
 import jp.kthrlab.jamsketch.music.data.MusicData
-import java.util.concurrent.CopyOnWriteArrayList
 
 /**
  * JamSketchの操作クラス

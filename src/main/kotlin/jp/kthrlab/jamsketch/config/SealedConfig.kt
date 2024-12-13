@@ -1,7 +1,6 @@
 package jp.kthrlab.jamsketch.config
 import com.fasterxml.jackson.databind.DeserializationFeature
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
-import jp.crestmuse.cmx.misc.ChordSymbol2
 import java.io.File
 import kotlin.reflect.KMutableProperty
 import kotlin.reflect.full.createType

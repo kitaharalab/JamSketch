@@ -28,14 +28,6 @@ class JamSketchEngineTF1: JamSketchEngineAbstract() {
 
         }
 
-//    override fun parameters(): Map<String, Double> {
-//        return emptyMap()
-//    }
-//
-//    override fun paramDesc(): Map<String, String> {
-//        return emptyMap()
-//    }
-
     override fun musicCalculatorForOutline() : MusicCalculator? {
         return null
     }

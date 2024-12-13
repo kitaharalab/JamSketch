@@ -70,12 +70,8 @@ class JamSketch : SimplePianoRoll(), IConfigAccessible {
     }
 
     init {
-        // TODO: delete comment
-        //  initData() から移動。読込は一度だけで良いはず。
         smfread((musicData.scc as SCCDataSet).midiSequence)
 
-        // TODO: Delete comments
-        // 20241118 initData() で行われていた処理を移動している
         val part = (musicData.scc as SCCDataSet).getFirstPartWithChannel(config.music.channel_acc)
         dataModel = part.getPianoRollDataModel(config.music.initial_blank_measures,
             config.music.initial_blank_measures + config.music.num_of_measures)

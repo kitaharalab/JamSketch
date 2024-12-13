@@ -15,7 +15,7 @@ import jp.crestmuse.cmx.processing.CMXController
  * @param division                  TODO: scc.division との違いを確認
  */
 class MusicData(
-    filename: String?,
+    val filename: String?,
     val size: Int,
     val initial_blank_measures: Int,
     val beats_per_measure: Int,
@@ -25,7 +25,7 @@ class MusicData(
     val channel_acc: Int = 0,
 ) {
     var curve1: MutableList<Int?> = arrayOfNulls<Int>(size).toMutableList()
-    var scc: SCC = CMXController.readSMFAsSCC(javaClass.getResource("/${filename}").path)
+    var scc: SCC = CMXController.readSMFAsSCC(javaClass.getResource("${filename}").path)
 
     init {
         scc.toDataSet().repeat(

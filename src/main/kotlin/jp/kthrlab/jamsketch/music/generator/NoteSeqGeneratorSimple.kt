@@ -42,7 +42,7 @@ class NoteSeqGeneratorSimple(
 
     private fun initModel() {
         val mapper = jacksonObjectMapper()
-        val jsonFile = File(javaClass.getResource("/${modelPath}").path)
+        val jsonFile = File(javaClass.getResource("${modelPath}").path)
         model = mapper.readValue(jsonFile)
     }
 
@@ -72,14 +72,16 @@ class NoteSeqGeneratorSimple(
                 (0..11).forEach { i ->
                     var value12 = value - (value / 12).toInt() * 12
                     var simil = -Math.log((value12 - i) * (value12 - i))
-                    var logtrigram = calcLogTrigram(i, prev1 as Int, prev2 as Int)
+                    var logtrigram = calcLogTrigram(i, prev1, prev2)
                     var logchord = calcLogChordBeatUnigram(i, c, tick, beatsPerMeas,
                         e_melo.duration(), mr)
                     var entdiff = calcEntropyDiff(i, prevlist)
-                    scores[i] = w1 * simil + w2 * logtrigram + w3 * logchord +
+                    scores[i] = w1 * simil +
+                            w2 * logtrigram +
+                            w3 * logchord +
                             w4 * (-entdiff)
                 }
-                e_melo.setEvidence(argmax(scores.toList() as List<Double>))
+                e_melo.setEvidence(scores.indices.maxByOrNull { scores[it] ?: Double.MIN_VALUE } )
             }
         }
     }
@@ -168,21 +170,6 @@ class NoteSeqGeneratorSimple(
         return entropy
     }
 
-    /**
-     * Returns the index with the highest value from the score list.
-     */
-    private fun argmax(list: List<Double>): Int {
-        var max = list[0]
-        var index = 0
-        list.forEachIndexed { i, x ->
-            if (x > max!!) {
-                max = x
-                index = i
-            }
-        }
-        return index
-    }
-
     private fun prev(e: MusicElement?, rep: Int, ifnull: Any): Any {
         return if (e == null) {
             ifnull
@@ -192,6 +179,5 @@ class NoteSeqGeneratorSimple(
             prev(e.prev(), rep - 1, ifnull)
         }
     }
-
 
 }
