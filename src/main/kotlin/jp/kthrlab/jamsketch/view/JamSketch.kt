@@ -12,6 +12,10 @@ import jp.kthrlab.jamsketch.controller.JamSketchServerController
 import jp.kthrlab.jamsketch.engine.JamSketchEngine
 import jp.kthrlab.jamsketch.music.data.GuideData
 import jp.kthrlab.jamsketch.music.data.MusicData
+import jp.kthrlab.jamsketch.view.element.drawBGImage
+import jp.kthrlab.jamsketch.view.element.drawGuideCurve
+import jp.kthrlab.jamsketch.view.element.addParticle
+import jp.kthrlab.jamsketch.view.element.drawParticles
 import jp.kthrlab.jamsketch.web.ServiceLocator
 import processing.core.PApplet
 import java.io.File
@@ -22,7 +26,7 @@ import javax.swing.JPanel
 class JamSketch : SimplePianoRoll(), IConfigAccessible {
 
     companion object {
-        const val PACKAGE_NAME: String = "jp.kthrlab.jamsketch.engine"
+        const val PACKAGE_NAME_ENGINE: String = "jp.kthrlab.jamsketch.engine"
     }
 
     override val config = AccessibleConfig.config
@@ -32,7 +36,7 @@ class JamSketch : SimplePianoRoll(), IConfigAccessible {
     //  mCurrentMeasure -> currentMeasureInTotalMeasures
     val totalMeasures: Int = config.music.num_of_measures * config.music.repeat_times
     val timelineWidth: Int = config.general.view_width - config.general.keyboard_width
-    private var currentMeasureInTotalMeasures = 0   // TODO: わかりやすい変数名にしたが、もっと短くしたい
+    private var currentMeasureInTotalMeasures = 0
 
     var musicData: MusicData =
         MusicData(
@@ -46,7 +50,7 @@ class JamSketch : SimplePianoRoll(), IConfigAccessible {
             config.music.channel_acc,
         )
 
-    var engine: JamSketchEngine = ((Class.forName(PACKAGE_NAME + "." + config.music.jamsketch_engine).getConstructor().newInstance()) as JamSketchEngine).let {
+    var engine: JamSketchEngine = ((Class.forName(PACKAGE_NAME_ENGINE + "." + config.music.jamsketch_engine).getConstructor().newInstance()) as JamSketchEngine).let {
         val target_part: SCCDataSet.Part  = musicData.scc.toDataSet().getFirstPartWithChannel(config.music.channel_acc)
         it.init(musicData.scc, target_part)
         it.resetMelodicOutline()
@@ -181,7 +185,10 @@ class JamSketch : SimplePianoRoll(), IConfigAccessible {
      * Caution!
      * --------------------
      * Don't write your draw() directly here.
-     * If you use JamSketch in your research and need to add your own features, write it in drawAdditionalElements().
+     * When you use JamSketch in your research and need to add your own features,
+     * call your drawing method from drawElements().
+     * When you need to add visual elements during the update, call your drawing
+     * method from drawElementsOnUpdate().
      */
     override fun draw() {
         super.draw()
@@ -194,30 +201,40 @@ class JamSketch : SimplePianoRoll(), IConfigAccessible {
         // Updating the curve and processing related to it
         if (isUpdatable) {
             updateCurve()
+            processOnUpdate()
         }
 
         // Drawing visual elements
-        drawBasicElements()
-        drawAdditionalElements()
+        drawElements()
 
         // Process for the last measure of each page
         if (isLastMeasure()) processLastMeasure()
     }
 
     /**
-     * Draw basic visual elements
+     * Draw visual elements
      */
-    private fun drawBasicElements() {
+    private fun drawElements() {
+        // Draw basic visual elements
         enhanceCursor()
         drawCurve()
         drawProgress()
+
+        // Draw additional visual elements
+        if (config.general.show_guide && guideData != null)  {
+            drawGuideCurve(this, guideData!!, config.general.keyboard_width)
+        }
+        if (config.general.show_bg_image) drawBGImage(this)
+        if (config.general.show_particles) drawParticles(this)
+
     }
 
     /**
-     * Draw additional visual elements
+     * Processes on update
      */
-    private fun drawAdditionalElements() {
-        if (guideData != null) drawGuideCurve()
+    private fun processOnUpdate() {
+        // Example of adding a visual element
+        if (config.general.show_particles) addParticle(this)
     }
 
     /**
@@ -237,28 +254,11 @@ class JamSketch : SimplePianoRoll(), IConfigAccessible {
             (0 until curve1.size - 1).forEach { i ->
                 if (curve1[i] != null &&  curve1[i+1] != null) {
                     line(
-                        (i + config.general.keyboard_width).toDouble(),
-                        curve1[i]!!.toDouble(),
-                        (i + 1 + config.general.keyboard_width).toDouble(),
-                        curve1[i+1]!!.toDouble()
+                        (i + config.general.keyboard_width).toFloat(),
+                        curve1[i]!!.toFloat(),
+                        (i + 1 + config.general.keyboard_width).toFloat(),
+                        curve1[i+1]!!.toFloat(),
                     )
-                }
-            }
-        }
-    }
-
-    /**
-     * Draw curves for the guide
-     */
-    private fun drawGuideCurve() {
-        strokeWeight(3f)
-        stroke(100f, 200f, 200f)
-        with(guideData!!) {
-            (0 until (curveGuideView!!.size - 1)).forEach { i ->
-                if (curveGuideView!![i] != null &&
-                    curveGuideView!![i+1] != null) {
-                    line((i + config.general.keyboard_width).toDouble(), curveGuideView!![i]!!.toDouble(),
-                        (i+ config.general.keyboard_width + 1).toDouble(), curveGuideView!![i+1]!!.toDouble())
                 }
             }
         }
@@ -452,5 +452,5 @@ class JamSketch : SimplePianoRoll(), IConfigAccessible {
 }
 
 fun main() {
-    PApplet.runSketch(arrayOf("jp.kthrlab.jamsketch.JamSketch"), JamSketch())
+    PApplet.runSketch(arrayOf("jp.kthrlab.jamsketch.view.JamSketch"), JamSketch())
 }

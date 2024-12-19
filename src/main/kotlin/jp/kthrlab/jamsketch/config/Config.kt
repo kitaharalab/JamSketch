@@ -26,6 +26,8 @@ data class General(
     var octave_program: MutableMap<String, String> = mutableMapOf(),
     var show_guide: Boolean = false,
     var guide_smoothness: Int = 0,
+    var show_bg_image : Boolean = false,
+    var show_particles : Boolean = false,
 )
 
 /**

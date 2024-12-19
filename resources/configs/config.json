@@ -11,17 +11,19 @@
     "on_drag_only": true,
     "forced_progress": false,
     "melody_resetting": true,
-    "show_guide": true,
+    "show_guide": false,
     "guide_smoothness": 10,
-    "octave_program" : {}
+    "octave_program" : {},
+    "show_bg_image" : false,
+    "show_particles" : false
   },
   "music" : {
-    "jamsketch_engine": "JamSketchEngineTF1",
-    "midfilename": "/music/blues02.mid",
+    "jamsketch_engine": "JamSketchEngineSimple",
+    "midfilename": "/music/blues01.mid",
     "chordprog": ["C", "F", "C", "C", "F", "F", "C", "C", "G", "F", "C", "G"],
-    "num_of_measures": 16,
+    "num_of_measures": 12,
     "num_of_reset_ahead": 1,
-    "division": 16,
+    "division": 12,
     "beats_per_measure": 4,
     "initial_blank_measures": 2,
     "repeat_times": 4,
@@ -34,7 +36,7 @@
     "ent_bias": 0.0
   },
   "simple": {
-    "model_file": "/model20180321.json"
+    "model_file": "/models/model20180321.json"
   },
   "tf": {
     "tf_model_dir": "/tf/onebar_model_div4",

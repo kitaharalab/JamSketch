@@ -1,10 +1,11 @@
-import org.jetbrains.kotlin.konan.file.File
-
 plugins {
     kotlin("jvm") version "2.0.20"
     application
-    id("edu.sc.seis.launch4j") version "2.5.4"
+
+    // deprecated?
+    id("edu.sc.seis.launch4j") version "3.0.6"
 }
+
 
 repositories {
     google()
@@ -19,6 +20,16 @@ application {
     // Define the main class for the application.
     mainClass = "jp.kthrlab.jamsketch.view.JamSketch"
 }
+
+sourceSets {
+    main {
+        resources {
+            srcDir("src/main/resources")
+            srcDir("$projectDir/resources")
+        }
+    }
+}
+
 
 dependencies {
 //    implementation fileTree(dir: "libs", include: ["*.jar"], exclude: [])
@@ -90,50 +101,70 @@ tasks.register<JavaExec>("runApp") {
 }
 
 task("printEnv") {
-    println(projectDir)
     println(sourceSets["main"].resources.srcDirs)
-    println("sourceSets.main.output.asPath = ${sourceSets["main"].output.asPath}")
+//    println(projectDir)
+//    println(sourceSets["main"].resources.srcDirs)
+//    println("sourceSets.main.output.asPath = ${sourceSets["main"].output.asPath}")
 }
 
-tasks.register<Jar>("jamsketchJar") {
+tasks.named<Copy>("processResources") {
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE // または DuplicatesStrategy.FAIL
+}
+
+
+//tasks.register<Jar>("jamsketchJar") {
+val jamsketchJar = task<Jar>("jamsketchJar") {
     //Exclude the duplicate dependencies.
-    duplicatesStrategy=DuplicatesStrategy.EXCLUDE
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
 
-    //Specify the main class for manifest file.
-    manifest {
-        attributes["Main-Class"] = "jp.jamsketch.view.JamSketch"
-    }
+    archiveClassifier.set("all")
+    from(sourceSets.main.get().output)
 
-    //Include multiple dependencies.
+    // Include runtime dependencies
+    dependsOn(configurations.runtimeClasspath)
+
+    exclude("configs/**")
+    exclude("expressive/**")
+    exclude("images/**")
+    exclude("models/**")
+    exclude("music/**")
+    exclude("tf/**")
+
     from({
-        configurations.runtimeClasspath.map {
-            if (it.asPath.File().isDirectory) it else zipTree(it)
+        configurations.runtimeClasspath.get().map {
+            if (it.isDirectory) it else zipTree(it)
         }
     })
 
-    //include some file from projectDir to Jar file.
-    from(projectDir) {
-        //Specifying the files excluded from Jar file.
-        exclude("*.java")
-        exclude("*.groovy")
-        exclude(".*")
-        exclude("build*")
-        exclude("*gradle*")
-        exclude("settings*")
-        exclude("*.txt")
-        exclude("*.mid")
-        exclude("bk")
-        exclude("bin*")
+    //Specify the main class for manifest file.
+    manifest {
+        attributes["Main-Class"] = "jp.kthrlab.jamsketch.view.JamSketch"
     }
+}
+
+// copy config.json before launch4j
+val copyConfig = tasks.register<Copy>("copyConfig") {
+    from("resources")
+    into( layout.buildDirectory.dir("dist/resources"))
+}
+
+tasks.build {
+    dependsOn(jamsketchJar)
 }
 
 //Build exe file.
 launch4j {
-    headerType="gui"
-    mainClassName = "JamSketch"
-    outfile = "JamSketch.exe"
+    mainClassName = "jp.kthrlab.jamsketch.view.JamSketch"
     // icon = "${projectDir}/src/main/resources/images/icon.ico"
 
     //Specify the jar task included in build.gradle.
-    jarTask=tasks.getByName("jamsketchJar")
+    setJarTask(jamsketchJar)
+
+    // add classpath
+    classpath.add("resources")
 }
+
+//tasks.named("launch4j") {
+//    dependsOn(copyConfig)
+//}
+

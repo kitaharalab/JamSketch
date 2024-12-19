@@ -40,8 +40,8 @@ class JamSketchController
     /**
      * Curveを更新する
      *
-     * @param from 始点
-     * @param thru 終点
+     * @param from X座標始点
+     * @param thru X座標終点
      * @param y    Y座標
      * @param nn   note number（Y座標をnote numberに変換した値）
      */
