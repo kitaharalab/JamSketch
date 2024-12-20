@@ -4,4 +4,3 @@ build/
 .gradle/
 .idea/
 .kotlin/
-src/main/resources/config_guided.json

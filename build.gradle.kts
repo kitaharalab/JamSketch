@@ -1,3 +1,5 @@
+import org.jetbrains.kotlin.compilerRunner.toArgumentStrings
+
 plugins {
     kotlin("jvm") version "2.0.20"
     application
@@ -101,7 +103,7 @@ tasks.register<JavaExec>("runApp") {
 }
 
 task("printEnv") {
-    println(sourceSets["main"].resources.srcDirs)
+//    println(sourceSets["main"].resources.srcDirs)
 //    println(projectDir)
 //    println(sourceSets["main"].resources.srcDirs)
 //    println("sourceSets.main.output.asPath = ${sourceSets["main"].output.asPath}")
@@ -111,17 +113,20 @@ tasks.named<Copy>("processResources") {
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE // または DuplicatesStrategy.FAIL
 }
 
+val customJarDir = layout.buildDirectory.dir("launch4j")
 
 //tasks.register<Jar>("jamsketchJar") {
 val jamsketchJar = task<Jar>("jamsketchJar") {
     //Exclude the duplicate dependencies.
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE
 
-    archiveClassifier.set("all")
+    destinationDirectory.set(file(customJarDir))
+
+//    archiveClassifier.set("all")
     from(sourceSets.main.get().output)
 
     // Include runtime dependencies
-    dependsOn(configurations.runtimeClasspath)
+//    dependsOn(configurations.runtimeClasspath)
 
     exclude("configs/**")
     exclude("expressive/**")
@@ -130,22 +135,22 @@ val jamsketchJar = task<Jar>("jamsketchJar") {
     exclude("music/**")
     exclude("tf/**")
 
-    from({
-        configurations.runtimeClasspath.get().map {
-            if (it.isDirectory) it else zipTree(it)
-        }
-    })
+//    from({
+//        configurations.runtimeClasspath.get().map {
+//            if (it.isDirectory) it else zipTree(it)
+//        }
+//    })
 
     //Specify the main class for manifest file.
     manifest {
-        attributes["Main-Class"] = "jp.kthrlab.jamsketch.view.JamSketch"
+        attributes["Main-Class"] = application.mainClass.get()
     }
 }
 
 // copy config.json before launch4j
 val copyConfig = tasks.register<Copy>("copyConfig") {
     from("resources")
-    into( layout.buildDirectory.dir("dist/resources"))
+    into( layout.buildDirectory.dir("launch4j/resources"))
 }
 
 tasks.build {
@@ -154,14 +159,24 @@ tasks.build {
 
 //Build exe file.
 launch4j {
-    mainClassName = "jp.kthrlab.jamsketch.view.JamSketch"
-    // icon = "${projectDir}/src/main/resources/images/icon.ico"
+    mainClassName = application.mainClass.get()
+    cmdLine.set("\"jp.kthrlab.jamsketch.view.JamSketch\"")
+//     icon = "${projectDir}/resources/images/ic_launcher.ico"
 
     //Specify the jar task included in build.gradle.
     setJarTask(jamsketchJar)
 
     // add classpath
-    classpath.add("resources")
+    classpath.add("JamSketch.jar")
+    classpath.add("resources".plus(File.separator))
+    classpath.add("lib".plus(File.separator).plus("*"))
+
+    // Launch4j by default wraps jars in native executables,
+    // you can prevent this by setting <dontWrapJar> to true.
+    dontWrapJar = true
+
+    // The default URL only allows downloads up to version 8.
+    downloadUrl = "https://www.oracle.com/java/technologies/downloads/"
 }
 
 //tasks.named("launch4j") {
