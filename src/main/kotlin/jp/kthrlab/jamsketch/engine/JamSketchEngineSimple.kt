@@ -31,11 +31,4 @@ class JamSketchEngineSimple : JamSketchEngineAbstract() {
         return true
     }
 
-    fun parameters(): Map<String, Double> {
-        return LinkedHashMap()
-    }
-
-    fun paramDesc(): Map<String, String> {
-        return LinkedHashMap()
-    }
 }

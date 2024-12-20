@@ -4,9 +4,8 @@ import jp.crestmuse.cmx.filewrappers.SCC
 import jp.crestmuse.cmx.filewrappers.SCCDataSet
 import jp.crestmuse.cmx.processing.CMXApplet
 
-// TODO: Stop passing notenum2y & beat2x
 class GuideData(
-    filename: String?,
+    val filename: String?,
     val size: Int,
     val initial_blank_measures: Int,
     val beats_per_measure: Int,
@@ -21,12 +20,11 @@ class GuideData(
     var curveGuide: List<Int?>
     var curveGuideView: List<Int?>? = null
     var fromMeasure: Int = 0
-    var sccDataSet: SCCDataSet = ((CMXApplet.readSMFAsSCC(javaClass.getResource("/${filename}").path)) as SCCDataSet)
+    var sccDataSet: SCCDataSet = ((CMXApplet.readSMFAsSCC(javaClass.getResource("${filename}").path)) as SCCDataSet)
 
     init {
         val guide_part = sccDataSet.getFirstPartWithChannel(channel_guide)
-        val smoothness: Int = guide_smoothness
-        curveGuide = createCurve(guide_part, smoothness,)
+        curveGuide = createCurve(guide_part, guide_smoothness,)
         updateCurveGuideView(0, size)
     }
 
@@ -47,7 +45,10 @@ class GuideData(
                     val m2: Int = (offset / beats)
                     val b2 = offset - m2 * beats
                     val x2: Double = beat2x(m2 - initial, b2.toDouble()) - keyboard_width
-                    for (x in x1.toInt()..x2.toInt()) curve[x] = y.toInt()
+                    for (x in x1.toInt()..x2.toInt())  {
+                        if (x < curve.size) curve[x] = y.toInt()
+                        else println("x == $x")
+                    }
                 } catch (e: UnsupportedOperationException) {
                 }
             }

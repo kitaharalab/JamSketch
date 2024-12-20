@@ -1,7 +1,6 @@
 package jp.kthrlab.jamsketch.config
 import com.fasterxml.jackson.databind.DeserializationFeature
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
-import jp.crestmuse.cmx.misc.ChordSymbol2
 import java.io.File
 import kotlin.reflect.KMutableProperty
 import kotlin.reflect.full.createType
@@ -17,9 +16,9 @@ sealed class SealedConfig {
             .plus(File.separator)
             .plus(APP_DATA_DIR)
             .plus(File.separator)
-            .plus("config.json")
+            .plus("configs/config.json")
         private val userJsonFile = File(getAppDataDirectory(), configFileName)
-        private val defaultJsonFile = File(javaClass.getResource("/config.json").path)
+        private val defaultJsonFile = File(javaClass.getResource("/configs/config.json").path)
         private val jsonFile = userJsonFile.takeIf { it.exists() } ?: defaultJsonFile
         private val mapper = jacksonObjectMapper().let {
             // Ignore unknown properties
@@ -114,20 +113,4 @@ data object AccessibleConfig : SealedConfig() {
         }
         return false
     }
-}
-
-data object ModelConfig : SealedConfig() {
-//  ModelConfig.config で参照したい場合
-//    var config = SealedConfig.config
-    fun save()  =  SealedConfig.save()
-}
-
-data object ControllerConfig : SealedConfig(
-
-) {
-
-}
-
-data object ViewConfig : SealedConfig() {
-
 }

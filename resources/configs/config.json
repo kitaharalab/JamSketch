@@ -13,11 +13,13 @@
     "melody_resetting": true,
     "show_guide": false,
     "guide_smoothness": 10,
-    "octave_program" : {}
+    "octave_program" : {},
+    "show_bg_image" : false,
+    "show_particles" : false
   },
   "music" : {
     "jamsketch_engine": "JamSketchEngineSimple",
-    "midfilename": "blues02.mid",
+    "midfilename": "/music/blues01.mid",
     "chordprog": ["C", "F", "C", "C", "F", "F", "C", "C", "G", "F", "C", "G"],
     "num_of_measures": 12,
     "num_of_reset_ahead": 1,
@@ -34,13 +36,10 @@
     "ent_bias": 0.0
   },
   "simple": {
-    "model_file": "model20180321.json"
-  },
-  "ga": {
-    "calc_length": 1
+    "model_file": "/models/model20180321.json"
   },
   "tf": {
-    "tf_model_dir": "tf/onebar_model_div4",
+    "tf_model_dir": "/tf/onebar_model_div4",
     "tf_model_layer": "serving_default_first_layer_input",
     "tf_model_input_col": 133,
     "tf_model_output_col": 121,
@@ -49,9 +48,5 @@
     "tf_note_con_col_start": 60,
     "tf_chord_col_start": 121,
     "tf_num_of_melody_element": 12
-  },
-  "deprecated": {
-    "melody_generate_engine": "SimpleMelodyGenerateEngine",
-    "note_seq_generator": "SimpleNoteSeqGenerator"
   }
 }
