@@ -103,9 +103,8 @@ tasks.register<JavaExec>("runApp") {
 }
 
 task("printEnv") {
-//    println(sourceSets["main"].resources.srcDirs)
 //    println(projectDir)
-//    println(sourceSets["main"].resources.srcDirs)
+    println(sourceSets["main"].resources.srcDirs)
 //    println("sourceSets.main.output.asPath = ${sourceSets["main"].output.asPath}")
 }
 
@@ -179,7 +178,7 @@ launch4j {
     downloadUrl = "https://www.oracle.com/java/technologies/downloads/"
 }
 
-//tasks.named("launch4j") {
-//    dependsOn(copyConfig)
-//}
+tasks.named("createExe") {
+    dependsOn(copyConfig)
+}
 
