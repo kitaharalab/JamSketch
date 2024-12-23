@@ -33,13 +33,20 @@ jobs:
           distribution: "temurin"
 
       # Gradle
-      - run: chmod +x gradlew
+      - name: Grant execute permission for
+        run: chmod +x gradlew
 
       - name: Build with Gradle
         run: ./gradlew build
 
       - name: Run createExe
         run: ./gradlew createExe
+
+      - name: Upload EXE artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: Output Directory
+          path: build/launch4j/
 
       # # Runs a single command using the runners shell
       # - name: Run a one-line script
