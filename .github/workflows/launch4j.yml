@@ -34,7 +34,11 @@ jobs:
 
       # Gradle
       - run: chmod +x gradlew
-      - name: run createExe
+
+      - name: Build with Gradle
+        run: ./gradlew build
+
+      - name: Run createExe
         run: ./gradlew createExe
 
       # # Runs a single command using the runners shell
