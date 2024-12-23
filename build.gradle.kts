@@ -168,7 +168,7 @@ launch4j {
     // add classpath
     classpath.add("JamSketch.jar")
     classpath.add("resources".plus(File.separator))
-    classpath.add("lib".plus(File.separator).plus("*"))
+    classpath.add("lib".plus(File.separator).plus("*.jar"))
 
     // Launch4j by default wraps jars in native executables,
     // you can prevent this by setting <dontWrapJar> to true.
