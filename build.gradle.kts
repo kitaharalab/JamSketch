@@ -103,9 +103,8 @@ tasks.register<JavaExec>("runApp") {
 }
 
 task("printEnv") {
-//    println(sourceSets["main"].resources.srcDirs)
 //    println(projectDir)
-//    println(sourceSets["main"].resources.srcDirs)
+    println(sourceSets["main"].resources.srcDirs)
 //    println("sourceSets.main.output.asPath = ${sourceSets["main"].output.asPath}")
 }
 
@@ -169,7 +168,7 @@ launch4j {
     // add classpath
     classpath.add("JamSketch.jar")
     classpath.add("resources".plus(File.separator))
-    classpath.add("lib".plus(File.separator).plus("*"))
+    classpath.add("lib".plus(File.separator).plus("*.jar"))
 
     // Launch4j by default wraps jars in native executables,
     // you can prevent this by setting <dontWrapJar> to true.
@@ -179,7 +178,7 @@ launch4j {
     downloadUrl = "https://www.oracle.com/java/technologies/downloads/"
 }
 
-//tasks.named("launch4j") {
-//    dependsOn(copyConfig)
-//}
+tasks.named("createExe") {
+    dependsOn(copyConfig)
+}
 
