@@ -45,7 +45,7 @@ jobs:
       - name: Upload EXE artifact
         uses: actions/upload-artifact@v4
         with:
-          name: Output Directory
+          name: JamSketch-executable
           path: build/launch4j/
 
       # # Runs a single command using the runners shell
