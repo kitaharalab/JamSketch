@@ -111,7 +111,7 @@ class JamSketch : SimplePianoRoll(), IConfigAccessible {
                 )
             }
             else -> {
-                // Leave it as is when running it standalone
+                // スタンドアロンで動かす場合はそのまま
                 origController
             }
         }

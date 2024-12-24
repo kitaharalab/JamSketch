@@ -4,11 +4,13 @@ JamSketch is a jam session system that enables the user to enjoy improvisation j
 
 ## Installation
 
+### From Source Code
+
 ```
 git clone https://github.com/kitaharalab/JamSketch.git
 ```
 
-## Usage
+#### Usage
 
 ```
 gradlew runApp
@@ -17,6 +19,22 @@ or
 ```
 gradlew run --args="jp.kthrlab.jamsketch.view.JamSketch" 
 ```
+
+### From Executable File
+
+* Download the latest release
+
+    Go to the [Releases Page](https://github.com/kitaharalab/JamSketch/releases) and download JamSketch-executable.zip.
+
+* Unzip the downloaded file
+
+* Run the executable
+  * Windows
+    * Run JamSketch.exe
+  * JRE
+    ```
+    java -cp "JamSketch.jar;resources/;lib/*" jp.kthrlab.jamsketch.view.JamSketch "jp.kthrlab.jamsketch.view.JamSketch"
+    ```
 
 ## Requirements
 
