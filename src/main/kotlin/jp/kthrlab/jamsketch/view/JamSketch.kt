@@ -94,7 +94,7 @@ class JamSketch : SimplePianoRoll(), IConfigAccessible {
 
         controller = when (config.general.mode) {
             "server" -> {
-                // サーバーで動かす場合に使う操作クラスを設定
+                // Set the controller class to be used when running on the server.
                 JamSketchServerController(
                     config.general.host,
                     config.general.port,
@@ -102,7 +102,7 @@ class JamSketch : SimplePianoRoll(), IConfigAccessible {
                 )
             }
             "client" -> {
-                // クライアントで動かす場合に使う操作クラスを設定
+                // Set the controller class to be used when running on the client
                 JamSketchClientController(
                     config.general.host,
                     config.general.port,
@@ -111,7 +111,7 @@ class JamSketch : SimplePianoRoll(), IConfigAccessible {
                 )
             }
             else -> {
-                // スタンドアロンで動かす場合はそのまま
+                // Leave it as is when running it standalone
                 origController
             }
         }
@@ -187,8 +187,7 @@ class JamSketch : SimplePianoRoll(), IConfigAccessible {
      * Don't write your draw() directly here.
      * When you use JamSketch in your research and need to add your own features,
      * call your drawing method from drawElements().
-     * When you need to add visual elements during the update, call your drawing
-     * method from drawElementsOnUpdate().
+     * When you need to process during the update, call your method from processOnUpdate().
      */
     override fun draw() {
         super.draw()
@@ -265,7 +264,7 @@ class JamSketch : SimplePianoRoll(), IConfigAccessible {
     }
 
     fun updateCurve() {
-        // JamSketch操作クラスを使用して楽譜データを更新する
+        // Update music data using the JamSketch controller class
         if(config.general.keyboard_width < pmouseX && config.general.keyboard_width < mouseX) {
             this.controller.updateCurve(
                 pmouseX - config.general.keyboard_width,
@@ -276,11 +275,15 @@ class JamSketch : SimplePianoRoll(), IConfigAccessible {
         }
     }
 
-    // !config.on_drag_only                                 : on_drag_only == false の場合
-    // nowDrawing           : mousePressed() でtrueとなっている。mousePressedと同じ
-    // m0 = x2measure(pmouseX.toDouble())                   : drag開始位置の小節が0以上か
-    // pmouseX < mouseX                                     : 右から左にdragしているか
-    // mouseX > beat2x(currentMeasure, currentBeat) + 10    : 演奏の現在位置より先か
+    /**
+     * The condition for isUpdatable to be true
+     *  !config.on_drag_only                            : on_drag_only == false (It is unclear what happens when on_drag_only == true)
+     *  m0 = x2measure(pmouseX.toDouble())              : The number of measures at the start of the drag is greater than or equal to 0
+     *  pmouseX < mouseX                                : Dragging from right to left
+     *  mouseX > beat2x(currentMeasure, currentBeat) + 10   : The drag end position is ahead of the current position of the performance
+     *
+     *  "nowDrawing" is removed because it has the same value as mousePressed.
+     */
     private val isUpdatable: Boolean
         get() {
 //            if ((!config.on_drag_only || nowDrawing) && isInside(mouseX, mouseY)
@@ -343,11 +346,11 @@ class JamSketch : SimplePianoRoll(), IConfigAccessible {
 
     private fun drawProgress() {
         if (isNowPlaying) {
-            // currentMeasureInTotalMeasures    演奏全体での現在の小節番号（processLastMeasure()でも参照）
-            // currentMeasure                   ページ内の小節番号
-            // dataModel.firstMeasure           ページ開始位置
-            // initial_blank_measures           ページ開始位置のoffset
-            // +1                               0小節目ではなく1小節目とするために加算
+            // currentMeasureInTotalMeasures    The current measure number throughout the song (also referenced in processLastMeasure())
+            // currentMeasure                   The current measure number on a page
+            // dataModel.firstMeasure           Number of starting measures on a page
+            // initial_blank_measures           offset of the number of starting measures
+            // +1                               Added to start from bar 1 instead of bar 0
             currentMeasureInTotalMeasures =
                 (currentMeasure + dataModel.firstMeasure - config.music.initial_blank_measures + 1)
             textSize(32f)
@@ -417,7 +420,7 @@ class JamSketch : SimplePianoRoll(), IConfigAccessible {
 
     /**
      * ControlP5
-     * 再接続する
+     * Reconnect
      */
     fun reconnect() {
         controller.init()
