@@ -31,10 +31,7 @@ class JamSketch : SimplePianoRoll(), IConfigAccessible {
 
     override val config = AccessibleConfig.config
 
-    // TODO: Delete comment
-    //  fullMeasure -> totalMeasures
-    //  mCurrentMeasure -> currentMeasureInTotalMeasures
-    val totalMeasures: Int = config.music.num_of_measures * config.music.repeat_times
+    val numOfTotalMeasures: Int = config.music.num_of_measures * config.music.repeat_times
     val timelineWidth: Int = config.general.view_width - config.general.keyboard_width
     private var currentMeasureInTotalMeasures = 0
 
@@ -304,9 +301,8 @@ class JamSketch : SimplePianoRoll(), IConfigAccessible {
      */
     private fun processLastMeasure() {
         makeLog("melody")
-        // TODO: melody_resetting の意味を確認
         if (config.general.melody_resetting) {
-            if (currentMeasureInTotalMeasures < (totalMeasures - config.music.num_of_reset_ahead)) {
+            if (currentMeasureInTotalMeasures < (numOfTotalMeasures - config.music.num_of_reset_ahead)) {
                 dataModel.shiftMeasure(config.music.num_of_measures)
             }
             musicData.resetCurve()
@@ -321,7 +317,7 @@ class JamSketch : SimplePianoRoll(), IConfigAccessible {
 
         // 20241121 add
         // the case when playing up to totalMeasures
-        if (currentMeasureInTotalMeasures >= totalMeasures) {
+        if (currentMeasureInTotalMeasures >= numOfTotalMeasures) {
             // 生成したメロディを残したまま再スタートするために、measureを戻す
             setPianoRollDataModelFirstMeasure(config.music.initial_blank_measures)
 
@@ -355,7 +351,7 @@ class JamSketch : SimplePianoRoll(), IConfigAccessible {
                 (currentMeasure + dataModel.firstMeasure - config.music.initial_blank_measures + 1)
             textSize(32f)
             fill(0f, 0f, 0f)
-            text(currentMeasureInTotalMeasures.toString() + " / " + totalMeasures, 460f, 675f)
+            text(currentMeasureInTotalMeasures.toString() + " / " + numOfTotalMeasures, 460f, 675f)
         }
     }
 

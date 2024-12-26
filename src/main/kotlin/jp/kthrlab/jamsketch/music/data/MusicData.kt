@@ -25,7 +25,7 @@ class MusicData(
     val channel_acc: Int = 0,
 ) {
     var curve1: MutableList<Int?> = arrayOfNulls<Int>(size).toMutableList()
-    var scc: SCC = CMXController.readSMFAsSCC(javaClass.getResource("${filename}").path)
+    var scc: SCC = CMXController.readSMFAsSCC(javaClass.getResource(filename).path)
 
     init {
         scc.toDataSet().repeat(

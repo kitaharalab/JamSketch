@@ -7,7 +7,6 @@ import jp.kthrlab.jamsketch.music.data.MusicData
 import processing.core.PApplet
 import java.io.File
 
-// call updateCurve after this method
 fun loadFileSelected(
     selection: File?,
     musicData: MusicData,

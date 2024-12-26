@@ -94,7 +94,6 @@ abstract class JamSketchEngineAbstract : JamSketchEngine,  IConfigAccessible {
     }
 
     override fun resetMelodicOutline() {
-        // TODO: need to refer config?
         mr.getMusicElementList(OUTLINE_LAYER).forEach { element ->
             mr.getMusicElement(OUTLINE_LAYER, element.measure(), element.tick()).setEvidence(Double.NaN)
         }

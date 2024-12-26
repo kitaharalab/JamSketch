@@ -2,6 +2,10 @@
 
 JamSketch is a jam session system that enables the user to enjoy improvisation just by drawing curves that represent the overall shape of melodies.
 
+## Requirements
+
+* Java Runtime Environment(JRE) Version 21
+
 ## Installation
 
 ### From Source Code
@@ -22,6 +26,7 @@ gradlew run --args="jp.kthrlab.jamsketch.view.JamSketch"
 
 ### From Executable File
 
+
 * Download the latest release
 
     Go to the [Releases Page](https://github.com/kitaharalab/JamSketch/releases) and download JamSketch-executable.zip.
@@ -36,9 +41,31 @@ gradlew run --args="jp.kthrlab.jamsketch.view.JamSketch"
     java -cp "JamSketch.jar;resources/;lib/*" jp.kthrlab.jamsketch.view.JamSketch "jp.kthrlab.jamsketch.view.JamSketch"
     ```
 
-## Requirements
+## Settings
 
-* Java Runtime Environment(JRE)
+####  Networked JamSketch
+
+* Server
+```json:config.json
+  "general" : {
+    ...
+    "mode": "server",
+    "host": "XXX.XXX.XXX.XXX",  // Hostname or IP address of the server
+    "port": 8181,
+    ...
+  },
+```
+
+* Client
+```json:config.json
+  "general" : {
+    ...
+    "mode": "client",
+    "host": "XXX.XXX.XXX.XXX",  // Hostname or IP address of the server
+    "port": 8181,
+    ...
+  },
+```
 
 ## References
 
