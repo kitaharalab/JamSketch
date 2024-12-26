@@ -31,7 +31,7 @@ class NoteSeqGeneratorTF1(
         "G" to floatArrayOf(0f, 0f, 1f, 0f, 0f, 1f, 0f, 1f, 0f, 0f, 0f, 1f)
     )
 
-    private var tfModel = SavedModelBundle.load(File(javaClass.getResource("${tf_model_dir}").path).path)
+    private var tfModel = SavedModelBundle.load(File(javaClass.getResource(tf_model_dir).path).path)
 
     override fun updated(measure: Int, tick: Int, layer: String?, mr: MusicRepresentation?) {
 

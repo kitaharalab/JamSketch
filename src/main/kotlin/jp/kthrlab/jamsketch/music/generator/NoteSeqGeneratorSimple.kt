@@ -42,7 +42,7 @@ class NoteSeqGeneratorSimple(
 
     private fun initModel() {
         val mapper = jacksonObjectMapper()
-        val jsonFile = File(javaClass.getResource("${modelPath}").path)
+        val jsonFile = File(javaClass.getResource(modelPath).path)
         model = mapper.readValue(jsonFile)
     }
 
