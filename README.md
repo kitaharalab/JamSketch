@@ -48,22 +48,22 @@ gradlew run --args="jp.kthrlab.jamsketch.view.JamSketch"
 * Server
 ```json:config.json
   "general" : {
-    ...
+    .....
     "mode": "server",
     "host": "XXX.XXX.XXX.XXX",  // Hostname or IP address of the server
     "port": 8181,
-    ...
+    .....
   },
 ```
 
 * Client
 ```json:config.json
   "general" : {
-    ...
+    .....
     "mode": "client",
     "host": "XXX.XXX.XXX.XXX",  // Hostname or IP address of the server
     "port": 8181,
-    ...
+    .....
   },
 ```
 
