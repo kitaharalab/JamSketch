@@ -12,13 +12,10 @@ import java.io.File
 
 class NoteSeqGeneratorTF1(
     private val num_of_measures: Int,
-    private val division: Int,
     private val melody_execution_span: Int,
     private val tf_model_dir: String,
     private val tf_model_layer: String,
     private val tf_note_num_start: Int,
-    private val tf_model_input_col: Int,
-    private val tf_model_output_col: Int,
     private val tf_rest_col: Int,
     private val tf_chord_col_start: Int,
     private val tf_num_of_melody_element: Int,
@@ -31,7 +28,17 @@ class NoteSeqGeneratorTF1(
         "G" to floatArrayOf(0f, 0f, 1f, 0f, 0f, 1f, 0f, 1f, 0f, 0f, 0f, 1f)
     )
 
-    private var tfModel = SavedModelBundle.load(File(javaClass.getResource(tf_model_dir).path).path)
+    private val tfModel = SavedModelBundle.load(File(javaClass.getResource(tf_model_dir).path).path)
+
+//    Signature for "serving_default":
+//    Method: "tensorflow/serving/predict"
+//    Inputs:
+//    "first_layer_input": dtype=DT_FLOAT, shape=(-1, 16, 133, 1)
+//    Outputs:
+//    "softmax_3": dtype=DT_FLOAT, shape=(-1, 16, 121, 1)
+    private val signature = tfModel.signatures().first { it.key() == "serving_default" }
+    private val savedModelInputs = signature.inputs.get("first_layer_input")
+    private val savedModelOutputs = signature.outputs.get("softmax_3")
 
     override fun updated(measure: Int, tick: Int, layer: String?, mr: MusicRepresentation?) {
 
@@ -61,8 +68,8 @@ class NoteSeqGeneratorTF1(
     //preprocessing input data
     private fun preprocessing(measure: Int, mr: MusicRepresentation): FloatNdArray {
         val nn_from = tf_note_num_start
-        val tf_row = division.toLong()
-        val tf_column = tf_model_input_col.toLong()
+        val tf_row = savedModelInputs!!.shape[1] //division.toLong()
+        val tf_column = savedModelInputs.shape[2] //tf_model_input_col.toLong()
 
         val shape = Shape.of(1 , tf_row, tf_column, 1)
         val tf_input = NdArrays.ofFloats(shape)
@@ -70,7 +77,8 @@ class NoteSeqGeneratorTF1(
 
         val mes = mr.getMusicElementList("curve")
         val me_start = (mes.size / num_of_measures) * measure
-        val me_end = me_start + division
+        val me_end = me_start + savedModelInputs.shape[1].toInt() //division
+        println("mes.subList($me_start, $me_end) ${mes.size}")
         val me_per_measure = mes.subList(me_start, me_end)
 
         for (i in 0 until tf_row) {
@@ -157,8 +165,8 @@ class NoteSeqGeneratorTF1(
      */
     private fun setEvidences(measure: Int, lastTick: Int, tf_normalized: TFloat32, mr: MusicRepresentation) {
 
-        val tf_row = division
-        val tf_column = tf_model_output_col
+        val tf_row = savedModelOutputs!!.shape[1] //division
+        val tf_column = savedModelOutputs.shape[2] //tf_model_output_col
         val tf_normalized2 = NdArrays.ofFloats(Shape.of(1, tf_row.toLong(), ((tf_column - 1) / 2).toLong(), 1))
 
         for (i in 0 until tf_row.toLong()) {
@@ -170,17 +178,18 @@ class NoteSeqGeneratorTF1(
         for (i in 0..lastTick) {
             val e = mr.getMusicElement("melody", measure, i)
 
-            if (tf_normalized[0][i.toLong()][120][0].getFloat() == 1.0f) {
+//            if (tf_normalized[0][i.toLong()][120][0].getFloat() == 1.0f) {
+            if (tf_normalized[0][i.toLong()][tf_normalized[0][i.toLong()].size()-1][0].getFloat() == 1.0f) {
                 e.setRest(true)
             } else {
                 e.setRest(false)
 
                 if (i >= 1) {
                     for (j in 0 until (tf_column - 1) / 2) {
-                        if ((tf_normalized2[0][(i - 1).toLong()][j.toLong()][0].getFloat() == 1.0f || tf_normalized[0][(i - 1).toLong()][j.toLong()][0].getFloat() == 1.0f) && tf_normalized2[0][i.toLong()][j.toLong()][0].getFloat() == 1.0f) {
+                        if ((tf_normalized2[0][(i - 1).toLong()][j][0].getFloat() == 1.0f || tf_normalized[0][(i - 1).toLong()][j.toLong()][0].getFloat() == 1.0f) && tf_normalized2[0][i.toLong()][j.toLong()][0].getFloat() == 1.0f) {
                             e.setTiedFromPrevious(true)
-                        } else if (tf_normalized[0][i.toLong()][j.toLong()][0].getFloat() == 1.0f) {
-                            e.setEvidence(j)
+                        } else if (tf_normalized[0][i.toLong()][j][0].getFloat() == 1.0f) {
+                            e.setEvidence(j.toInt())
                         }
                     }
                 }

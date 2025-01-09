@@ -58,7 +58,7 @@ abstract class JamSketchEngineAbstract : JamSketchEngine,  IConfigAccessible {
 
         initLocal()
     }
-    
+
     val fullChordProgression: Any
         get() = List(config.music.initial_blank_measures) { NON_CHORD } +
                 List(config.music.repeat_times) { config.music.chordprog.toList()}.flatten()
