@@ -27,7 +27,7 @@ abstract class JamSketchEngineAbstract : JamSketchEngine,  IConfigAccessible {
 
     abstract fun outlineUpdated(measure: Int, tick: Int)
     abstract fun automaticUpdate(): Boolean
-    abstract fun initMusicRepresentationLocal()
+    abstract fun initMusicRepresentation()
     abstract fun initLocal()
     abstract fun musicCalculatorForOutline(): MusicCalculator?
 
@@ -58,23 +58,7 @@ abstract class JamSketchEngineAbstract : JamSketchEngine,  IConfigAccessible {
 
         initLocal()
     }
-
-    fun initMusicRepresentation() {
-        this.mr = CMXController.createMusicRepresentation(config.music.num_of_measures, config.music.division)
-        mr.addMusicLayerCont(OUTLINE_LAYER)
-
-        mr.addMusicLayer(
-            CHORD_LAYER,
-            listOf<ChordSymbol2>(ChordSymbol2.C, ChordSymbol2.F, ChordSymbol2.G),
-            config.music.division)
-        config.music.chordprog.forEachIndexed { index, chord ->
-            mr.getMusicElement(CHORD_LAYER, index, 0).setEvidence(ChordSymbol2.parse(chord))
-        }
-
-        initMusicRepresentationLocal()
-
-    }
-
+    
     val fullChordProgression: Any
         get() = List(config.music.initial_blank_measures) { NON_CHORD } +
                 List(config.music.repeat_times) { config.music.chordprog.toList()}.flatten()
