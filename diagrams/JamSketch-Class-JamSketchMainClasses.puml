@@ -2,9 +2,19 @@
 'https://plantuml.com/class-diagram
 hide empty members
 
-class jamsketch.music.generator.NoteSeqGeneratorX
-class jamsketch.music.generator.SCCGenerator
-class jamsketch.music.data.MusicData
-class jamsketch.view.JamSketch
+package "jamsketch" {
+    package "music" {
+        package "generator" {
+            class NoteSeqGeneratorX
+            class SCCGenerator
+        }
+        package "data" {
+            class MusicData
+        }
+    }
+    package "view" {
+        class JamSketch
+    }
+}
 
 @enduml
