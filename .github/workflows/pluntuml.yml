@@ -25,8 +25,17 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Set up PlantUML
-        run: sudo apt-get install plantuml
+      - name: Install Java 21
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'temurin'
+          java-version: '21'
+          
+      - name: Download specific version of PlantUML 
+        run: wget https://github.com/plantuml/plantuml/releases/download/v1.2025.0/plantuml.jar -O plantuml.jar
+
+      # - name: Set up PlantUML
+      #   run: sudo apt-get install plantuml
 
       - name: Generate PlantUML diagrams
         run: |
