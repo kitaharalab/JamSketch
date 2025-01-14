@@ -1,0 +1,42 @@
+name: PlantUML Diagram Generator
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'diagrams/**'
+      - 'docs/**'
+  pull_request:
+    branches:
+      - main
+    paths:
+      - 'diagrams/**'
+      - 'docs/**'
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+
+jobs:
+  generate-diagrams:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up PlantUML
+        run: sudo apt-get install plantuml
+
+      - name: Generate PlantUML diagrams
+        run: |
+          find diagrams -name "*.puml" -exec plantuml {} \;
+
+      - name: Commit and push diagrams
+        run: |
+          git config user.name 'GitHub Action'
+          git config user.email 'action@github.com'
+          git add diagrams/*.png
+          git commit -m 'Auto-generate PlantUML diagrams' -a
+          git pull
+          git push

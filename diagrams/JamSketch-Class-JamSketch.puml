@@ -1,0 +1,22 @@
+@startuml
+'https://plantuml.com/class-diagram
+hide empty members
+
+class processing.core.PApplet {
+    draw()
+}
+class jp.crestmuse.cmx.processing.CMXApplet {
+    CMXController ctrl
+}
+interface jp.crestmuse.cmx.misc.PianoRoll
+interface jp.crestmuse.cmx.misc.DataModel
+class jp.crestmuse.cmx.processing.gui.SimplePianoRoll
+class jp.kthrlab.jamsketch.view.JamSketch
+
+PApplet <|-- CMXApplet
+CMXApplet <|-- SimplePianoRoll
+PianoRoll +-- DataModel
+PianoRoll <|-- SimplePianoRoll
+SimplePianoRoll <|-- JamSketch
+
+@enduml

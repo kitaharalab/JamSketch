@@ -1,0 +1,10 @@
+@startuml
+'https://plantuml.com/class-diagram
+hide empty members
+
+class jamsketch.music.generator.NoteSeqGeneratorX
+class jamsketch.music.generator.SCCGenerator
+class jamsketch.music.data.MusicData
+class jamsketch.view.JamSketch
+
+@enduml
