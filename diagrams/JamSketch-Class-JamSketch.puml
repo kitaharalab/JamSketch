@@ -16,7 +16,7 @@ class jp.kthrlab.jamsketch.view.JamSketch
 PApplet <|-- CMXApplet
 CMXApplet <|-- SimplePianoRoll
 PianoRoll +-- DataModel
-PianoRoll <|-- SimplePianoRoll
+PianoRoll <|.. SimplePianoRoll
 SimplePianoRoll <|-- JamSketch
 
 @enduml

@@ -1,21 +1,20 @@
 name: PlantUML Diagram Generator
 
-on:
-  push:
-    branches:
-      - main
-    paths:
-      - 'diagrams/**'
-      - 'docs/**'
-  pull_request:
-    branches:
-      - main
-    paths:
-      - 'diagrams/**'
-      - 'docs/**'
-  # Allows you to run this workflow manually from the Actions tab
-  workflow_dispatch:
-
+#on:
+#  push:
+#    branches:
+#      - main
+#    paths:
+#      - 'diagrams/**'
+#      - 'docs/**'
+#  pull_request:
+#    branches:
+#      - main
+#    paths:
+#      - 'diagrams/**'
+#      - 'docs/**'
+#  # Allows you to run this workflow manually from the Actions tab
+#  workflow_dispatch:
 
 jobs:
   generate-diagrams:
@@ -25,17 +24,17 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Install Java 21
-        uses: actions/setup-java@v3
-        with:
-          distribution: 'temurin'
-          java-version: '21'
-          
-      - name: Download specific version of PlantUML 
-        run: wget https://github.com/plantuml/plantuml/releases/download/v1.2025.0/plantuml.jar -O plantuml.jar
+#      - name: Install Java 21
+#        uses: actions/setup-java@v3
+#        with:
+#          distribution: 'temurin'
+#          java-version: '21'
+#
+#      - name: Download specific version of PlantUML
+#        run: wget https://github.com/plantuml/plantuml/releases/download/v1.2025.0/plantuml.jar -O plantuml.jar
 
-      # - name: Set up PlantUML
-      #   run: sudo apt-get install plantuml
+      - name: Set up PlantUML
+        run: sudo apt-get install plantuml
 
       - name: Generate PlantUML diagrams
         run: |
@@ -44,7 +43,7 @@ jobs:
       - name: Commit and push diagrams
         run: |
           git config user.name 'GitHub Action'
-          git config user.email 'action@github.com'
+          git config user.email 'github-actions[bot]@users.noreply.github.com'
           git add diagrams/*.png
           git commit -m 'Auto-generate PlantUML diagrams' -a
           git pull

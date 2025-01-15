@@ -21,13 +21,17 @@ MusicData is JamSketch input and output data.
     It is both input and output data.
     JamSketch updates the generated performance in real-time while playing the scc.
 
-#### MusicCalculator
+#### MusicCalculators
+
+In JamSketch, the MusicCalculators of each layer work together to perform the process.
+
+![MusicCalculators](../diagrams/JamSketch-Class-MusicCalculator.png)
 
 ##### NoteSeqGeneratorX
 
 "X" is the name of the feature.
-By making the performance generation independent, it can be implemented in various ways.
+By separating the music generation for each feature, it can be implemented in a variety of ways.
 
 ##### SCCGenerator
 
-A MusicCalculator for editing scc in the generated performance.
+A MusicCalculator to edit scc for the generated music.
