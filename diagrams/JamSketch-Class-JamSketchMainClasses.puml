@@ -1,0 +1,20 @@
+@startuml
+'https://plantuml.com/class-diagram
+hide empty members
+
+package "jamsketch" {
+    package "music" {
+        package "generator" {
+            class NoteSeqGeneratorX
+            class SCCGenerator
+        }
+        package "data" {
+            class MusicData
+        }
+    }
+    package "view" {
+        class JamSketch
+    }
+}
+
+@enduml

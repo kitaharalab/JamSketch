@@ -72,8 +72,8 @@ data class Simple(
 data class TF(
     var tf_model_dir: String = "",
     var tf_model_layer: String = "",
-    var tf_model_input_col: Int = 0,
-    var tf_model_output_col: Int = 0,
+//    var tf_model_input_col: Int = 0,
+//    var tf_model_output_col: Int = 0,
     var tf_note_num_start: Int = 0,
     var tf_note_con_col_start: Int = 0,
     var tf_rest_col: Int = 0,

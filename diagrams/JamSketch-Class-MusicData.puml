@@ -1,0 +1,46 @@
+@startuml
+'https://plantuml.com/class-diagram
+hide empty members
+
+class MusicData {
+    curve1: MutableList<Int?>
+    // XY coordinates of the curve
+
+    scc: SCC
+    // Data converted from input MIDI file to SCCXML format
+
+    filename: Input file name
+    size: Int
+    initial_blank_measures: Int
+    beats_per_measure: Int
+    num_of_measures: Int
+    repeat_times: Int
+    division: Int
+    channel_acc: Int
+}
+
+package "cmx.misc" {
+    interface PianoRoll {
+    }
+    interface DataModel
+    PianoRoll +-- DataModel
+}
+package "cmx.filewrappers" {
+    interface SCC {
+        Part[]
+    }
+    interface Part
+    SCC +-- Part
+    class SCCDataSet implements SCC {
+        List<Part> parts
+    }
+    class PartImpl implements Part
+    SCCDataSet +-- PartImpl
+    note right of PartImpl
+        The actual class name is SCCDataSet.Part
+    end note
+    class PianoRollDataModel implements cmx.misc.DataModel
+    PartImpl +-- PianoRollDataModel
+}
+
+@enduml

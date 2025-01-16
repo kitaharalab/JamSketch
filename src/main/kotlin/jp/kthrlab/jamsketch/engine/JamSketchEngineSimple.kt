@@ -1,10 +1,23 @@
 package jp.kthrlab.jamsketch.engine
 
 import jp.crestmuse.cmx.inference.MusicCalculator
+import jp.crestmuse.cmx.misc.ChordSymbol2
+import jp.crestmuse.cmx.processing.CMXController
 import jp.kthrlab.jamsketch.music.generator.NoteSeqGeneratorSimple
 
 class JamSketchEngineSimple : JamSketchEngineAbstract() {
-    override fun initMusicRepresentationLocal() {
+    override fun initMusicRepresentation() {
+        this.mr = CMXController.createMusicRepresentation(config.music.num_of_measures, config.music.division)
+        mr.addMusicLayerCont(OUTLINE_LAYER)
+
+        mr.addMusicLayer(
+            CHORD_LAYER,
+            listOf<ChordSymbol2>(ChordSymbol2.C, ChordSymbol2.F, ChordSymbol2.G),
+            config.music.division)
+        config.music.chordprog.forEachIndexed { index, chord ->
+            mr.getMusicElement(CHORD_LAYER, index, 0).setEvidence(ChordSymbol2.parse(chord))
+        }
+
         mr.addMusicLayer(MELODY_LAYER, (0..11).toList())
     }
 

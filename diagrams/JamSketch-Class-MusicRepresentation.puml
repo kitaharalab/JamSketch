@@ -1,0 +1,46 @@
+@startuml
+'https://plantuml.com/class-diagram
+hide empty members
+
+package "cmx" {
+    package "inference" {
+        interface MusicRepresentation {
+            addMusicLayer(String var1, List<Object> var2)
+            addMusicLayer(String var1, List<Object> var2, int var3)
+            addMusicLayerCont(String var1)
+        }
+        class MusicRepresentationImpl implements MusicRepresentation {
+            HashMap<String, AbstractMusicLayer> name2layer
+        }
+        abstract class AbstractMusicLayer {
+            String name // OUTLINE_LAYER, MELODY_LAYER, CHORD_LAYER
+            MusicElement[] elements
+            List<MusicCalculator> calculators
+        }
+        class MusicLayer extends cmx.inference.AbstractMusicLayer
+        class MusicLayerCont extends cmx.inference.AbstractMusicLayer
+        interface MusicElement {
+            setEvidence(Object var1)
+        }
+        abstract class AbstractMusicElementImpl implements cmx.inference.MusicElement
+        class MusicElementImpl extends cmx.inference.AbstractMusicElementImpl
+        class MusicElementContImpl extends cmx.inference.AbstractMusicElementImpl
+    }
+}
+
+MusicRepresentationImpl "1" +-- "0..*" AbstractMusicLayer
+MusicRepresentationImpl +-- AbstractMusicElementImpl
+AbstractMusicLayer "1" -- "0..*" MusicElement
+
+abstract class JamSketchEngineAbstract implements JamSketchEngine {
+    OUTLINE_LAYER: String = "curve"
+    MELODY_LAYER: String = "melody"
+    CHORD_LAYER: String = "chord"
+}
+
+class JamSketchEngineX implements JamSketchEngineAbstract{}
+JamSketchEngineX --> MusicRepresentation : addMusicLayer(MELODY_LAYER, Object[])
+JamSketchEngineX --> MusicRepresentation : addMusicLayer(CHORD_LAYER, Object[], division)
+JamSketchEngineX --> MusicRepresentation : addMusicLayerCont(OUTLINE_LAYER)
+
+@enduml

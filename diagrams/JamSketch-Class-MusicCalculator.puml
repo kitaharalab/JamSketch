@@ -1,0 +1,27 @@
+@startuml
+'https://plantuml.com/class-diagram
+hide empty members
+
+package "cmx" {
+    package "inference" {
+        interface MusicCalculator {
+            updated(int var1, int var2, String var3, MusicRepresentation var4)
+        }
+    }
+}
+
+class SCCGenerator implements cmx.inference.MusicCalculator
+
+note bottom of SCCGenerator
+    MusicCalculator implementation for the MELODY layer.
+    SCCGenerator updates the MIDI sequence being played
+    in real-time.
+end note
+
+class NoteSeqGeneratorX implements cmx.inference.MusicCalculator
+note bottom of NoteSeqGeneratorX
+    MusicCalculator implementation for the OUTLINE layer
+    for each feature.
+end note
+
+@enduml

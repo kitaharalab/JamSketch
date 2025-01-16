@@ -71,14 +71,6 @@ class JamSketch : SimplePianoRoll(), IConfigAccessible {
     }
 
     init {
-        smfread((musicData.scc as SCCDataSet).midiSequence)
-
-        val part = (musicData.scc as SCCDataSet).getFirstPartWithChannel(config.music.channel_acc)
-        dataModel = part.getPianoRollDataModel(config.music.initial_blank_measures,
-            config.music.initial_blank_measures + config.music.num_of_measures)
-        // init music player ((SMFPlayer)this.musicPlayer[i]).setTickPosition(tick);
-        tickPosition = 0
-
         // init controller
         val listener: JamSketchEventListener =
             JamSketchEventListenerImpl(panel)
@@ -140,6 +132,15 @@ class JamSketch : SimplePianoRoll(), IConfigAccessible {
         super.setup()
         showMidiOutChooser()
 
+        // smfread should be called after selecting a MIDI output device.
+        smfread((musicData.scc as SCCDataSet).midiSequence)
+
+        val part = (musicData.scc as SCCDataSet).getFirstPartWithChannel(config.music.channel_acc)
+        dataModel = part.getPianoRollDataModel(config.music.initial_blank_measures,
+            config.music.initial_blank_measures + config.music.num_of_measures)
+        // init music player ((SMFPlayer)this.musicPlayer[i]).setTickPosition(tick);
+        tickPosition = 0
+
         // ControlP5 GUI components
         val p5ctrl = ControlP5(this)
         if (config.general.mode == "client") {
@@ -195,16 +196,34 @@ class JamSketch : SimplePianoRoll(), IConfigAccessible {
         }
 
         // Updating the curve and processing related to it
-        if (isUpdatable) {
-            updateCurve()
-            processOnUpdate()
-        }
+//        if (isUpdatable) {
+//            updateCurve()
+//            processOnUpdate()
+//        }
 
         // Drawing visual elements
         drawElements()
 
         // Process for the last measure of each page
         if (isLastMeasure()) processLastMeasure()
+    }
+
+    override fun mouseDragged() {
+        super.mouseDragged()
+        mouseMovedOrDragged()
+    }
+
+    override fun mouseMoved() {
+        super.mouseMoved()
+        mouseMovedOrDragged()
+    }
+
+    private fun mouseMovedOrDragged() {
+        // Updating the curve and processing related to it
+        if (isUpdatable) {
+            updateCurve()
+            processOnUpdate()
+        }
     }
 
     /**
@@ -342,11 +361,11 @@ class JamSketch : SimplePianoRoll(), IConfigAccessible {
 
     private fun drawProgress() {
         if (isNowPlaying) {
-            // currentMeasureInTotalMeasures    The current measure number throughout the song (also referenced in processLastMeasure())
-            // currentMeasure                   The current measure number on a page
+            // currentMeasureInTotalMeasures    Number of the current measure throughout the song (also referenced in processLastMeasure())
+            // currentMeasure                   Number of the current measure on a page
             // dataModel.firstMeasure           Number of starting measures on a page
-            // initial_blank_measures           offset of the number of starting measures
-            // +1                               Added to start from bar 1 instead of bar 0
+            // initial_blank_measures           Offset of the number of starting measures
+            // +1                               Added to prevent from being displayed as "0th measure" instead of the 1st measure
             currentMeasureInTotalMeasures =
                 (currentMeasure + dataModel.firstMeasure - config.music.initial_blank_measures + 1)
             textSize(32f)

@@ -71,6 +71,14 @@ gradlew run --args="jp.kthrlab.jamsketch.view.JamSketch"
   },
 ```
 
+## Documents
+
+[Main Classes in JamSketch](docs/JamSketch.md)
+
+[Sequences of JamSketch](docs/Sequences.md)
+
+[For Java Developers](docs/JavaDeveloper.md)
+
 ## References
 
 See for details of the system:
