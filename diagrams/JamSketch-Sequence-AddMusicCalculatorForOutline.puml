@@ -8,9 +8,9 @@ boundary JamSketch
 control JamSketchEngineX
 control JamSketchController
 entity MusicData
+entity SCCDataSet.Part
 control "MusicCalculator\nfor OUTLINE_LAYER"
 control "MusicCalculator\nfor MELODY_LAYER"
-entity SCCDataSet.Part
 entity MusicRepresentation
 entity "AbstractMusicLayer\nfor OUTLINE_LAYER"
 entity "AbstractMusicLayer\nfor MELODY_LAYER"
