@@ -21,16 +21,27 @@ MusicData is JamSketch input and output data.
     It is both input and output data.
     JamSketch updates the generated performance in real-time while playing the scc.
 
+#### JamSketchEngines and MusicRepresentation
+
+By separating the engine for each feature, JamSketch uses the appropriate MusicCalculators.
+JamSketch uses the engine defined in the configuration file.
+
+The elements of music are represented using [CMX](https://github.com/kitaharalab/cmx), a music information processing library developed by our laboratory.
+
+![JamSketchEngines](../diagrams/JamSketch-Class-MusicRepresentation.png)
+The "X" in "JamsketchEngineX" in the diagram is the name of the feature.
+
+
 #### MusicCalculators
 
 In JamSketch, the MusicCalculators of each layer work together to perform the process.
 
 ![MusicCalculators](../diagrams/JamSketch-Class-MusicCalculator.png)
 
-##### NoteSeqGeneratorX
+##### NoteSeqGenerators
 
-"X" is the name of the feature.
 By separating the music generation for each feature, it can be implemented in a variety of ways.
+The "X" in "NoteSeqGeneratorX" in the diagram is the name of the feature.
 
 ##### SCCGenerator
 

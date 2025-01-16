@@ -3,6 +3,11 @@
 hide empty members
 
 package "jamsketch" {
+    package "engine" {
+'        class JamSketchEngineAbstract
+        class JamSketchEngineX
+'        JamSketchEngineAbstract <|-- JamSketchEngineX
+    }
     package "music" {
         package "generator" {
             class NoteSeqGeneratorX
