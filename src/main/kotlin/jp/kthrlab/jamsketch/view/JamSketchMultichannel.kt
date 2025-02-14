@@ -141,7 +141,10 @@ class JamSketchMultichannel : SimplePianoRollMultiChannel(), IConfigAccessible {
      */
     override fun setup() {
         super.setup()
-        showMidiOutChooser()
+
+        if (config.general.mode != "client") {
+            showMidiOutChooser()
+        }
 
         // smfread should be called after selecting a MIDI output device.
         smfread((observableMusicData.scc as SCCDataSet).midiSequence)

@@ -97,9 +97,9 @@ tasks.compileJava {
 }
 
 tasks.register<JavaExec>("runApp") {
-    mainClass.set("jp.kthrlab.jamsketch.view.JamSketch")
+    mainClass.set("jp.kthrlab.jamsketch.view.JamSketchMultichannel")
     classpath = sourceSets["main"].runtimeClasspath
-    args = listOf("jp.kthrlab.jamsketch.view.JamSketch")
+    args = listOf("jp.kthrlab.jamsketch.view.JamSketchMultichannel")
 }
 
 task("printEnv") {
@@ -159,7 +159,7 @@ tasks.build {
 //Build exe file.
 launch4j {
     mainClassName = application.mainClass.get()
-    cmdLine.set("\"jp.kthrlab.jamsketch.view.JamSketch\"")
+    cmdLine.set("\"jp.kthrlab.jamsketch.view.JamSketchMultichannel\"")
 //     icon = "${projectDir}/resources/images/ic_launcher.ico"
 
     //Specify the jar task included in build.gradle.
