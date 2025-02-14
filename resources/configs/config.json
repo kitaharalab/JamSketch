@@ -18,7 +18,7 @@
     "show_particles" : false
   },
   "music" : {
-    "jamsketch_engine": "JamSketchEngineSimple",
+    "jamsketch_engine": "JamSketchEngineMultichannelSimple",
     "midfilename": "/music/blues02.mid",
     "chordprog": ["C", "F", "C", "C", "F", "F", "C", "C", "G", "F", "C", "G"],
     "num_of_measures": 12,
@@ -30,11 +30,53 @@
     "expression": false,
     "melody_execution_span": 150,
     "how_in_advance": 1,
-    "channel_acc": 1,
+    "channel_gen": 1,
     "channel_guide": 2,
     "input_file_path": "./inputs/data.json",
     "ent_bias": 0.0
   },
+  "channels": [
+    {
+      "number": 4,
+      "program": 67,
+      "color": {
+        "r": 0,
+        "g": 0,
+        "b": 255,
+        "a": 127
+      }
+    },
+    {
+      "number": 5,
+      "program": 57,
+      "color": {
+        "r": 0,
+        "g": 255,
+        "b": 0,
+        "a": 127
+      }
+    },
+    {
+      "number": 6,
+      "program": 13,
+      "color": {
+        "r": 255,
+        "g": 0,
+        "b": 0,
+        "a": 127
+      }
+    },
+    {
+      "number": 7,
+      "program": 74,
+      "color": {
+        "r": 153,
+        "g": 0,
+        "b": 153,
+        "a": 127
+      }
+    }
+  ],
   "simple": {
     "model_file": "/models/model20180321.json"
   },

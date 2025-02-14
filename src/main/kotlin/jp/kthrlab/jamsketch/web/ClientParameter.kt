@@ -24,6 +24,15 @@ class ClientParameter {
         this.nn = nn
     }
 
+    constructor(channel:Int, from: Int, thru: Int, y: Int) {
+        this.channel = channel
+        this.from = from
+        this.thru = thru
+        this.y = y
+        this.nn = nn
+    }
+
+    var channel: Int? = null
     var from: Int = 0
     var thru: Int = 0
     var y: Int = 0

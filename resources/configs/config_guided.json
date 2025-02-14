@@ -28,7 +28,7 @@
     "expression": false,
     "melody_execution_span": 150,
     "how_in_advance": 1,
-    "channel_acc": 1,
+    "channel_gen": 1,
     "channel_guide": 2,
     "input_file_path": "./inputs/data.json",
     "ent_bias": 0.0

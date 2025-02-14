@@ -34,8 +34,16 @@ class JamSketchServerController(host: String?, port: Int, private val innerContr
         innerController.updateCurve(from, thru, y, nn)
     }
 
-    override fun storeCursorPosition(i: Int, y: Int) {
-        innerController.storeCursorPosition(i, y)
+    override fun updateCurve(channel: Int, from: Int, thru: Int, y: Int) {
+        innerController.updateCurve(channel, thru, from, thru)
+    }
+
+    override fun storeCurveCoordinates(i: Int, y: Int) {
+        innerController.storeCurveCoordinates(i, y)
+    }
+
+    override fun storeCurveCoordinates(channel: Int, i: Int, y: Int) {
+        TODO("Not yet implemented")
     }
 
     override fun setMelodicOutline(measure: Int, tick: Int, value: Double) {

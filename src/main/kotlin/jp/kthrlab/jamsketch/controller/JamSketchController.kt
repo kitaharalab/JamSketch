@@ -2,7 +2,7 @@ package jp.kthrlab.jamsketch.controller
 
 import jp.crestmuse.cmx.processing.CMXController
 import jp.kthrlab.jamsketch.engine.JamSketchEngine
-import jp.kthrlab.jamsketch.music.data.MusicData
+import jp.kthrlab.jamsketch.music.data.IMusicData
 
 /**
  * JamSketchの操作クラス
@@ -17,18 +17,11 @@ class JamSketchController
      * @param setPianoRollDataModelFirstMeasure   CurrentBarの描画をresetするためのメソッド
      */
     (
-    private var musicData: MusicData,
+    private var musicData: IMusicData,
     private val engine: JamSketchEngine,
     private val setPianoRollDataModelFirstMeasure: (Int) -> Unit,
     ) : IJamSketchController
 {
-//    override fun addListener(listener: JamMouseListener?) {
-//        listeners.add(listener)
-//    }
-//
-//    override fun mouseReleased(p: Point?) {
-//        for (m in listeners) m.mouseReleased(p)
-//    }
 
     /**
      * 初期化する
@@ -53,7 +46,7 @@ class JamSketchController
         for (i in (from..thru)) {
             if (0 <= i) {
                 // Store CursorPosition
-                storeCursorPosition(i, y)
+                storeCurveCoordinates(i, y)
 
                 // setEvidence (OUTLINE_LAYER)
                 println("var nn: $nn curve1[$i] == ${musicData.curve1[i]}")
@@ -65,11 +58,19 @@ class JamSketchController
         }
     }
 
-    override fun storeCursorPosition(i: Int, y: Int) {
-        musicData.storeCursorPosition(i, y)
+    override fun updateCurve(channel: Int, from: Int, thru: Int, y: Int) {
+        musicData.storeCurveCoordinatesByChannel(channel, from, thru, y)
     }
 
-   override fun setMelodicOutline(measure: Int, tick: Int, value: Double) {
+    override fun storeCurveCoordinates(i: Int, y: Int) {
+        musicData.storeCurveCoordinates(i, y)
+    }
+
+    override fun storeCurveCoordinates(channel: Int, i: Int, y: Int) {
+        musicData.storeCurveCoordinatesByChannel(channel, i, y)
+    }
+
+    override fun setMelodicOutline(measure: Int, tick: Int, value: Double) {
         engine.setMelodicOutline(measure, tick, value)
     }
 
@@ -77,20 +78,16 @@ class JamSketchController
      * リセットする
      */
     override fun reset() {
-
+        // reset curve1 and curves
         this.musicData.resetCurve()
 
         // removing generated note
-        // tickPosition must be 0
-        CMXController.getInstance().setTickPosition(0)
-        val part = (this.musicData.scc.toDataSet()).getFirstPartWithChannel(musicData.channel_acc)
-        part.remove(part.noteList.toList())
+        this.musicData.resetNotes()
 
         // reset PianoRollDataModel
-        setPianoRollDataModelFirstMeasure(musicData.initial_blank_measures)
+        this.setPianoRollDataModelFirstMeasure(musicData.initial_blank_measures)
 
         this.engine.resetMelodicOutline()
         this.engine.setFirstMeasure(this.musicData.initial_blank_measures)
-
     }
 }

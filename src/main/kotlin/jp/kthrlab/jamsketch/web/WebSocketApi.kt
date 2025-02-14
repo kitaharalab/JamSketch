@@ -33,22 +33,26 @@ class WebSocketApi {
     @OnMessage
     @Throws(IOException::class)
     fun receiveMessage(message: String?) {
-        // メッセージをコンソールに出力する
+        // Print a message to the console
         println(message)
 
         try {
-            // 操作クラスのインスタンスを取得する
+            // Get an instance of the controller class
             val serviceLocator = GetInstance()
             val controller = serviceLocator.contoller
 
-            // JSONで送られたメッセージをデコードする
+            // Decode messages sent in JSON
             val mapper = ObjectMapper()
             val info = mapper.readValue(message, ClientParameter::class.java)
 
-            // 操作クラスを使って楽譜データを更新する
-            controller!!.updateCurve(info.from, info.thru, info.y, info.nn)
+            // Update music data using controller classes
+            if (info.channel == null) {
+                controller!!.updateCurve(info.from, info.thru, info.y, info.nn)
+            } else {
+                controller!!.updateCurve(info.channel!!, info.from, info.thru, info.y)
+            }
         } catch (e: Exception) {
-            // 例外をコンソールに出力する
+            // Print an exception to the console
             println(e)
         }
     }

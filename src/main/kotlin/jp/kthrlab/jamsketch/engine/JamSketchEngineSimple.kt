@@ -5,7 +5,7 @@ import jp.crestmuse.cmx.misc.ChordSymbol2
 import jp.crestmuse.cmx.processing.CMXController
 import jp.kthrlab.jamsketch.music.generator.NoteSeqGeneratorSimple
 
-class JamSketchEngineSimple : JamSketchEngineAbstract() {
+open class JamSketchEngineSimple : JamSketchEngineAbstract() {
     override fun initMusicRepresentation() {
         this.mr = CMXController.createMusicRepresentation(config.music.num_of_measures, config.music.division)
         mr.addMusicLayerCont(OUTLINE_LAYER)
@@ -26,7 +26,7 @@ class JamSketchEngineSimple : JamSketchEngineAbstract() {
     }
 
     override fun musicCalculatorForOutline(): MusicCalculator? {
-        var noteSeqGenerator =
+        val noteSeqGenerator =
             NoteSeqGeneratorSimple(
                 noteLayer = MELODY_LAYER,
                 chordLayer = CHORD_LAYER,

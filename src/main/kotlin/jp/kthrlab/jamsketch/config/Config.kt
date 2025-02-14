@@ -3,6 +3,7 @@ package jp.kthrlab.jamsketch.config
 class Config {
     val general = General()
     val music = Music()
+    val channels = mutableListOf<Channel>()
     val simple = Simple()
 //    val ga = GA()
     val tf = TF()
@@ -47,9 +48,23 @@ data class Music(
     var melody_execution_span: Int = 0,
     var how_in_advance: Int = 0,
     var channel_guide: Int = 0,
-    var channel_acc: Int = 0,
+    var channel_gen: Int = 0,
     var input_file_path: String = "",
 )
+
+/**
+ * Channel
+ */
+data class Channel(
+    var number: Int = 0,
+    var program: Int = 0,
+    var color: Color = Color(0, 0, 0, 0),
+)
+
+/**
+ * Color by channel
+ */
+data class Color(var r: Int, var g: Int, var b: Int, var a: Int)
 
 /**
  * JamSketchEngineSimple
