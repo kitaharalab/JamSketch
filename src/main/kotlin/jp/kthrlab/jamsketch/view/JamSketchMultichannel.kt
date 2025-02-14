@@ -18,7 +18,6 @@ import jp.kthrlab.jamsketch.view.element.addParticle
 import jp.kthrlab.jamsketch.view.element.drawBGImage
 import jp.kthrlab.jamsketch.view.element.drawGuideCurve
 import jp.kthrlab.jamsketch.view.element.drawParticles
-import jp.kthrlab.jamsketch.view.util.SimplePianoRollMultiChannel
 import jp.kthrlab.jamsketch.view.util.addButtons
 import jp.kthrlab.jamsketch.view.util.addInstrumentSelector
 import jp.kthrlab.jamsketch.web.ServiceLocator

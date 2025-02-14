@@ -1,4 +1,4 @@
-package jp.kthrlab.jamsketch.view.util
+package jp.kthrlab.jamsketch.view
 
 import jp.crestmuse.cmx.processing.gui.SimplePianoRoll
 import jp.kthrlab.jamsketch.music.data.PianoRollDataModelMultiChannel
