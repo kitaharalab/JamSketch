@@ -1,7 +1,6 @@
 package jp.kthrlab.jamsketch.engine
 
 import jp.crestmuse.cmx.filewrappers.SCC
-import jp.crestmuse.cmx.filewrappers.SCCDataSet
 import jp.crestmuse.cmx.inference.MusicCalculator
 import jp.crestmuse.cmx.inference.MusicRepresentation
 import jp.crestmuse.cmx.misc.ChordSymbol2
@@ -10,96 +9,93 @@ import jp.crestmuse.cmx.processing.CMXController
 import jp.kthrlab.jamsketch.config.AccessibleConfig
 import jp.kthrlab.jamsketch.config.IConfigAccessible
 import jp.kthrlab.jamsketch.music.generator.SCCGenerator
+import kotlin.random.Random
 
-abstract class JamSketchEngineAbstract : JamSketchEngine,  IConfigAccessible {
-
+abstract class JamSketchEngineAbstract : JamSketchEngine, IConfigAccessible {
     override var config = AccessibleConfig.config
-    lateinit var mr: MusicRepresentation
-    var cmx: CMXController? = null
-    var scc: SCC? = null
-    var expgen: Any? = null
+    var cmx = CMXController.getInstance()
+    lateinit var scc: SCC
 
-    companion object {
-        var OUTLINE_LAYER: String = "curve"
-        var MELODY_LAYER: String = "melody"
-        var CHORD_LAYER: String = "chord"
-    }
-
-    abstract fun outlineUpdated(measure: Int, tick: Int)
-    abstract fun automaticUpdate(): Boolean
-    abstract fun initMusicRepresentation()
     abstract fun initLocal()
-    abstract fun musicCalculatorForOutline(): MusicCalculator?
+    abstract fun outlineUpdated(channel: Int, measure: Int, tick: Int)
+    abstract fun initMusicRepresentation()
+    abstract fun musicCalculatorForOutline(channel: Int): MusicCalculator
+    abstract fun musicCalculatorForGen(channel: Int): MusicCalculator
 
-    override fun init(scc: SCC, target_part: SCC.Part) {
-        this.scc = scc
-        cmx = CMXController.getInstance()
-
-        initMusicRepresentation()
-        // if (cfg.EXPRESSION) {
-        //    expgen = new ExpressionGenerator()
-        //    expgen.start(scc.getFirstPartWithChannel(1),
-        //           getFullChordProgression(), cfg.BEATS_PER_MEASURE)
-        // }
-
-        val sccgen = SCCGenerator(
-            target_part as SCCDataSet.Part,
-            scc.division,
-            OUTLINE_LAYER,
-            expgen,
-            config.music.division,
-            config.music.beats_per_measure,
-            )
-        mr.addMusicCalculator(MELODY_LAYER, sccgen)
-        val calc: MusicCalculator? = musicCalculatorForOutline()
-        if (calc != null) {
-            mr.addMusicCalculator(OUTLINE_LAYER, calc)
-        }
-
-        initLocal()
-    }
+    var channelMrSet: MutableSet<Pair<Int, MusicRepresentation>> = mutableSetOf()
+    var channelCalcSet: MutableSet<Pair<Int, MutableMap<String, MusicCalculator>>> = mutableSetOf()
 
     val fullChordProgression: Any
         get() = List(config.music.initial_blank_measures) { NON_CHORD } +
                 List(config.music.repeat_times) { config.music.chordprog.toList()}.flatten()
 
-
-    override fun setMelodicOutline(measure: Int, tick: Int, value: Double) {
-        val e = mr.getMusicElement(OUTLINE_LAYER, measure, tick)
-        if (!automaticUpdate()) {
-            e.suspendUpdate()
-        }
-        e.setEvidence(value)
-        outlineUpdated(measure, tick)
+    object Layer {
+        const val OUTLINE = "outline"
+        const val GEN = "gen"
+        const val CHORD = "chord"
     }
 
-    override fun getMelodicOutline(measure: Int, tick: Int): Double {
-        return ((mr.getMusicElement(OUTLINE_LAYER, measure, tick).mostLikely) as Double)
-    }
+    override fun init(scc: SCC) {
+        this.scc = scc
 
-    override fun resetMelodicOutline() {
-        mr.getMusicElementList(OUTLINE_LAYER).forEach { element ->
-            mr.getMusicElement(OUTLINE_LAYER, element.measure(), element.tick()).setEvidence(Double.NaN)
+        config.channels.forEach { channel ->
+            scc.toDataSet().addPart(Random(channel.channel_number).nextInt(), channel.channel_number)
+                .addProgramChange(0, channel.program_number)
         }
 
-//        mr.getMusicElementList(MELODY_LAYER).forEach { element ->
-//            mr.getMusicElement(MELODY_LAYER, element.measure(), element.tick()).setRest(true)
-//        }
-
-//        (0..cfg!!.num_of_measures-1).forEach { i ->
-//            (0..cfg!!.division-1).forEach { j ->
-//                mr.getMusicElement(OUTLINE_LAYER, i, j).
-//                setEvidence(Double.NaN)
-//            }
-//        }
+        initLocal()
+        initMusicRepresentation()
     }
 
-    override fun setFirstMeasure(num: Int) {
-        SCCGenerator.firstMeasure = num
+    override fun setMelodicOutline(channel: Int, measure: Int, tick: Int, value: Double) {
+        println("setMelodicOutline($channel, $measure, $tick, $value)")
+        val mr = channelMrSet.find { it.first == channel }?.second
+//        println("mr == $mr ${channelMrSet.size}")
+        val e = mr?.getMusicElement(Layer.OUTLINE, measure, tick)
+        e?.let {
+//            it.suspendUpdate()
+            it.setEvidence(value)
+            outlineUpdated(channel, measure, tick)
+        }
+    }
+
+    override fun getMelodicOutline(channel: Int, measure: Int, tick: Int): Double {
+        val channelMr = channelMrSet.find { it.first == channel }?.second
+        return if (channelMr != null) {
+            (channelMr.getMusicElement(Layer.OUTLINE, measure, tick)?.mostLikely) as Double
+        } else {
+            Double.NaN
+        }
+    }
+
+    override fun getChord(channel: Int, measure: Int, tick: Int): ChordSymbol2? {
+        val mr = channelMrSet.find { it.first == channel }?.second
+        return if (mr != null) {
+            (mr.getMusicElement(Layer.CHORD, measure, tick).mostLikely) as ChordSymbol2
+        } else  {
+            return ChordSymbol2.NON_CHORD
+        }
+    }
+
+    override fun resetMelodicOutline(channel: Int) {
+        val myMr = channelMrSet.find { it.first == channel }?.second
+        myMr?.let {
+            it.getMusicElementList(Layer.OUTLINE).forEach { element ->
+                it.getMusicElement(Layer.OUTLINE, element.measure(), element.tick()).setEvidence(Double.NaN)
+            }
+        }
     }
 
     override fun getChord(measure: Int, tick: Int): ChordSymbol2? {
-        return ((mr.getMusicElement(CHORD_LAYER, measure, tick).mostLikely) as ChordSymbol2)
+        // Do nothing for multichannel
+        return ChordSymbol2.NON_CHORD
     }
 
+    override fun setFirstMeasure(number: Int) {
+        SCCGenerator.firstMeasure = number
+    }
+
+    override fun resetMelodicOutline() {
+        // Do nothing
+    }
 }

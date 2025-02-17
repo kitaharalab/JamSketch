@@ -1,0 +1,13 @@
+@startwbs
+'https://plantuml.com/wbs-diagram
+
+* Multi Channel JamSketch
+** JamSketch
+*** Add channel
+**** Add 1 channel programmatically
+***** Add channel
+***** Add radio button
+**** Add channels  programmatically
+*** Draw multiple curves
+** pianoroll
+@endwbs

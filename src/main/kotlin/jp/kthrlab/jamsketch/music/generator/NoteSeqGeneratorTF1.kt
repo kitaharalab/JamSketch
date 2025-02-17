@@ -47,12 +47,12 @@ class NoteSeqGeneratorTF1(
             val currentTime = System.nanoTime()
             if (currentTime - lastUpdateTime >= 1000 * 1000 * melody_execution_span.toLong()) {
 
-                mr!!.getMusicElement("curve", measure, tick).resumeUpdate()
+//                mr!!.getMusicElement("curve", measure, tick).resumeUpdate() <- Did in engine
 
                 lastUpdateMeasure = measure
                 lastUpdateTime = currentTime
 
-                val tf_input = preprocessing(measure, mr)
+                val tf_input = preprocessing(measure, mr!!, layer!!)
                 val tf_output = tfModel.session()
                     .runner()
                     .feed(tf_model_layer, TFloat32.tensorOf(tf_input))
@@ -60,13 +60,13 @@ class NoteSeqGeneratorTF1(
                     .run()
                     .get(0) as TFloat32
                 var normalized_data = normalize(tf_output)
-                setEvidences(measure, tick, normalized_data, mr)
+                setEvidences(measure, tick, normalized_data, mr,)
             }
         }
     }
 
     //preprocessing input data
-    private fun preprocessing(measure: Int, mr: MusicRepresentation): FloatNdArray {
+    private fun preprocessing(measure: Int, mr: MusicRepresentation, layer: String): FloatNdArray {
         val nn_from = tf_note_num_start
         val tf_row = savedModelInputs!!.shape[1] //division.toLong()
         val tf_column = savedModelInputs.shape[2] //tf_model_input_col.toLong()
@@ -75,17 +75,18 @@ class NoteSeqGeneratorTF1(
         val tf_input = NdArrays.ofFloats(shape)
         // TODO: need to init tf_input with 0.0f?
 
-        val mes = mr.getMusicElementList("curve")
-        val me_start = (mes.size / num_of_measures) * measure
+        val mes_outline = mr.getMusicElementList(layer)
+        val me_start = (mes_outline.size / num_of_measures) * measure
         val me_end = me_start + savedModelInputs.shape[1].toInt() //division
-        println("mes.subList($me_start, $me_end) ${mes.size}")
-        val me_per_measure = mes.subList(me_start, me_end)
+        println("mes.subList($me_start, $me_end) ${mes_outline.size}")
+        val me_per_measure = mes_outline.subList(me_start, me_end)
 
         for (i in 0 until tf_row) {
             val note_num_f : Double = me_per_measure[i.toInt()].mostLikely as Double
             print("$note_num_f, ")
             if (!note_num_f.isNaN()) {
                 val note_number = Math.floor(note_num_f) - nn_from
+                println("note_number($note_number) = ${Math.floor(note_num_f)} - $nn_from")
                 tf_input[0][i][note_number.toLong()][0].setFloat(1.0f)
             } else {
                 tf_input[0][i][tf_rest_col.toLong()][0].setFloat(1.0f)
@@ -116,7 +117,7 @@ class NoteSeqGeneratorTF1(
         // Assign the elements from columns 60 to 120 (inclusive) of all rows in tf_output to tmp_output.
         for (i in 0 until tf_row) {
             for (j in size3 until tf_column - 1) {
-                println("i==$i, j==$j, j-size3==${j-size3}")
+//                println("i==$i, j==$j, j-size3==${j-size3}")
                 tmp_output[0][i][j - size3][0].setFloat(tf_output[0][i][j][0].getFloat())
             }
         }
@@ -163,20 +164,25 @@ class NoteSeqGeneratorTF1(
      *       tf_output: A matrix in which 0.5 or greater is replaced by 1 and values less than 0.5 are replaced by 0.
      *
      */
-    private fun setEvidences(measure: Int, lastTick: Int, tf_normalized: TFloat32, mr: MusicRepresentation) {
+    private fun setEvidences(
+        measure: Int,
+        lastTick: Int,
+        tf_normalized: TFloat32,
+        mr: MusicRepresentation,
+    ) {
 
         val tf_row = savedModelOutputs!!.shape[1] //division
         val tf_column = savedModelOutputs.shape[2] //tf_model_output_col
         val tf_normalized2 = NdArrays.ofFloats(Shape.of(1, tf_row.toLong(), ((tf_column - 1) / 2).toLong(), 1))
 
-        for (i in 0 until tf_row.toLong()) {
-            for (j in 60 until tf_column.toLong() - 1) {
-                tf_normalized2[0][i][(j - 60).toLong()][0].setFloat(tf_normalized[0][i][j][0].getFloat())
+        for (i in 0 until tf_row) {
+            for (j in 60 until tf_column - 1) {
+                tf_normalized2[0][i][(j - 60)][0].setFloat(tf_normalized[0][i][j][0].getFloat())
             }
         }
 
         for (i in 0..lastTick) {
-            val e = mr.getMusicElement("melody", measure, i)
+            val e = mr.getMusicElement("gen", measure, i)
 
 //            if (tf_normalized[0][i.toLong()][120][0].getFloat() == 1.0f) {
             if (tf_normalized[0][i.toLong()][tf_normalized[0][i.toLong()].size()-1][0].getFloat() == 1.0f) {
@@ -190,6 +196,7 @@ class NoteSeqGeneratorTF1(
                             e.setTiedFromPrevious(true)
                         } else if (tf_normalized[0][i.toLong()][j][0].getFloat() == 1.0f) {
                             e.setEvidence(j.toInt())
+                            println("e.setEvidence(${j.toInt()}) ${e.measure()}, ${e.tick()}")
                         }
                     }
                 }

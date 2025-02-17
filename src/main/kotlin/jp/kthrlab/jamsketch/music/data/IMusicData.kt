@@ -10,11 +10,13 @@ interface IMusicData {
     val num_of_measures: Int
     val repeat_times: Int
     val division: Int
-    val channel_gen: Int
-    var curve1: MutableList<Int?>
     var scc: SCC
 
-    fun resetCurve()
+    /**
+     * Reset curves and notes
+     */
+    fun resetMusicData()
+
     fun resetCurves()
     fun resetNotes()
     fun storeCurveCoordinates(i: Int, y: Int)

@@ -30,11 +30,56 @@
     "how_in_advance": 1,
     "channel_gen": 1,
     "channel_guide": 2,
-    "input_file_path": "./inputs/data.json",
-    "ent_bias": 0.0
+    "input_file_path": "./inputs/data.json"
   },
+  "channels": [
+    {
+      "channel_number": 5,
+      "program_number": 67,
+      "color": {
+        "r": 0,
+        "g": 0,
+        "b": 255,
+        "a": 127
+      }
+    },
+    {
+      "channel_number": 6,
+      "program_number": 57,
+      "color": {
+        "r": 0,
+        "g": 255,
+        "b": 0,
+        "a": 127
+      }
+    },
+    {
+      "channel_number": 7,
+      "program_number": 13,
+      "color": {
+        "r": 255,
+        "g": 0,
+        "b": 0,
+        "a": 127
+      }
+    },
+    {
+      "channel_number": 8,
+      "program_number": 74,
+      "color": {
+        "r": 153,
+        "g": 0,
+        "b": 153,
+        "a": 127
+      }
+    }
+  ],
   "simple": {
-    "model_file": "/model20180321.json"
+    "model_file": "/model20180321.json",
+    "w1": 0.15,
+    "w2": 0.8,
+    "w3": 1.2,
+    "w4": 2.4
   },
   "ga": {
     "calc_length": 1

@@ -20,7 +20,7 @@ class SCCGenerator(
             val curvevalue = mr.getMusicElement(curveLayer, measure, tick).mostLikely
             println("curve value: $curvevalue")
             if (curvevalue != null) {
-                println("e.getMostLikely: " + e.mostLikely.javaClass.toString() + ", curvevalue: " + curvevalue.javaClass.toString())
+                println("e.getMostLikely: ${e.mostLikely}(${e.mostLikely.javaClass}, curvevalue: $curvevalue(${curvevalue.javaClass}))")
                val notenum  = getNoteNum(e.mostLikely as Int, curvevalue as Double)
                 val duration = e.duration() * sccdiv / (division / beats_per_measure)
                 val onset =

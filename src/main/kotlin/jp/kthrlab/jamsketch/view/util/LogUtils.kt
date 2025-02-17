@@ -20,10 +20,12 @@ fun makeLog(action: String, musicData: MusicData, logDir: String, pApplet: PAppl
         SimplePianoRoll.println("saved as $sccname")
 
         val jsonname: String = logDir + "/" + logname + "_curve.json"
-        pApplet.saveStrings(
-            jsonname,
-            arrayOf(jacksonObjectMapper().writeValueAsString(musicData.curve1))
-        )
+        musicData.channelCurveSet.forEach { channelCurve ->
+            pApplet.saveStrings(
+                jsonname,
+                arrayOf(jacksonObjectMapper().writeValueAsString(channelCurve.second))
+            )
+        }
         SimplePianoRoll.println("saved as $jsonname")
         val pngname: String = logDir + "/" + logname + "_screenshot.png"
         pApplet.save(pngname)

@@ -46,11 +46,11 @@ class WebSocketApi {
             val info = mapper.readValue(message, ClientParameter::class.java)
 
             // Update music data using controller classes
-            if (info.channel == null) {
-                controller!!.updateCurve(info.from, info.thru, info.y, info.nn)
-            } else {
+//            if (info.channel == null) {
+//                controller!!.updateCurve(info.from, info.thru, info.y, info.nn)
+//            } else {
                 controller!!.updateCurve(info.channel!!, info.from, info.thru, info.y)
-            }
+//            }
         } catch (e: Exception) {
             // Print an exception to the console
             println(e)

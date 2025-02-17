@@ -16,12 +16,14 @@ open class ObservableMusicData(
     }
 
     override fun storeCurveCoordinates(from: Int, thru: Int, y: Int) {
-        delegate.storeCurveCoordinates(from, thru, y)
-        onChange?.invoke(channel_gen, from, thru, y)
+        // Do nothing
+//        delegate.storeCurveCoordinates(from, thru, y)
+//        onChange?.invoke(channel_gen, from, thru, y)
     }
 
     override fun storeCurveCoordinates(i: Int, y: Int) {
-        delegate.storeCurveCoordinates(i, y)
-        onChange?.invoke(channel_gen, i, i, y)
+        // Do nothing
+//        delegate.storeCurveCoordinates(i, y)
+//        onChange?.invoke(channel_gen, i, i, y)
     }
 }

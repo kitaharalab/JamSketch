@@ -16,11 +16,12 @@ data class General(
     var view_width: Int = 0,
     var view_height: Int = 0,
     var keyboard_width: Int = 0,
+    var scalable: Boolean = false,
     var log_dir: String = "",
     var mode: String = "",
     var host: String = "",
     var port: Int = 0,
-    var cursor_enhanced: Boolean = true,
+    var cursor_enhanced: Boolean = false,
     var on_drag_only: Boolean = true,
     var forced_progress: Boolean = false,
     var melody_resetting: Boolean = false,
@@ -56,8 +57,9 @@ data class Music(
  * Channel
  */
 data class Channel(
-    var number: Int = 0,
-    var program: Int = 0,
+    var channel_number: Int = 0,
+    var program_number: Int = 0,
+    var program_name: String = "",
     var color: Color = Color(0, 0, 0, 0),
 )
 
@@ -72,6 +74,10 @@ data class Color(var r: Int, var g: Int, var b: Int, var a: Int)
 data class Simple(
     var model_file: String = "",
     var ent_bias: Double = 0.0,
+    var w1: Double = 0.0,
+    var w2: Double = 0.0,
+    var w3: Double = 0.0,
+    var w4: Double = 0.0,
 )
 
 /**

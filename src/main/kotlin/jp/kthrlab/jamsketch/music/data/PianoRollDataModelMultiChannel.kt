@@ -8,12 +8,10 @@ import jp.kthrlab.jamsketch.config.Channel
 class PianoRollDataModelMultiChannel(
     var displaysFromMeasure: Int,
     var displaysToMeasure: Int,
-//    var division: Int,
     private var beatPerMeasure: Int,
     var channels: MutableList<Channel>,
     var scc: SCC,
 ) : PianoRoll.DataModel {
-//    var channelPartSet: MutableSet<Pair<Int, Part>> = mutableSetOf()
 
     fun getPart(channel: Int): Part? {
         return scc.toDataSet().getFirstPartWithChannel(channel)

@@ -1,7 +1,6 @@
 package jp.kthrlab.jamsketch.music.data
 
 import jp.crestmuse.cmx.filewrappers.SCC
-import jp.crestmuse.cmx.misc.PianoRoll
 import jp.crestmuse.cmx.processing.CMXController
 
 /**
@@ -13,7 +12,7 @@ import jp.crestmuse.cmx.processing.CMXController
  * @param beats_per_measure
  * @param num_of_measures
  * @param repeat_times
- * @param division                 config.music.division (scc.division は ticksPerBeat?)
+ * @param division                 config.music.division (scc.division は ticksPerBeat)
  */
 open class MusicData(
     override val filename: String,
@@ -23,9 +22,7 @@ open class MusicData(
     override val num_of_measures: Int,
     override val repeat_times: Int,
     override val division: Int,
-    override val channel_gen: Int,
 ) : IMusicData {
-    override var curve1: MutableList<Int?> = arrayOfNulls<Int>(size).toMutableList()
     override var scc: SCC = CMXController.readSMFAsSCC(javaClass.getResource(filename).path)
 
     // multi-channel
@@ -39,13 +36,20 @@ open class MusicData(
         )
     }
 
-//    fun getPianoRollDataModel(displaysFrom: Int, displaysTo: Int): PianoRoll.DataModel {
-//        return PianoRollDataModelMultiChannel(displaysTo, displaysFrom,  division, beats_per_measure)
-//    }
-
     // IMusicData
     override fun addCurveByChannel(channel: Int, curve: MutableList<Int?>) {
         channelCurveSet += Pair(channel, curve)
+    }
+
+    override fun resetMusicData() {
+        // tickPosition must be 0
+        CMXController.getInstance().setTickPosition(0)
+
+        channelCurveSet.forEach { (channel, curve) ->
+            curve.fill(null)
+            val channelPart = scc.toDataSet().getFirstPartWithChannel(channel)
+            channelPart.remove(channelPart.noteList.toList())
+        }
     }
 
     override fun resetCurves() {
@@ -55,19 +59,14 @@ open class MusicData(
     }
 
     override fun resetNotes() {
-        // remove notes for curve1 and curves
         // tickPosition must be 0
         CMXController.getInstance().setTickPosition(0)
-        // remove notes for curve1
-        val part = scc.toDataSet().getFirstPartWithChannel(channel_gen)
-        part.remove(part.noteList.toList())
 
         // remove notes for curves
         channelCurveSet.forEach { (channel, curve) ->
             val channelPart = scc.toDataSet().getFirstPartWithChannel(channel)
             channelPart.remove(channelPart.noteList.toList())
         }
-
     }
 
     override fun storeCurveCoordinatesByChannel(channel: Int, from: Int, thru: Int, y: Int) {
@@ -82,17 +81,12 @@ open class MusicData(
         }
     }
 
-    override fun resetCurve() {
-        curve1.fill(null)
-        resetCurves()
-    }
-
     override fun storeCurveCoordinates(from: Int, thru: Int, y: Int) {
-        (from..thru).forEach { i: Int -> curve1[i] = y }
+        // Do nothing
     }
 
     override fun storeCurveCoordinates(i: Int, y: Int) {
-        curve1[i] = y
+        // Do nothing
     }
 
 }

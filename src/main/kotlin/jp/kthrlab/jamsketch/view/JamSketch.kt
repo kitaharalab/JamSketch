@@ -2,7 +2,6 @@ package jp.kthrlab.jamsketch.view
 
 import controlP5.ControlP5
 import jp.crestmuse.cmx.filewrappers.SCCDataSet
-import jp.crestmuse.cmx.processing.gui.SimplePianoRoll
 import jp.kthrlab.jamsketch.config.AccessibleConfig
 import jp.kthrlab.jamsketch.config.IConfigAccessible
 import jp.kthrlab.jamsketch.controller.IJamSketchController
@@ -12,28 +11,36 @@ import jp.kthrlab.jamsketch.controller.JamSketchServerController
 import jp.kthrlab.jamsketch.engine.JamSketchEngine
 import jp.kthrlab.jamsketch.music.data.GuideData
 import jp.kthrlab.jamsketch.music.data.MusicData
+import jp.kthrlab.jamsketch.music.data.ObservableMusicData
+import jp.kthrlab.jamsketch.music.data.PianoRollDataModelMultiChannel
+import jp.kthrlab.jamsketch.view.element.addParticle
 import jp.kthrlab.jamsketch.view.element.drawBGImage
 import jp.kthrlab.jamsketch.view.element.drawGuideCurve
-import jp.kthrlab.jamsketch.view.element.addParticle
 import jp.kthrlab.jamsketch.view.element.drawParticles
+import jp.kthrlab.jamsketch.view.util.addButtons
+import jp.kthrlab.jamsketch.view.util.addInstrumentSelector
+import jp.kthrlab.jamsketch.view.util.getScalePercentage
+import jp.kthrlab.jamsketch.view.util.sendAllNotesOff
 import jp.kthrlab.jamsketch.web.ServiceLocator
 import processing.core.PApplet
+import java.awt.Color
 import java.io.File
 import javax.swing.BoxLayout
 import javax.swing.JLabel
 import javax.swing.JPanel
 
-open class JamSketch : SimplePianoRoll(), IConfigAccessible {
-
+class JamSketch : SimplePianoRollMultiChannel(), IConfigAccessible {
     companion object {
         const val PACKAGE_NAME_ENGINE: String = "jp.kthrlab.jamsketch.engine"
     }
-
     override val config = AccessibleConfig.config
-
-    val numOfTotalMeasures: Int = config.music.num_of_measures * config.music.repeat_times
     val timelineWidth: Int = config.general.view_width - config.general.keyboard_width
+    lateinit var controller: IJamSketchController
+    val numOfTotalMeasures: Int = config.music.num_of_measures * config.music.repeat_times
+    var guideData: GuideData? = null
+
     private var currentMeasureInTotalMeasures = 0
+    override var currentInstrumentChannelNumber = config.channels[0].channel_number
 
     var musicData: MusicData =
         MusicData(
@@ -44,31 +51,95 @@ open class JamSketch : SimplePianoRoll(), IConfigAccessible {
             config.music.num_of_measures,
             config.music.repeat_times,
             config.music.division,
-            config.music.channel_gen,
+//            config.music.channel_gen,
         )
+    val numOfMeasuresByDivision = musicData.num_of_measures * musicData.division
+    var observableMusicData = ObservableMusicData(
+        delegate = musicData,
+        onChange = { channel: Int, from: Int, thru: Int, y: Int ->
+            println("onChange $channel $from $thru")
+            val curveSize = (musicData.channelCurveSet.find { it.first == channel })?.second?.size
+            (from .. thru).forEach { x ->
+                val position: Int = x * numOfMeasuresByDivision / curveSize!!
+                if (position >= 0) {
+                    engine.setMelodicOutline(
+                        channel,
+                        (position / musicData.division),
+                        position % musicData.division,
+                        y2notenum(y.toDouble())
+                    )
+                }
+            }
+        }
+    ).let {
+        config.channels.forEach { channel ->
+            it.addCurveByChannel(channel.channel_number, arrayOfNulls<Int>(timelineWidth).toMutableList())
+        }
+        it
+    }
 
-    open var engine: JamSketchEngine = ((Class.forName(PACKAGE_NAME_ENGINE + "." + config.music.jamsketch_engine).getConstructor().newInstance()) as JamSketchEngine).let {
-        val target_part: SCCDataSet.Part  = musicData.scc.toDataSet().getFirstPartWithChannel(config.music.channel_gen)
-        it.init(musicData.scc, target_part)
+    lateinit var p5ctrl: ControlP5
+
+    var engine: JamSketchEngine = ((Class.forName(PACKAGE_NAME_ENGINE + "." + config.music.jamsketch_engine).getConstructor().newInstance()) as JamSketchEngine).let {
+        it.init(observableMusicData.scc)
         it.resetMelodicOutline()
         it.setFirstMeasure(config.music.initial_blank_measures)
         it
     }
 
-    lateinit var controller: IJamSketchController
-
-    var guideData: GuideData? = null
-
-    // Unused
-    var username: String = ""
-
     // A dialogue for JamSketchEventListener
-    var panel: JPanel  = JPanel().let {
+    var panel: JPanel = JPanel().let {
         val layout = BoxLayout(it, BoxLayout.Y_AXIS)
         it.layout = layout
-        it.add(JLabel("The connection is lost."))
+        it.add(JLabel("Connection is lost."))
         it
     }
+
+    /**
+     * The condition for isUpdatable to be true
+     *  !config.on_drag_only                            : on_drag_only == false
+     *  m0 = x2measure(pmouseX.toDouble())              : The number of measures at the start of the drag is greater than or equal to 0
+     *  pmouseX < mouseX                                : Dragging from right to left
+     *  mouseX > beat2x(currentMeasure, currentBeat) + 10   : The drag end position is ahead of the current position of the performance
+     *
+     *  "nowDrawing" is removed because it has the same value as mousePressed.
+     */
+    protected val isUpdatable: Boolean
+        get() {
+// !config.general.on_drag_only is commented out because it was checked before this property was referenced.
+// mousePressed is commented out because it is always true in mouseDragged().
+//            if ((!config.general.on_drag_only || mousePressed) && isInside(mouseX, mouseY)
+            if (isInside(musicMouseX, musicMouseY, scalePercentage)) {
+//                val m1 = x2measure(mouseX.toDouble())
+                val m0 = x2measure(musicPMouseX.toDouble())
+                return 0 <= m0
+                        && musicPMouseX < musicMouseX
+                        && musicMouseX > beat2x(currentMeasure, currentBeat) + 10
+            } else {
+                return false
+            }
+        }
+
+    // scale
+    var scalePercentage: Float = 1.0f
+
+    // Get the position of the scaled cursor.
+    private val musicMouseX: Int
+        get() {
+            return (mouseX / scalePercentage).toInt()
+        }
+    private val musicPMouseX: Int
+    get() {
+        return (pmouseX / scalePercentage).toInt()
+    }
+    private val musicMouseY: Int
+        get() {
+            return (mouseY / scalePercentage).toInt()
+        }
+    private val musicPmouseY: Int
+        get() {
+            return (pmouseY / scalePercentage).toInt()
+        }
 
     /**
      * Role: Used for initial graphical settings such as window size and rendering mode.
@@ -78,7 +149,11 @@ open class JamSketch : SimplePianoRoll(), IConfigAccessible {
      */
     override fun settings() {
         super.settings()
-        size(config.general.view_width, config.general.view_height)
+        if (config.general.scalable) {
+            scalePercentage = getScalePercentage(this, config.general.view_width, config.general.view_height)
+            println("scalePercentage == $scalePercentage")
+        }
+        size((config.general.view_width * scalePercentage).toInt(), (config.general.view_height * scalePercentage).toInt())
     }
 
     /**
@@ -90,14 +165,29 @@ open class JamSketch : SimplePianoRoll(), IConfigAccessible {
      */
     override fun setup() {
         super.setup()
-        showMidiOutChooser()
+
+        // scale
+        musicWidth = config.general.view_width
+        musicHeight = config.general.view_height
+        noCursor()
+
+        textAlign(CENTER, CENTER)
+
+        if (config.general.mode != "client") {
+            showMidiOutChooser()
+        }
 
         // smfread should be called after selecting a MIDI output device.
-        smfread((musicData.scc as SCCDataSet).midiSequence)
+        smfread((observableMusicData.scc as SCCDataSet).midiSequence)
 
-        val part = (musicData.scc as SCCDataSet).getFirstPartWithChannel(config.music.channel_gen)
-        dataModel = part.getPianoRollDataModel(config.music.initial_blank_measures,
-            config.music.initial_blank_measures + config.music.num_of_measures)
+        dataModel = PianoRollDataModelMultiChannel(
+            config.music.initial_blank_measures,
+            config.music.initial_blank_measures + config.music.num_of_measures,
+            config.music.beats_per_measure,
+            config.channels,
+            musicData.scc,
+        )
+
         // init music player ((SMFPlayer)this.musicPlayer[i]).setTickPosition(tick);
         tickPosition = 0
 
@@ -106,7 +196,7 @@ open class JamSketch : SimplePianoRoll(), IConfigAccessible {
             JamSketchEventListenerImpl(panel)
 
         val origController = JamSketchController(
-            musicData,
+            observableMusicData,
             engine,
             this::setPianoRollDataModelFirstMeasure,
         )
@@ -138,16 +228,12 @@ open class JamSketch : SimplePianoRoll(), IConfigAccessible {
         val serviceLocator = ServiceLocator.GetInstance()
         serviceLocator.setContoller(controller)
 
-
         // ControlP5 GUI components
-        val p5ctrl = ControlP5(this)
-        if (config.general.mode == "client") {
-            p5ctrl.addButton("reconnect").setLabel("Reconnect").setPosition(20f, 645f).setSize(120, 40)
-        } else {
-            p5ctrl.addButton("startMusic").setLabel("Start / Stop").setPosition(20f, 645f).setSize(120, 40)
-            p5ctrl.addButton("loadCurve").setLabel("Load").setPosition(300f, 645f).setSize(120, 40)
-        }
-        p5ctrl.addButton("resetMusic").setLabel("Reset").setPosition(160f, 645f).setSize(120, 40)
+        p5ctrl = ControlP5(this)
+        p5ctrl.isAutoDraw = false
+        p5ctrl.font.size = (p5ctrl.font.size * scalePercentage).toInt()
+        addButtons(p5ctrl, config.general.mode, scalePercentage)
+        addInstrumentSelector(p5ctrl, config.channels, this::color, scalePercentage)
 
         // --------------------
         // init GuideData
@@ -172,8 +258,6 @@ open class JamSketch : SimplePianoRoll(), IConfigAccessible {
             } else {
                 null
             }
-
-        // add WindowListener (windowClosing) which calls exit();
     }
 
     /**
@@ -186,6 +270,9 @@ open class JamSketch : SimplePianoRoll(), IConfigAccessible {
      * When you need to process during the update, call your method from processOnUpdate().
      */
     override fun draw() {
+        // scale
+        scale(scalePercentage)
+
         super.draw()
 
         // Manipulating mouseX
@@ -198,6 +285,12 @@ open class JamSketch : SimplePianoRoll(), IConfigAccessible {
 
         // Process for the last measure of each page
         if (isLastMeasure()) processLastMeasure()
+
+        // drawP5
+//        pushMatrix()
+        resetMatrix()
+        p5ctrl.draw()
+//        popMatrix()
     }
 
     override fun mouseDragged() {
@@ -212,6 +305,10 @@ open class JamSketch : SimplePianoRoll(), IConfigAccessible {
         }
     }
 
+//    override fun mousePressed() {
+//        (p5ctrl.getController("startMusic") as Button).isInside()
+//    }
+
     protected open fun mouseMovedOrDragged() {
         // Updating the curve and processing related to it
         if (isUpdatable) {
@@ -221,10 +318,19 @@ open class JamSketch : SimplePianoRoll(), IConfigAccessible {
     }
 
     /**
+     * Processes on update
+     */
+    protected fun processOnUpdate() {
+        // Example of adding a visual element
+        if (config.general.show_particles) addParticle(this)
+    }
+
+    /**
      * Draw visual elements
      */
     private fun drawElements() {
         // Draw basic visual elements
+        drawCursor()
         enhanceCursor()
         drawCurve()
         drawProgress()
@@ -238,77 +344,46 @@ open class JamSketch : SimplePianoRoll(), IConfigAccessible {
 
     }
 
-    /**
-     * Processes on update
-     */
-    protected fun processOnUpdate() {
-        // Example of adding a visual element
-        if (config.general.show_particles) addParticle(this)
-    }
-
-    /**
-     * Returns true if currentMeasure is the last measure
-     */
-    private fun isLastMeasure(): Boolean {
-        return currentMeasure == config.music.num_of_measures - config.music.num_of_reset_ahead
-    }
-
-    /**
-     * Draw curves
-     */
-    protected open fun drawCurve() {
-        strokeWeight(3f)
-        stroke(0f, 0f, 255f)
-        with(musicData) {
-            (0 until curve1.size - 1).forEach { i ->
-                if (curve1[i] != null &&  curve1[i+1] != null) {
-                    line(
-                        (i + config.general.keyboard_width).toFloat(),
-                        curve1[i]!!.toFloat(),
-                        (i + 1 + config.general.keyboard_width).toFloat(),
-                        curve1[i+1]!!.toFloat(),
-                    )
-                }
-            }
-        }
-    }
-
-    open fun updateCurve() {
+    fun updateCurve() {
         // Update music data using the JamSketch controller class
-        if(config.general.keyboard_width < pmouseX && config.general.keyboard_width < mouseX) {
+        if (config.general.keyboard_width * scalePercentage < pmouseX && config.general.keyboard_width * scalePercentage < mouseX) {
             this.controller.updateCurve(
-                pmouseX - config.general.keyboard_width,
-                mouseX - config.general.keyboard_width,
-                mouseY,
-                y2notenum(mouseY.toDouble()),
+                currentInstrumentChannelNumber,
+                (musicPMouseX - config.general.keyboard_width),
+                (musicMouseX - config.general.keyboard_width),
+                musicMouseY,
             )
         }
     }
 
-    /**
-     * The condition for isUpdatable to be true
-     *  !config.on_drag_only                            : on_drag_only == false
-     *  m0 = x2measure(pmouseX.toDouble())              : The number of measures at the start of the drag is greater than or equal to 0
-     *  pmouseX < mouseX                                : Dragging from right to left
-     *  mouseX > beat2x(currentMeasure, currentBeat) + 10   : The drag end position is ahead of the current position of the performance
-     *
-     *  "nowDrawing" is removed because it has the same value as mousePressed.
-     */
-    protected val isUpdatable: Boolean
-        get() {
-// !config.general.on_drag_only is commented out because it was checked before this property was referenced.
-// mousePressed is commented out because it is always true in mouseDragged().
-//            if ((!config.general.on_drag_only || mousePressed) && isInside(mouseX, mouseY)
-            if (isInside(mouseX, mouseY)) {
-//                val m1 = x2measure(mouseX.toDouble())
-                val m0 = x2measure(pmouseX.toDouble())
-                return 0 <= m0
-                        && pmouseX < mouseX
-                        && mouseX > beat2x(currentMeasure, currentBeat) + 10
-            } else {
-                return false
+    fun drawCurve() {
+        strokeWeight(3f)
+        musicData.channelCurveSet.forEach { (channel, curve) ->
+            val configChannel = config.channels.find { it.channel_number == channel }
+            configChannel?.let {
+                with(configChannel.color){
+                    stroke(r.toFloat(), g.toFloat(), b.toFloat(),  a.toFloat())
+                }
+                (0 until curve.size-1).forEach { i ->
+                    if (curve[i] != null &&  curve[i+1] != null) {
+                        line(
+                            (i + config.general.keyboard_width).toFloat(),
+                            curve[i]!!.toFloat(),
+                            (i + 1 + config.general.keyboard_width).toFloat(),
+                            curve[i+1]!!.toFloat(),
+                        )
+                        blendMode(MULTIPLY)
+                    }
+                }
             }
+
         }
+        blendMode(1)
+    }
+
+    protected fun setPianoRollDataModelFirstMeasure(firstMeasure: Int) {
+        dataModel!!.firstMeasure = firstMeasure
+    }
 
     /**
      * The process to be performed in the last measure on the screen
@@ -317,9 +392,9 @@ open class JamSketch : SimplePianoRoll(), IConfigAccessible {
         makeLog("melody")
         if (config.general.melody_resetting) {
             if (currentMeasureInTotalMeasures < (numOfTotalMeasures - config.music.num_of_reset_ahead)) {
-                dataModel.shiftMeasure(config.music.num_of_measures)
+                dataModel!!.shiftMeasure(config.music.num_of_measures)
             }
-            musicData.resetCurve()
+            musicData.resetCurves()
 
             // for Guided
             if (guideData != null) guideData!!.shiftCurveGuideView()
@@ -340,17 +415,22 @@ open class JamSketch : SimplePianoRoll(), IConfigAccessible {
         }
 
         // SCCGenerator.firstMeasure = num
-        engine.setFirstMeasure(dataModel.firstMeasure)
+        engine.setFirstMeasure(dataModel!!.firstMeasure)
     }
 
-    protected fun setPianoRollDataModelFirstMeasure(firstMeasure: Int) {
-        dataModel.firstMeasure = firstMeasure
+
+    private fun drawCursor() {
+        stroke(Color.ORANGE.rgb)
+        strokeWeight(2f)
+        fill(Color.GRAY.rgb)
+
+        ellipse(musicMouseX.toFloat(), musicMouseY.toFloat(), 10f, 10f)
     }
 
     private fun enhanceCursor() {
         if (config.general.cursor_enhanced) {
             fill(255f, 0f, 0f)
-            ellipse(mouseX.toFloat(), mouseY.toFloat(), 10f, 10f)
+            ellipse(musicMouseX.toFloat(), musicMouseY.toFloat(), 10f, 10f)
         }
     }
 
@@ -362,11 +442,18 @@ open class JamSketch : SimplePianoRoll(), IConfigAccessible {
             // initial_blank_measures           Offset of the number of starting measures
             // +1                               Added to prevent from being displayed as "0th measure" instead of the 1st measure
             currentMeasureInTotalMeasures =
-                (currentMeasure + dataModel.firstMeasure - config.music.initial_blank_measures + 1)
+                (currentMeasure + dataModel!!.firstMeasure - config.music.initial_blank_measures + 1)
             textSize(32f)
             fill(0f, 0f, 0f)
-            text(currentMeasureInTotalMeasures.toString() + " / " + numOfTotalMeasures, 460f, 675f)
+            text( "$currentMeasureInTotalMeasures / $numOfTotalMeasures" , 460f, 645f + 32f/2)
         }
+    }
+
+    /**
+     * Returns true if currentMeasure is the last measure
+     */
+    private fun isLastMeasure(): Boolean {
+        return currentMeasure == config.music.num_of_measures - config.music.num_of_reset_ahead
     }
 
     private fun resetGuideData() {
@@ -374,6 +461,10 @@ open class JamSketch : SimplePianoRoll(), IConfigAccessible {
             guideData!!.fromMeasure = 0
             guideData!!.updateCurveGuideView(0, guideData!!.size)
         }
+    }
+
+    private fun makeLog(action: String) {
+        jp.kthrlab.jamsketch.view.util.makeLog(action, musicData, config.general.log_dir, this)
     }
 
     /**
@@ -395,7 +486,6 @@ open class JamSketch : SimplePianoRoll(), IConfigAccessible {
      * Reset
      */
     fun resetMusic() {
-
         // JamSketch操作クラスを使用してリセットする
         controller.reset()
 
@@ -429,11 +519,28 @@ open class JamSketch : SimplePianoRoll(), IConfigAccessible {
     }
 
     /**
-     * ControlP5
+     * ControlP5 callback
      * Reconnect
      */
     fun reconnect() {
         controller.init()
+    }
+
+    /**
+     * ControlP5 callback
+     * Change instrument
+     */
+    fun setInstrument(value: Int) {
+        currentInstrumentChannelNumber = config.channels.find { channel -> channel.program_number == value }!!.channel_number
+    }
+
+    /**
+     * ControlP5 callback
+     * Panic (Send all notes off)
+     */
+    fun panic() {
+        println("!!!!! panic !!!!!")
+        sendAllNotesOff(musicData)
     }
 
     override fun keyReleased() {
@@ -452,18 +559,13 @@ open class JamSketch : SimplePianoRoll(), IConfigAccessible {
         }
     }
 
-
     override fun exit() {
         println("exit() called.")
         super.exit()
     }
 
-    fun makeLog(action: String) {
-        jp.kthrlab.jamsketch.view.util.makeLog(action, musicData, config.general.log_dir, this)
-    }
-
 }
 
 fun main() {
-    PApplet.runSketch(arrayOf("jp.kthrlab.jamsketch.view.JamSketch"), JamSketch())
+    PApplet.runSketch(arrayOf("jp.kthrlab.jamsketch.view.JamSketchMultichannel"), JamSketch())
 }
