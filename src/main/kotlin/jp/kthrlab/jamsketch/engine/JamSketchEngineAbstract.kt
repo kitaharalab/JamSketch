@@ -51,10 +51,11 @@ abstract class JamSketchEngineAbstract : JamSketchEngine, IConfigAccessible {
         println("setMelodicOutline($channel, $measure, $tick, $value)")
         val mr = channelMrSet.find { it.first == channel }?.second
 //        println("mr == $mr ${channelMrSet.size}")
-        val e = mr?.getMusicElement(Layer.OUTLINE, measure, tick)
-        e?.let {
+        val e_outline = mr?.getMusicElement(Layer.OUTLINE, measure, tick)
+        e_outline?.let {
 //            it.suspendUpdate()
             it.setEvidence(value)
+//            println("[DEBUG] e_outline,setEvidence($value), ${e_outline.measure()}, ${e_outline.tick()}")
             outlineUpdated(channel, measure, tick)
         }
     }

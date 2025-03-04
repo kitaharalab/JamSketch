@@ -67,6 +67,7 @@ class NoteSeqGeneratorTF1(
 
     //preprocessing input data
     private fun preprocessing(measure: Int, mr: MusicRepresentation, layer: String): FloatNdArray {
+//        println("[DEBUG] preprocessing($measure, $layer)")
         val nn_from = tf_note_num_start
         val tf_row = savedModelInputs!!.shape[1] //division.toLong()
         val tf_column = savedModelInputs.shape[2] //tf_model_input_col.toLong()
@@ -170,7 +171,7 @@ class NoteSeqGeneratorTF1(
         tf_normalized: TFloat32,
         mr: MusicRepresentation,
     ) {
-
+//        println("[DEBUG] setEvidences($measure, $lastTick)")
         val tf_row = savedModelOutputs!!.shape[1] //division
         val tf_column = savedModelOutputs.shape[2] //tf_model_output_col
         val tf_normalized2 = NdArrays.ofFloats(Shape.of(1, tf_row.toLong(), ((tf_column - 1) / 2).toLong(), 1))
@@ -182,21 +183,22 @@ class NoteSeqGeneratorTF1(
         }
 
         for (i in 0..lastTick) {
-            val e = mr.getMusicElement("gen", measure, i)
+            val e_gen = mr.getMusicElement("gen", measure, i)
+            println("e_gen = mr.getMusicElement(\"gen\", $measure, $i)")
 
 //            if (tf_normalized[0][i.toLong()][120][0].getFloat() == 1.0f) {
             if (tf_normalized[0][i.toLong()][tf_normalized[0][i.toLong()].size()-1][0].getFloat() == 1.0f) {
-                e.setRest(true)
+                e_gen.setRest(true)
             } else {
-                e.setRest(false)
+                e_gen.setRest(false)
 
                 if (i >= 1) {
                     for (j in 0 until (tf_column - 1) / 2) {
                         if ((tf_normalized2[0][(i - 1).toLong()][j][0].getFloat() == 1.0f || tf_normalized[0][(i - 1).toLong()][j.toLong()][0].getFloat() == 1.0f) && tf_normalized2[0][i.toLong()][j.toLong()][0].getFloat() == 1.0f) {
-                            e.setTiedFromPrevious(true)
+                            e_gen.setTiedFromPrevious(true)
                         } else if (tf_normalized[0][i.toLong()][j][0].getFloat() == 1.0f) {
-                            e.setEvidence(j.toInt())
-                            println("e.setEvidence(${j.toInt()}) ${e.measure()}, ${e.tick()}")
+                            e_gen.setEvidence(j.toInt())
+//                            println("[DEBUG] e_gen.setEvidence(${j.toInt()}) ${e_gen.measure()}, ${e_gen.tick()}")
                         }
                     }
                 }

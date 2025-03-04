@@ -9,20 +9,21 @@ import kotlin.math.abs
 class SCCGenerator(
     var target_part: SCCDataSet.Part,
     var sccdiv: Int,
-    var curveLayer: String,
+    var outlineLayer: String,
     var expgen: Any?,
     val division: Int,
     val beats_per_measure: Int,
 ) : MusicCalculator {
     override fun updated(measure: Int, tick: Int, layer: String, mr: MusicRepresentation) {
-        val e = mr.getMusicElement(layer, measure, tick)
-        if (!e.rest() && !e.tiedFromPrevious()) {
-            val curvevalue = mr.getMusicElement(curveLayer, measure, tick).mostLikely
-            println("curve value: $curvevalue")
-            if (curvevalue != null) {
-                println("e.getMostLikely: ${e.mostLikely}(${e.mostLikely.javaClass}, curvevalue: $curvevalue(${curvevalue.javaClass}))")
-               val notenum  = getNoteNum(e.mostLikely as Int, curvevalue as Double)
-                val duration = e.duration() * sccdiv / (division / beats_per_measure)
+        println("SCCGenerator updated($measure, $tick, $layer, $mr)")
+        val e_gen = mr.getMusicElement(layer, measure, tick)
+        if (!e_gen.rest() && !e_gen.tiedFromPrevious()) {
+            val outlineMostLikely = mr.getMusicElement(outlineLayer, measure, tick).mostLikely
+//            println("[DEBUG] outline mostLikely: $outlineMostLikely")
+            if (outlineMostLikely != null) {
+//                println("[DEBUG] e_gen.getMostLikely: ${e_gen.mostLikely}(${e_gen.mostLikely.javaClass}, ${e_gen.measure()}, ${e_gen.tick()})")
+               val notenum  = getNoteNum(e_gen.mostLikely as Int, outlineMostLikely as Double)
+                val duration = e_gen.duration() * sccdiv / (division / beats_per_measure)
                 val onset =
                     ((firstMeasure + measure) * division + tick) * sccdiv / (division / beats_per_measure)
                 synchronized(this) {

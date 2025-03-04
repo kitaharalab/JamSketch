@@ -19,6 +19,9 @@ fun addButtons(p5ctrl: ControlP5, mode: String, scalePercentage: Float = 1.0f) {
             .setLabel("Start / Stop")
             .setPosition(spacing * scalePercentage, y * scalePercentage)
             .setSize((buttonWidth * scalePercentage).toInt(), (buttonHeight * scalePercentage).toInt())
+//            .onClick {
+//                (it.controller as Button).mouseReleased()
+//            }
         p5ctrl.addButton("loadCurve")
             .setLabel("Load")
             .setPosition((spacing*3 + buttonWidth*2) * scalePercentage, y * scalePercentage)

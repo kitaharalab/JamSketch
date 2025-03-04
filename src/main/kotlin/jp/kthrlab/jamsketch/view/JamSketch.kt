@@ -479,6 +479,7 @@ class JamSketch : SimplePianoRollMultiChannel(), IConfigAccessible {
             playMusic()
             makeLog("play")
         }
+//        p5ctrl.getController("startMusic").setValue(0f)
     }
 
     /**
