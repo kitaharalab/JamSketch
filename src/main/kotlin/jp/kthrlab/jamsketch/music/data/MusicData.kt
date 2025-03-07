@@ -27,7 +27,7 @@ open class MusicData(
     override var scc: SCC = CMXController.readSMFAsSCC(javaClass.getResource(filename).path)
 
     // multi-channel
-    var channelCurveSet: Set<Pair<Int, MutableList<Int?>>> = mutableSetOf()
+    var channelCurveSet: Set<Pair<Int, MutableList<Int?>>> = Collections.synchronizedSet(mutableSetOf())
 
     init {
         scc.toDataSet().repeat(

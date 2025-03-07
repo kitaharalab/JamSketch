@@ -358,25 +358,28 @@ class JamSketch : SimplePianoRollMultiChannel(), IConfigAccessible {
 
     fun drawCurve() {
         strokeWeight(3f)
-        musicData.channelCurveSet.forEach { (channel, curve) ->
-            val configChannel = config.channels.find { it.channel_number == channel }
-            configChannel?.let {
-                with(configChannel.color){
-                    stroke(r.toFloat(), g.toFloat(), b.toFloat(),  a.toFloat())
-                }
-                (0 until curve.size-1).forEach { i ->
-                    if (curve[i] != null &&  curve[i+1] != null) {
-                        line(
-                            (i + config.general.keyboard_width).toFloat(),
-                            curve[i]!!.toFloat(),
-                            (i + 1 + config.general.keyboard_width).toFloat(),
-                            curve[i+1]!!.toFloat(),
-                        )
-                        blendMode(MULTIPLY)
+        synchronized(musicData.channelCurveSet) {
+            musicData.channelCurveSet.forEach { (channel, curve) ->
+                synchronized(curve) {
+                    val configChannel = config.channels.find { it.channel_number == channel }
+                    configChannel?.let {
+                        with(configChannel.color){
+                            stroke(r.toFloat(), g.toFloat(), b.toFloat(),  a.toFloat())
+                        }
+                        (0 until curve.size-1).forEach { i ->
+                            if (curve[i] != null &&  curve[i+1] != null) {
+                                line(
+                                    (i + config.general.keyboard_width).toFloat(),
+                                    curve[i]!!.toFloat(),
+                                    (i + 1 + config.general.keyboard_width).toFloat(),
+                                    curve[i+1]!!.toFloat(),
+                                )
+                                blendMode(MULTIPLY)
+                            }
+                        }
                     }
                 }
             }
-
         }
         blendMode(1)
     }

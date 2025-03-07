@@ -27,7 +27,9 @@ abstract class SimplePianoRollMultiChannel: SimplePianoRollScalable() {
                             drawNote(measure - this.displaysFromMeasure, beat, duration, note.notenum(), false, dataModel)
                         }
                     }
+                    blendMode(MULTIPLY)
                 }
+                blendMode(1)
             }
         }
     }
