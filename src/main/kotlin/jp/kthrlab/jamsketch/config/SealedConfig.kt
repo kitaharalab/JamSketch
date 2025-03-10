@@ -12,19 +12,21 @@ sealed class SealedConfig {
     companion object : AbstractConfig() {
         private const val APP_DATA_PARENT_DIR = "kthrlab"
         private const val APP_DATA_DIR = "jamsketch"
-        private val configFileName = APP_DATA_PARENT_DIR
-            .plus(File.separator)
-            .plus(APP_DATA_DIR)
-            .plus(File.separator)
-            .plus("configs/config.json")
-        private val userJsonFile = File(getAppDataDirectory(), configFileName)
-        private val defaultJsonFile = File(javaClass.getResource("/configs/config.json").path)
-        private val jsonFile = userJsonFile.takeIf { it.exists() } ?: defaultJsonFile
         private val mapper = jacksonObjectMapper().let {
             // Ignore unknown properties
             it.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
             it
         }
+        private val configFileName = mapper.readValue(File(javaClass.getResource("/configs/configfile.json").path), Map::class.java)["name"]
+        private val configFileNameAppData = APP_DATA_PARENT_DIR
+            .plus(File.separator)
+            .plus(APP_DATA_DIR)
+            .plus(File.separator)
+            .plus("configs/")
+            .plus(configFileName)
+        private val userJsonFile = File(getAppDataDirectory(), configFileNameAppData)
+        private val defaultJsonFile = File(javaClass.getResource("/configs/".plus(configFileName))!!.path)
+        private val jsonFile = userJsonFile.takeIf { it.exists() } ?: defaultJsonFile
         private val defaultConfig: Config = (mapper.readValue(defaultJsonFile, Config::class.java) as Config)
 
         @JvmStatic

@@ -51,14 +51,14 @@ class NoteSeqGeneratorSimple(
      * CMX calls back to this method.
      */
     override fun updated(measure: Int, tick: Int, layer: String, mr: MusicRepresentation) {
-        val e_curve = mr.getMusicElement(layer, measure, tick)
-        val value = e_curve.mostLikely as Double
+        val e_outline = mr.getMusicElement(layer, measure, tick)
+        val value = e_outline.mostLikely as Double
         if (!value.isNaN()) {
-            val e_melo = mr.getMusicElement(noteLayer, measure, tick)
-            val b = decideRhythm(value, prev(e_curve, 1, Double.NaN) as Double, tick, e_melo, mr)
+            val e_gen = mr.getMusicElement(noteLayer, measure, tick)
+            val b = decideRhythm(value, prev(e_outline, 1, Double.NaN) as Double, tick, e_gen, mr)
             if (!b) {
-                val prev1 = prev(e_melo, 1, -1) as Int
-                val prev2 = prev(e_melo, 2, -1) as Int
+                val prev1 = prev(e_gen, 1, -1) as Int
+                val prev2 = prev(e_gen, 2, -1) as Int
                 val c = mr.getMusicElement(chordLayer, measure, tick).mostLikely as ChordSymbol2
                 val scores: MutableList<Double?> = MutableList(12){null}
                 val prevlist: MutableList<Int> = ArrayList()
@@ -74,14 +74,14 @@ class NoteSeqGeneratorSimple(
                     var simil = -Math.log((value12 - i) * (value12 - i))
                     var logtrigram = calcLogTrigram(i, prev1, prev2)
                     var logchord = calcLogChordBeatUnigram(i, c, tick, beatsPerMeas,
-                        e_melo.duration(), mr)
+                        e_gen.duration(), mr)
                     var entdiff = calcEntropyDiff(i, prevlist)
                     scores[i] = w1 * simil +
                             w2 * logtrigram +
                             w3 * logchord +
                             w4 * (-entdiff)
                 }
-                e_melo.setEvidence(scores.indices.maxByOrNull { scores[it] ?: Double.MIN_VALUE } )
+                e_gen.setEvidence(scores.indices.maxByOrNull { scores[it] ?: Double.MIN_VALUE } )
             }
         }
     }

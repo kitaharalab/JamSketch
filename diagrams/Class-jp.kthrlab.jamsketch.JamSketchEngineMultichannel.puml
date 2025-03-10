@@ -1,0 +1,18 @@
+@startuml
+'https://plantuml.com/class-diagram
+!include Class-jp.crestmuse.cmx.inference.puml
+
+hide empty members
+
+abstract class JamSketchEngineMultichannelAbstract implements JamSketchEngine {
+    Layer.OUTLINE: String = "outline"
+    Layer.GEN: String = "gen"
+    Layer.CHORD: String = "cord"
+}
+
+class JamSketchEngineX implements JamSketchEngineAbstract{}
+JamSketchEngineX --> MusicRepresentation : addMusicLayer(Layer.GEN, Object[])
+JamSketchEngineX --> MusicRepresentation : addMusicLayer(Layer.CHORD, Object[], division)
+JamSketchEngineX --> MusicRepresentation : addMusicLayerCont(Layer.OUTLINE)
+
+@enduml

@@ -3,6 +3,7 @@
     "view_width": 1200,
     "view_height": 700,
     "keyboard_width": 100,
+    "scalable": true,
     "log_dir": "./log/",
     "mode": "",
     "host": "192.168.11.4",
@@ -30,13 +31,151 @@
     "expression": false,
     "melody_execution_span": 150,
     "how_in_advance": 1,
-    "channel_acc": 1,
+    "channel_gen": 1,
     "channel_guide": 2,
-    "input_file_path": "./inputs/data.json",
-    "ent_bias": 0.0
+    "input_file_path": "./inputs/data.json"
   },
+  "channels": [
+    {
+      "channel_number": 4,
+      "program_number": 67,
+      "program_name": "Tenor Sax",
+      "color": {
+        "r": 0,
+        "g": 0,
+        "b": 255,
+        "a": 128
+      }
+    },
+    {
+      "channel_number": 5,
+      "program_number": 57,
+      "program_name": "Trumpet",
+      "color": {
+        "r": 0,
+        "g": 255,
+        "b": 0,
+        "a": 128
+      }
+    },
+    {
+      "channel_number": 6,
+      "program_number": 46,
+      "program_name": "Pizzicato Strings",
+      "color": {
+        "r": 255,
+        "g": 0,
+        "b": 0,
+        "a": 128
+      }
+    },
+    {
+      "channel_number": 7,
+      "program_number": 74,
+      "program_name": "Flute",
+      "color": {
+        "r": 128,
+        "g": 0,
+        "b": 128,
+        "a": 128
+      }
+    },
+    {
+      "channel_number": 8,
+      "program_number": 1,
+      "program_name": "Piano 1",
+      "color": {
+        "r": 47,
+        "g": 79,
+        "b": 79,
+        "a": 128
+      }
+    },
+    {
+      "channel_number": 9,
+      "program_number": 18,
+      "program_name": "Percussive Organ",
+      "color": {
+        "r": 0,
+        "g": 255,
+        "b": 255,
+        "a": 128
+      }
+    },
+    {
+      "channel_number": 11,
+      "program_number": 10,
+      "program_name": "Glockenspiel",
+      "color": {
+        "r": 255,
+        "g": 0,
+        "b": 255,
+        "a": 128
+      }
+    },
+    {
+      "channel_number": 12,
+      "program_number": 27,
+      "program_name": "Electric Guitar (jazz)",
+      "color": {
+        "r": 255,
+        "g": 192,
+        "b": 203,
+        "a": 128
+      }
+    },
+    {
+      "channel_number": 13,
+      "program_number": 13,
+      "program_name": "Marimba",
+      "color": {
+        "r": 0,
+        "g": 0,
+        "b": 128,
+        "a": 128
+      }
+    },
+    {
+      "channel_number": 14,
+      "program_number": 41,
+      "program_name": "Violin",
+      "color": {
+        "r": 50,
+        "g": 205,
+        "b": 50,
+        "a": 128
+      }
+    },
+    {
+      "channel_number": 15,
+      "program_number": 19,
+      "program_name": "Rock Organ",
+      "color": {
+        "r": 255,
+        "g": 165,
+        "b": 0,
+        "a": 128
+      }
+    },
+    {
+      "channel_number": 16,
+      "program_number": 72,
+      "program_name": "Clarinet",
+      "color": {
+        "r": 165,
+        "g": 42,
+        "b": 42,
+        "a": 128
+      }
+    }
+  ],
   "simple": {
-    "model_file": "/models/model20180321.json"
+    "model_file": "/models/model20180321.json",
+    "entropy_bias": 0.0,
+    "w1": 0.15,
+    "w2": 0.8,
+    "w3": 1.2,
+    "w4": 2.4
   },
   "tf": {
     "tf_model_dir": "/tf/onebar_model_div4",

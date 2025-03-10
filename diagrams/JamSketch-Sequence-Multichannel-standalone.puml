@@ -1,0 +1,47 @@
+@startuml
+'https://plantuml.com/sequence-diagram
+
+autonumber
+
+actor User
+boundary JamSketchMultiChannel
+control JamSketchEngineMultiChannel
+control JamSketchController
+entity ObservableMusicData
+entity SCCDataSet.Part
+control "MusicCalculator\nfor OUTLINE_LAYER"
+control "MusicCalculator\nfor MELODY_LAYER"
+entity MusicRepresentation
+entity "AbstractMusicLayer\nfor OUTLINE_LAYER"
+entity "AbstractMusicLayer\nfor MELODY_LAYER"
+entity "MusicElement\nfor OUTLINE_LAYER"
+entity "MusicElement\nfor MELODY_LAYER"
+
+JamSketchMultiChannel -> JamSketchEngineMultiChannel: init()
+JamSketchEngineMultiChannel -> MusicRepresentation: addMusicCalculator(MELODY_LAYER)
+User -> JamSketchMultiChannel: Draw a curve
+JamSketchMultiChannel -> JamSketchController: updateCurve(channel)
+JamSketchController -> ObservableMusicData: storeCursorPosition(channel)
+ObservableMusicData -> ObservableMusicData: onChange(channel)
+ObservableMusicData -> JamSketchEngineMultiChannel: setMelodicOutline(channel)
+JamSketchEngineMultiChannel -> "MusicElement\nfor OUTLINE_LAYER": setEvidence(channel)
+"MusicElement\nfor OUTLINE_LAYER" -> "AbstractMusicLayer\nfor OUTLINE_LAYER": update(channel)
+note over "AbstractMusicLayer\nfor OUTLINE_LAYER"
+    Do nothing
+end note
+JamSketchEngineMultiChannel -> JamSketchEngineMultiChannel: outlineUpdated(channel)
+JamSketchEngineMultiChannel -> "MusicCalculator\nfor OUTLINE_LAYER": updated(channel)
+'MusicElement -> MusicElement: parent()
+"MusicCalculator\nfor OUTLINE_LAYER" -> "MusicElement\nfor MELODY_LAYER": setEvidence(channel)
+"MusicElement\nfor MELODY_LAYER" -> "AbstractMusicLayer\nfor MELODY_LAYER": update(channel)
+note over "AbstractMusicLayer\nfor MELODY_LAYER"
+    Do nothing
+end note
+'"AbstractMusicLayer\nfor MELODY_LAYER" -> "MusicCalculator\nfor MELODY_LAYER": updated(channel)
+"MusicCalculator\nfor MELODY_LAYER" -> SCCDataSet.Part: remove(channel)
+"MusicCalculator\nfor MELODY_LAYER" -> SCCDataSet.Part: addNoteElement(channel)
+'AbstractMusicLayer -> "MusicCalculator\nfor MELODY_LAYER": updated()
+
+'JamSketchEngineSimple -> JamSketchEngineSimple: outlineUpdated(measure, tick)
+
+@enduml

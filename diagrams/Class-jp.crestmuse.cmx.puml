@@ -1,0 +1,126 @@
+@startuml
+'https://plantuml.com/class-diagram
+hide empty members
+
+'class processing.core.PApplet {
+'    draw()
+'}
+
+package "jp" {
+    package "crestmuse" {
+        package "cmx" {
+            package "misc" {
+                interface PianoRoll
+                interface DataModel
+                PianoRoll +-- DataModel
+            }
+            package "processing" {
+                class CMXController
+                class CMXApplet {
+                    CMXController ctrl
+                }
+                PApplet <|-- CMXApplet
+                CMXApplet o-- CMXController
+
+                package "gui" {
+                    class SimplePianoRoll {
+'                        PianoRoll.DataModel data
+                    }
+                    CMXApplet <|-- SimplePianoRoll
+                    PianoRoll <|.. SimplePianoRoll
+                }
+            }
+            package "filewrappers" {
+                interface SCC {
+                    Part[]
+                }
+                interface Part {
+                    byte channel()
+                }
+                SCC +-- Part
+                class SCCDataSet implements SCC {
+                    List<Part> parts
+                }
+                class PartImpl implements Part {
+                    byte channel
+                }
+                SCCDataSet +-- PartImpl
+                note right of PartImpl
+                    The actual class name is SCCDataSet.Part
+                end note
+                class PianoRollDataModel {
+                    drawData(PianoRoll pianoroll)
+                }
+                DataModel <|.. PianoRollDataModel
+                PartImpl +-- PianoRollDataModel
+            }
+        }
+    }
+'    package "kthrlab" {
+'        package "pianoroll" #orange {
+'            interface MultichannelPianoRoll {
+'                CMXController cmx // need cmx?
+'            }
+'            PianoRoll <|.. MultichannelPianoRoll
+'
+'            class MultichannelPianoRollPApplet {
+'            }
+'            MultichannelPianoRoll <|.. MultichannelPianoRollPApplet
+'            PApplet <|-- MultichannelPianoRollPApplet
+'        }
+'        package "jamsketch" {
+'            package "view" {
+'                class JamSketch {
+'                }
+'                SimplePianoRoll <|-- JamSketch
+'
+'                class MultichannelJamSketch #orange {
+'                }
+'                MultichannelPianoRollPApplet <|-- MultichannelJamSketch
+'                note bottom of MultichannelJamSketch
+'                    Temporary implementation
+'                end note
+'            }
+'            package "music" {
+'                package "data" {
+'                    class MusicData {
+'                        curve1: MutableList<Int?>
+'                        // XY coordinates of the curve
+'
+'                        scc: SCC
+'                        // Data converted from input MIDI file to SCCXML format
+'
+'                        <color:red>channelCurveSet: Set<Pair<Int, MutableList<Int?>>></color>
+'                        // for multi-channel
+'
+'                        filename: Input file name
+'                        size: Int
+'                        initial_blank_measures: Int
+'                        beats_per_measure: Int
+'                        num_of_measures: Int
+'                        repeat_times: Int
+'                        division: Int
+'                        channel_gen: Int
+'                    }
+'                    class ObservableMusicData #orange {
+'                        onChange: ()
+'                    }
+'                    MusicData <|-- ObservableMusicData
+''                    class MultichannelMusicData #orange {
+''                        channelCurveSet: Set<Pair<Int, MutableList<Int?>>>
+'''                        curves: MutableList<Pair MutableList<Int?>>
+''                    }
+''                    MusicData <|-- MultichannelMusicData
+'                }
+'            }
+'        }
+'    }
+'}
+
+'MusicData *-- SCC
+'MultichannelMusicData *-- SCC
+
+'PianoRoll +-- DataModel
+'MultiPartPianoRoll o-- CMXController
+
+@enduml

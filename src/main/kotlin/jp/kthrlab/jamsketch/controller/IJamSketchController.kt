@@ -10,36 +10,37 @@ interface IJamSketchController {
     fun init()
 
     /**
-     * Curveを更新する
+     * Update Curve by channel
      *
-     * @param from 始点
-     * @param thru 終点
-     * @param y    Y座標
-     * @param nn   note number（Y座標をnote numberに変換した値）
+     * @param channel   MIDI channel
+     * @param from
+     * @param thru
+     * @param y         Y-coordinate
      */
-    fun updateCurve(from: Int, thru: Int, y: Int, nn:Double)
+    fun updateCurve(channel: Int, from: Int, thru: Int, y: Int)
+
 
     /**
-     * Curveを更新する
+     * Store curve coordinates
      *
-     * @param i    インデックス（X座標）
-     * @param y    Y座標
+     * @param i    index（X-coordinate）
+     * @param y    Y-coordinate
      */
-    fun storeCursorPosition(i: Int, y: Int)
+    fun storeCurveCoordinates(i: Int, y: Int)
 
-    // TODO: develop
-    fun setMelodicOutline(measure: Int, tick: Int, value: Double)
+    /**
+     * Store curve coordinates by channel
+     *
+     * @param channel   MIDI channel
+     * @param i         index（X-coordinate）
+     * @param y         Y-coordinate
+     */
+    fun storeCurveCoordinatesByChannel(channel : Int, i: Int, y: Int)
 
 
-        /**
-     * リセットする
+    /**
+     * Reset JamSketch
      */
     fun reset()
 
-    /**
-     * 仮実装
-     */
-//    fun addListener(listener: JamMouseListener?)
-//
-//    fun mouseReleased(p: Point?)
 }

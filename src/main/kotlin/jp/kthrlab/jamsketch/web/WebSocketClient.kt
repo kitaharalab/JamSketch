@@ -60,7 +60,7 @@ class WebSocketClient {
      */
     @OnError
     fun onError(th: Throwable?) {
-        listener!!.disconnected()
+        listener?.error(th?.message ?: "Error")
     }
 
     /**
@@ -70,7 +70,7 @@ class WebSocketClient {
      */
     @OnClose
     fun onClose(session: Session?) {
-        listener!!.disconnected()
+        listener?.disconnected("Connection closed.")
     }
 
     /**
@@ -79,7 +79,12 @@ class WebSocketClient {
      * @param object 送信オブジェクト
      */
     fun Send(`object`: Any?) {
-        session!!.basicRemote.sendText(ObjectMapper().writeValueAsString(`object`))
+        session?.let { it ->
+            if (it.isOpen) {
+                it.basicRemote.sendText(ObjectMapper().writeValueAsString(`object`))
+            }
+        }
+//        session!!.basicRemote.sendText(ObjectMapper().writeValueAsString(`object`))
     }
 
     /**
@@ -89,13 +94,18 @@ class WebSocketClient {
      * @param port 接続先ポート
      */
     fun Init(host: String, port: Int, listener: JamSketchEventListener?) {
+        this.listener = listener
+
         // 初期化のため WebSocket コンテナのオブジェクトを取得する
         val container = ContainerProvider.getWebSocketContainer()
         // サーバー・エンドポイントの URI
         val uri = URI.create("ws://$host:$port/websockets/WebSocketApi")
-        this.session = container.connectToServer(this, uri)
+        try {
+            this.session = container.connectToServer(this, uri)
+        } catch (e: Exception) {
+            listener!!.error(e.message.toString())
+        }
 
-        this.listener = listener
     }
 
     private var session: Session? = null

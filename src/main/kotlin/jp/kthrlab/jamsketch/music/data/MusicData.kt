@@ -2,6 +2,7 @@ package jp.kthrlab.jamsketch.music.data
 
 import jp.crestmuse.cmx.filewrappers.SCC
 import jp.crestmuse.cmx.processing.CMXController
+import java.util.Collections
 
 /**
  * 音楽生成の入出力データ
@@ -12,20 +13,21 @@ import jp.crestmuse.cmx.processing.CMXController
  * @param beats_per_measure
  * @param num_of_measures
  * @param repeat_times
- * @param division                  TODO: scc.division との違いを確認
+ * @param division                 config.music.division (scc.division は ticksPerBeat)
  */
-class MusicData(
-    val filename: String?,
-    val size: Int,
-    val initial_blank_measures: Int,
-    val beats_per_measure: Int,
-    val num_of_measures: Int,
-    val repeat_times: Int,
-    val division: Int,
-    val channel_acc: Int = 0,
-) {
-    var curve1: MutableList<Int?> = arrayOfNulls<Int>(size).toMutableList()
-    var scc: SCC = CMXController.readSMFAsSCC(javaClass.getResource(filename).path)
+open class MusicData(
+    override val filename: String,
+    override val size: Int,
+    override val initial_blank_measures: Int,
+    override val beats_per_measure: Int,
+    override val num_of_measures: Int,
+    override val repeat_times: Int,
+    override val division: Int,
+) : IMusicData {
+    override var scc: SCC = CMXController.readSMFAsSCC(javaClass.getResource(filename).path)
+
+    // multi-channel
+    var channelCurveSet: Set<Pair<Int, MutableList<Int?>>> = Collections.synchronizedSet(mutableSetOf())
 
     init {
         scc.toDataSet().repeat(
@@ -35,16 +37,57 @@ class MusicData(
         )
     }
 
-    fun resetCurve() {
-        curve1 = arrayOfNulls<Int>(size).toMutableList()
+    // IMusicData
+    override fun addCurveByChannel(channel: Int, curve: MutableList<Int?>) {
+        channelCurveSet += Pair(channel, Collections.synchronizedList(curve))
     }
 
-    fun storeCursorPosition(from: Int, thru: Int, y: Int) {
-        (from..thru).forEach { i: Int -> curve1[i] = y }
+    override fun resetMusicData() {
+        // tickPosition must be 0
+        CMXController.getInstance().setTickPosition(0)
+
+        channelCurveSet.forEach { (channel, curve) ->
+            curve.fill(null)
+            val channelPart = scc.toDataSet().getFirstPartWithChannel(channel)
+            channelPart.remove(channelPart.noteList.toList())
+        }
     }
 
-    fun storeCursorPosition(i: Int, y: Int) {
-        curve1[i] = y
+    override fun resetCurves() {
+        channelCurveSet.forEach { (channel, curve) ->
+            curve.fill(null)
+        }
+    }
+
+    override fun resetNotes() {
+        // tickPosition must be 0
+        CMXController.getInstance().setTickPosition(0)
+
+        // remove notes for curves
+        channelCurveSet.forEach { (channel, curve) ->
+            val channelPart = scc.toDataSet().getFirstPartWithChannel(channel)
+            channelPart.remove(channelPart.noteList.toList())
+        }
+    }
+
+    override fun storeCurveCoordinatesByChannel(channel: Int, from: Int, thru: Int, y: Int) {
+        channelCurveSet.find { it.first == channel }?.let { (_, curve) ->
+            (from..thru).forEach { i: Int -> curve[i] = y }
+        }
+    }
+
+    override fun storeCurveCoordinatesByChannel(channel: Int, i: Int, y: Int) {
+        channelCurveSet.find { it.first == channel }?.let { (_, curve) ->
+            curve[i] = y
+        }
+    }
+
+    override fun storeCurveCoordinates(from: Int, thru: Int, y: Int) {
+        // Do nothing
+    }
+
+    override fun storeCurveCoordinates(i: Int, y: Int) {
+        // Do nothing
     }
 
 }

@@ -16,7 +16,7 @@ class MusicData {
     num_of_measures: Int
     repeat_times: Int
     division: Int
-    channel_acc: Int
+    channel_gen: Int
 }
 
 package "cmx.misc" {

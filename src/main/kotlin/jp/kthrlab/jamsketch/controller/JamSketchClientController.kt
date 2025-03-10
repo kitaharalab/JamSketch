@@ -28,22 +28,21 @@ class JamSketchClientController(
      * @param from 始点
      * @param thru 終点
      * @param y    Y座標
-     * @param nn   note number（Y座標をnote numberに変換した値）
      */
-    override fun updateCurve(from: Int, thru: Int, y: Int, nn: Double) {
+    override fun updateCurve(channel: Int, from: Int, thru: Int, y: Int) {
         // 内部で持つ操作クラスで更新操作をする
-        innerController.updateCurve(from, thru, y, nn)
+        innerController.updateCurve(channel, from, thru, y)
 
         // WebSocketで更新情報をサーバーに送る
-        webSocketClient.Send(ClientParameter(from, thru, y, nn))
+        webSocketClient.Send(ClientParameter(channel, from, thru, y))
     }
 
-    override fun storeCursorPosition(i: Int, y: Int) {
-        innerController.storeCursorPosition(i, y)
+    override fun storeCurveCoordinates(i: Int, y: Int) {
+        innerController.storeCurveCoordinates(i, y)
     }
 
-    override fun setMelodicOutline(measure: Int, tick: Int, value: Double) {
-        innerController.setMelodicOutline(measure, tick, value)
+    override fun storeCurveCoordinatesByChannel(channel: Int, i: Int, y: Int) {
+        innerController.storeCurveCoordinatesByChannel(channel, i, y)
     }
 
     /**
@@ -54,14 +53,6 @@ class JamSketchClientController(
         // クライアントはリセット時にデータは送らないため、他の処理はしない
         innerController.reset()
     }
-
-//    override fun addListener(listener: JamMouseListener?) {
-//        innerController.addListener(listener)
-//    }
-//
-//    override fun mouseReleased(p: Point?) {
-//        innerController.mouseReleased(p)
-//    }
 
     private val webSocketClient = WebSocketClient()
 

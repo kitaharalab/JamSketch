@@ -32,15 +32,15 @@ MusicRepresentationImpl "1" +-- "0..*" AbstractMusicLayer
 MusicRepresentationImpl +-- AbstractMusicElementImpl
 AbstractMusicLayer "1" -- "0..*" MusicElement
 
-abstract class JamSketchEngineAbstract implements JamSketchEngine {
-    OUTLINE_LAYER: String = "curve"
-    MELODY_LAYER: String = "melody"
-    CHORD_LAYER: String = "chord"
-}
-
-class JamSketchEngineX implements JamSketchEngineAbstract{}
-JamSketchEngineX --> MusicRepresentation : addMusicLayer(MELODY_LAYER, Object[])
-JamSketchEngineX --> MusicRepresentation : addMusicLayer(CHORD_LAYER, Object[], division)
-JamSketchEngineX --> MusicRepresentation : addMusicLayerCont(OUTLINE_LAYER)
+'abstract class JamSketchEngineAbstract implements JamSketchEngine {
+'    OUTLINE_LAYER: String = "curve"
+'    MELODY_LAYER: String = "melody"
+'    CHORD_LAYER: String = "chord"
+'}
+'
+'class JamSketchEngineX implements JamSketchEngineAbstract{}
+'JamSketchEngineX --> MusicRepresentation : addMusicLayer(MELODY_LAYER, Object[])
+'JamSketchEngineX --> MusicRepresentation : addMusicLayer(CHORD_LAYER, Object[], division)
+'JamSketchEngineX --> MusicRepresentation : addMusicLayerCont(OUTLINE_LAYER)
 
 @enduml
