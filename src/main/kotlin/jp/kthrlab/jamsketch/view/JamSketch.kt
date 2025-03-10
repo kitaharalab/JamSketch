@@ -150,7 +150,7 @@ class JamSketch : SimplePianoRollMultiChannel(), IConfigAccessible {
     override fun settings() {
         super.settings()
         if (config.general.scalable) {
-            scalePercentage = getScalePercentage(this, config.general.view_width, config.general.view_height)
+            scalePercentage = getScalePercentage(config.general.view_width, config.general.view_height)
             println("scalePercentage == $scalePercentage")
         }
         size((config.general.view_width * scalePercentage).toInt(), (config.general.view_height * scalePercentage).toInt())
